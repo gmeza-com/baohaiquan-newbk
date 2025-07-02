@@ -63,7 +63,7 @@ class UserController extends AdminController
 
     return Datatables::eloquent(User::query())
       ->editColumn('avatar', function ($model) {
-        return sprintf('<div class="%s"><img src="%s" width="80" class="img-circle"></div>', 'text-center', $model->avatar);
+        return sprintf('<div class="%s"><img src="%s" width="40" class="img-circle"></div>', 'text-center', $model->avatar);
       })
       ->addColumn('action', function ($model) {
         $button = [];

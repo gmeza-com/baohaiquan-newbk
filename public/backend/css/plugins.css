@@ -8411,12 +8411,16 @@ img.mfp-img {
   padding: 8px 0 5px;
   width: auto;
   border: 1px solid #eaedf1;
-  border-top-width: 0;
+  border-left: 0;
+  border-right: 0;
 }
 
-.dataTables_wrapper > div:first-child {
-  border-top-width: 1px;
-  border-bottom-width: 0;
+.dataTables_wrapper .row:first-child {
+  border-top: 0;
+}
+
+.dataTables_wrapper .row:last-child {
+  border-bottom: 0;
 }
 
 .dataTables_wrapper .row {
@@ -8476,6 +8480,7 @@ table.dataTable {
   margin-top: 0 !important;
   margin-bottom: 0 !important;
   max-width: none !important;
+  width: 100% !important;
 }
 
 table.table thead .sorting,

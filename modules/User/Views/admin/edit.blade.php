@@ -1,7 +1,6 @@
 @extends('admin')
 
 @section('page_header')
-
     <div class="pull-right">
         <a href="{{ route('admin.user.index') }}" class="btn btn-default">
             <i class="fa fa-arrow-circle-left"></i> {{ trans('language.back') }}
@@ -23,8 +22,8 @@
         'class' => 'form-validate',
         'id' => 'user_edit',
         'enctype' => 'multipart/form-data',
-        'data-callback' => 'nothing_to_do'
+        'data-callback' => 'nothing_to_do',
     ]) !!}
-        @include('user::admin.form')
+    @include('user::admin.form')
     {!! Form::close() !!}
 @stop

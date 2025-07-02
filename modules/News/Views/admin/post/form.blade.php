@@ -1,18 +1,18 @@
 <div class="row">
-    @if($post->published === -1)
+    @if ($post->published === -1)
         <div class="col-md-12">
             <p class="alert alert-danger">
-                <strong>Bài viết này đã bị hủy, lý do: </strong> {{ $post->cancel_message ?: 'Không rõ'}}
+                <strong>Bài viết này đã bị hủy, lý do: </strong> {{ $post->cancel_message ?: 'Không rõ' }}
             </p>
         </div>
     @endif
     <div class="col-lg-8">
         @component('components.block')
             @slot('title', trans('language.basic_info'))
+            <div class="block-body">
                 <div class="form-bordered">
-
                     <ul class="nav nav-tabs" data-toggle="tabs">
-                        @foreach(config('cnv.languages') as $language)
+                        @foreach (config('cnv.languages') as $language)
                             <li {{ $loop->first ? 'class=active' : '' }}>
                                 <a href="#{{ $language['locale'] }}">
                                     {{ $language['name'] }}
@@ -22,74 +22,110 @@
                     </ul>
 
                     <div class="tab-content">
-                        @foreach(config('cnv.languages') as $language)
+                        @foreach (config('cnv.languages') as $language)
                             <div class="tab-pane {{ $loop->first ? 'active' : '' }}" id="{{ $language['locale'] }}">
                                 <div class="form-group">
                                     {!! Form::label('name', trans('language.name_post'), ['class' => 'label-control']) !!}
-                                    {!! Form::text('language['. $language['locale'] .'][name]', @$post->language('name', $language['locale']), ['class' => 'form-control', 'required']) !!}
+                                    {!! Form::text('language[' . $language['locale'] . '][name]', @$post->language('name', $language['locale']), [
+                                        'class' => 'form-control',
+                                        'required',
+                                    ]) !!}
                                 </div>
 
                                 <div class="form-group">
                                     {!! Form::label('name', trans('language.name2_post'), ['class' => 'label-control']) !!}
-                                    {!! Form::text('language['. $language['locale'] .'][second_name]', @$post->language('second_name', $language['locale']), ['class' => 'form-control']) !!}
+                                    {!! Form::text(
+                                        'language[' . $language['locale'] . '][second_name]',
+                                        @$post->language('second_name', $language['locale']),
+                                        ['class' => 'form-control'],
+                                    ) !!}
                                 </div>
 
                                 <div class="form-group">
                                     {!! Form::label('name', 'Tiêu đề thứ 3', ['class' => 'label-control']) !!}
-                                    {!! Form::text('language['. $language['locale'] .'][third_name]', @$post->language('third_name', $language['locale']), ['class' => 'form-control']) !!}
+                                    {!! Form::text(
+                                        'language[' . $language['locale'] . '][third_name]',
+                                        @$post->language('third_name', $language['locale']),
+                                        ['class' => 'form-control'],
+                                    ) !!}
                                 </div>
 
                                 <div class="form-group">
                                     {!! Form::label('name', trans('language.tags_post'), ['class' => 'label-control']) !!}
-                                    {!! Form::text('language['. $language['locale'] .'][tags]', @$post->language('tags', $language['locale']), ['class' => 'form-control input-tags']) !!}
+                                    {!! Form::text('language[' . $language['locale'] . '][tags]', @$post->language('tags', $language['locale']), [
+                                        'class' => 'form-control input-tags',
+                                    ]) !!}
                                 </div>
 
                                 <div class="form-group">
                                     {!! Form::label('description', trans('language.description_post'), ['class' => 'label-control']) !!}
-                                    {!! Form::textarea('language['. $language['locale'] .'][description]', @$post->language('description', $language['locale']), ['class' => 'form-control', 'rows' => 3]) !!}
+                                    {!! Form::textarea(
+                                        'language[' . $language['locale'] . '][description]',
+                                        @$post->language('description', $language['locale']),
+                                        ['class' => 'form-control', 'rows' => 3],
+                                    ) !!}
                                 </div>
 
                                 <div class="form-group">
                                     {!! Form::label('description', trans('language.quote_post'), ['class' => 'label-control']) !!}
-                                    {!! Form::textarea('language['. $language['locale'] .'][quote]', @$post->language('quote', $language['locale']), ['class' => 'form-control simple_editor']) !!}
+                                    {!! Form::textarea(
+                                        'language[' . $language['locale'] . '][quote]',
+                                        @$post->language('quote', $language['locale']),
+                                        ['class' => 'form-control simple_editor'],
+                                    ) !!}
                                 </div>
 
                                 <div class="form-group">
                                     {!! Form::label('description', trans('language.content'), ['class' => 'label-control']) !!}
-                                    {!! Form::textarea('language['. $language['locale'] .'][content]', @$post->language('content', $language['locale']), ['class' => 'form-control editor', 'required']) !!}
+                                    {!! Form::textarea(
+                                        'language[' . $language['locale'] . '][content]',
+                                        @$post->language('content', $language['locale']),
+                                        ['class' => 'form-control editor', 'required'],
+                                    ) !!}
                                 </div>
 
                                 <div class="form-group">
                                     {!! Form::label('description', trans('language.note_post'), ['class' => 'label-control']) !!}
-                                    {!! Form::textarea('language['. $language['locale'] .'][note]', @$post->language('note', $language['locale']), ['class' => 'form-control simple_editor']) !!}
+                                    {!! Form::textarea(
+                                        'language[' . $language['locale'] . '][note]',
+                                        @$post->language('note', $language['locale']),
+                                        ['class' => 'form-control simple_editor'],
+                                    ) !!}
                                 </div>
                             </div>
                         @endforeach
                     </div>
 
                 </div>
+            </div>
         @endcomponent
-        @include('seo_plugin::form', ['base'=>'tin-tuc', 'model'=>$post])
+        @include('seo_plugin::form', ['base' => 'tin-tuc', 'model' => $post])
         @include('custom_field::custom_fields', ['module' => 'blog', 'model' => $post])
+
     </div>
     <div class="col-lg-4">
         @component('components.block')
             @slot('title', trans('language.setting_field'))
+            <div class="block-body">
                 <div class="form-horizontal form-bordered">
                     <div class="form-group">
                         {!! Form::label('user_id', 'Giới thiệu', ['class' => 'control-label col-md-4']) !!}
                         <div class="col-md-8">
-                            {!! Form::select('prefix', ['' => 'Không có', 'HQ Online' => 'HQ Online', 'HQVN' => 'HQVN'], $post->prefix, ['class' => 'form-control']) !!}
+                            {!! Form::select('prefix', ['' => 'Không có', 'HQ Online' => 'HQ Online', 'HQVN' => 'HQVN'], $post->prefix, [
+                                'class' => 'form-control',
+                            ]) !!}
                         </div>
                     </div>
 
-                    @if(allow('news.post.approved_level_3') || allow('news.post.approved_level_2'))
-                    <div class="form-group">
-                        {!! Form::label('user_id', trans('news::language.author'), ['class' => 'control-label col-md-4']) !!}
-                        <div class="col-md-8">
-                            {!! Form::select('user_id', get_list_authors_for_choose(), $post->id ? $post->user_id : auth()->user()->id, ['class' => 'form-control']) !!}
+                    @if (allow('news.post.approved_level_3') || allow('news.post.approved_level_2'))
+                        <div class="form-group">
+                            {!! Form::label('user_id', trans('news::language.author'), ['class' => 'control-label col-md-4']) !!}
+                            <div class="col-md-8">
+                                {!! Form::select('user_id', get_list_authors_for_choose(), $post->id ? $post->user_id : auth()->user()->id, [
+                                    'class' => 'form-control',
+                                ]) !!}
+                            </div>
                         </div>
-                    </div>
                     @else
                         {!! Form::hidden('user_id', $post->id ? $post->user_id : auth()->user()->id) !!}
                     @endif
@@ -98,7 +134,8 @@
                         {!! Form::label('featured', trans('news::language.featured'), ['class' => 'control-label col-md-4']) !!}
                         <div class="col-md-8">
                             <label class="switch switch-warning">
-                                <input type="checkbox" name="featured" value="1" {{ @$post->featured ? 'checked' : '' }}>
+                                <input type="checkbox" name="featured" value="1"
+                                    {{ @$post->featured ? 'checked' : '' }}>
                                 <span></span>
                             </label>
                         </div>
@@ -121,11 +158,19 @@
                             <span>Ngày hiển thị tin tiêu điểm</span>
                         </div>
                         <div class="col-md-7">
-                            {!! Form::text('date_featured_started_at', @$post->getOriginal('featured_started_at') ? @$post->featured_started_at->format('d-m-Y') : '', ['class' => 'form-control input-datepicker']) !!}
+                            {!! Form::text(
+                                'date_featured_started_at',
+                                @$post->getOriginal('featured_started_at') ? @$post->featured_started_at->format('d-m-Y') : '',
+                                ['class' => 'form-control input-datepicker'],
+                            ) !!}
                         </div>
                         <div class="col-md-5">
                             <div class="input-group bootstrap-timepicker timepicker">
-                                {!! Form::text('time_featured_started_at', @$post->getOriginal('featured_started_at') ? @$post->featured_started_at->format('H:i') : '', ['class' => 'form-control input-timepicker24']) !!}
+                                {!! Form::text(
+                                    'time_featured_started_at',
+                                    @$post->getOriginal('featured_started_at') ? @$post->featured_started_at->format('H:i') : '',
+                                    ['class' => 'form-control input-timepicker24'],
+                                ) !!}
                                 <span class="input-group-addon"><i class="fa fa-clock-o"></i></span>
                             </div>
                         </div>
@@ -136,17 +181,25 @@
                             <span>Ngày ẩn tin tiêu điểm</span>
                         </div>
                         <div class="col-md-7">
-                            {!! Form::text('date_featured_ended_at', @$post->getOriginal('featured_ended_at') ? @$post->featured_ended_at->format('d-m-Y') : '', ['class' => 'form-control input-datepicker']) !!}
+                            {!! Form::text(
+                                'date_featured_ended_at',
+                                @$post->getOriginal('featured_ended_at') ? @$post->featured_ended_at->format('d-m-Y') : '',
+                                ['class' => 'form-control input-datepicker'],
+                            ) !!}
                         </div>
                         <div class="col-md-5">
                             <div class="input-group bootstrap-timepicker timepicker">
-                                {!! Form::text('time_featured_ended_at', @$post->getOriginal('featured_ended_at') ? @$post->featured_ended_at->format('H:i') : '', ['class' => 'form-control input-timepicker24']) !!}
+                                {!! Form::text(
+                                    'time_featured_ended_at',
+                                    @$post->getOriginal('featured_ended_at') ? @$post->featured_ended_at->format('H:i') : '',
+                                    ['class' => 'form-control input-timepicker24'],
+                                ) !!}
                                 <span class="input-group-addon"><i class="fa fa-clock-o"></i></span>
                             </div>
                         </div>
                     </div>
 
-                   {{--  <div class="form-group">
+                    {{-- <div class="form-group">
                         {!! Form::label('hide', 'Ẩn bản tin', ['class' => 'control-label col-md-4']) !!}
                         <div class="col-md-8">
                             <label class="switch switch-warning">
@@ -154,14 +207,15 @@
                                 <span></span>
                             </label>
                         </div>
-                    </div> --}}
+                </div> --}}
 
-                    @if($post->could_be_approved_post)
+                    @if ($post->could_be_approved_post)
                         <div class="form-group">
                             {!! Form::label('published', trans('news::language.publish'), ['class' => 'control-label col-md-4']) !!}
                             <div class="col-md-8">
                                 <label class="switch switch-primary">
-                                    <input type="checkbox" name="published" value="1" {{ @$post->approved ? 'checked' : '' }}>
+                                    <input type="checkbox" name="published" value="1"
+                                        {{ @$post->approved ? 'checked' : '' }}>
                                     <span></span>
                                 </label>
                             </div>
@@ -171,74 +225,105 @@
                     <div class="form-group">
                         {!! Form::label('published', trans('language.status'), ['class' => 'control-label col-md-4']) !!}
                         <div class="col-md-8">
-                            @if($post->id)
+                            @if ($post->id)
                                 @php
-                                    switch($post->published):
+                                    switch ($post->published):
                                         case -1:
-                                                printf('<p class="form-control-static %s">%s</p>', 'text-danger', 'Đã bị hủy');
+                                            printf(
+                                                '<p class="form-control-static %s">%s</p>',
+                                                'text-danger',
+                                                'Đã bị hủy',
+                                            );
                                             break;
                                         case 1:
-                                                printf('<p class="form-control-static %s">%s</p>', 'text-warning', trans('news::language.waiting_level_2'));
+                                            printf(
+                                                '<p class="form-control-static %s">%s</p>',
+                                                'text-warning',
+                                                trans('news::language.waiting_level_2'),
+                                            );
                                             break;
                                         case 2:
-                                                printf('<p class="form-control-static %s">%s</p>', 'text-warning', trans('news::language.waiting_level_3'));
+                                            printf(
+                                                '<p class="form-control-static %s">%s</p>',
+                                                'text-warning',
+                                                trans('news::language.waiting_level_3'),
+                                            );
                                             break;
                                         case 3:
-                                                printf('<p class="form-control-static %s">%s</p>', 'text-success', trans('news::language.approved_by_level_3'));
+                                            printf(
+                                                '<p class="form-control-static %s">%s</p>',
+                                                'text-success',
+                                                trans('news::language.approved_by_level_3'),
+                                            );
                                             break;
                                         default:
-                                                printf('<p class="form-control-static %s">%s</p>', 'text-warning', trans('news::language.waiting_level_1'));
+                                            printf(
+                                                '<p class="form-control-static %s">%s</p>',
+                                                'text-warning',
+                                                trans('news::language.waiting_level_1'),
+                                            );
                                             break;
-                                    endswitch
+                                    endswitch;
                                 @endphp
-                             @else
+                            @else
                                 <p class="form-control-static text-warning">-</p>
-                             @endif
+                            @endif
                         </div>
                     </div>
-                    @if(allow('news.post.approved_level_1') && $post->published >= 3)
-                    <div class="form-group" id="show_publish_datetime">
-                        <div class="col-md-7">
-                            {!! Form::text('date_published', @$post->getOriginal('published_at') ? @$post->published_at->format('d-m-Y') : '', ['class' => 'form-control input-datepicker']) !!}
-                        </div>
-                        <div class="col-md-5">
-                            <div class="input-group bootstrap-timepicker timepicker">
-                                {!! Form::text('time_published', @$post->getOriginal('published_at') ? @$post->published_at->format('H:i') : '', ['class' => 'form-control input-timepicker24']) !!}
-                                <span class="input-group-addon"><i class="fa fa-clock-o"></i></span>
+                    @if (allow('news.post.approved_level_1') && $post->published >= 3)
+                        <div class="form-group" id="show_publish_datetime">
+                            <div class="col-md-7">
+                                {!! Form::text(
+                                    'date_published',
+                                    @$post->getOriginal('published_at') ? @$post->published_at->format('d-m-Y') : '',
+                                    ['class' => 'form-control input-datepicker'],
+                                ) !!}
+                            </div>
+                            <div class="col-md-5">
+                                <div class="input-group bootstrap-timepicker timepicker">
+                                    {!! Form::text(
+                                        'time_published',
+                                        @$post->getOriginal('published_at') ? @$post->published_at->format('H:i') : '',
+                                        ['class' => 'form-control input-timepicker24'],
+                                    ) !!}
+                                    <span class="input-group-addon"><i class="fa fa-clock-o"></i></span>
+                                </div>
+                            </div>
+                            <div class="col-md-12 help-block">
+                                <p>Để trống các ô trên để ẩn bài viết</p>
                             </div>
                         </div>
-                        <div class="col-md-12 help-block">
-                            <p>Để trống các ô trên để ẩn bài viết</p>
-                        </div>
-                    </div>
                     @endif
                 </div>
+            </div>
         @endcomponent
 
         @component('components.block')
             @slot('title', trans('news::language.choose_category'))
-            @slot('action',
-                link_to_route('admin.post.category.index', trans('news::language.category_create'), null,
-                ['class' => 'btn btn-xs btn-primary', 'target' => '_blank', 'required'])
-            )
-            <div class="form_group">
-                {!! Form::select('category[]', (
-                    new \Modules\News\Models\PostCategory())->getParentForSelection(null, false, false),
-                    @$post->categories->map->id->toArray(),
-                    ['class' => 'form-control', 'multiple' => true]
-                ) !!}
-            </div>
-
-        @endcomponent
-        @component('components.block')
-            @slot('title', trans('language.thumbnail'))
-            <div class="form_group">
-                <div class="choose-thumbnail">
-                    {!! Form::hidden('thumbnail', $post->thumbnail, ['id' => 'thumbnail']) !!}
+            @slot('action', link_to_route('admin.post.category.index', trans('news::language.category_create'), null,
+                ['class' => 'btn btn-xs btn-primary', 'target' => '_blank', 'required']))
+                <div class="block-body">
+                    <div class="form_group">
+                        {!! Form::select(
+                            'category[]',
+                            (new \Modules\News\Models\PostCategory())->getParentForSelection(null, false, false),
+                            @$post->categories->map->id->toArray(),
+                            ['class' => 'form-control', 'multiple' => true],
+                        ) !!}
+                    </div>
                 </div>
-            </div>
-        @endcomponent
+            @endcomponent
+            @component('components.block')
+                @slot('title', trans('language.thumbnail'))
+                <div class="block-body">
+                    <div class="form_group">
+                        <div class="choose-thumbnail">
+                            {!! Form::hidden('thumbnail', $post->thumbnail, ['id' => 'thumbnail']) !!}
+                        </div>
+                    </div>
+                </div>
+            @endcomponent
+        </div>
     </div>
-</div>
 
-@include('partial.editor')
+    @include('partial.editor')

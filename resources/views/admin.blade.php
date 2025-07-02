@@ -1,7 +1,7 @@
 @extends('layout')
 
 @section('layout')
-<div id="page-wrapper page-loading">
+<div id="page-wrapper" class="page-loading">
 
   <!-- Preloader -->
   <div class="preloader themed-background">
@@ -19,10 +19,10 @@
     <!-- Main Container -->
     <div id="main-container">
 
-      @include('partial.navbar')
-
       <!-- Page content -->
       <div id="page-content">
+        @include('partial.breadcrumb')
+
         <!-- Blank Header -->
         <div class="content-header">
           <div class="header-section">
@@ -30,7 +30,7 @@
           </div>
         </div>
 
-        @include('partial.breadcrumb')
+
 
 
         <!-- END Blank Header -->

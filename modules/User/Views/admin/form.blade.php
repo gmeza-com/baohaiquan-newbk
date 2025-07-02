@@ -1,5 +1,5 @@
 <div class="row">
-    <div class="col-lg-12">
+    <div class="col-lg-7 col-md-12">
         @component('components.block')
             @slot('title', trans('user::language.user_create'))
             <div class="form-horizontal form-bordered">
@@ -12,10 +12,12 @@
                         @foreach ($roles as $role)
                             <p>
                                 <label class="switch switch-primary">
-                                    <input type="checkbox" name="role[]" id="role_{{ $role->id }}" value="{{ $role->id }}" {{ $user->roles->contains($role) ? 'checked' : '' }}>
+                                    <input type="checkbox" name="role[]" id="role_{{ $role->id }}"
+                                        value="{{ $role->id }}" {{ $user->roles->contains($role) ? 'checked' : '' }}>
                                     <span></span>
                                 </label>
-                                 <label class="switch-label" for="permision_{{ $role->id }}">{{ $role->language('name') }}</label>
+                                <label class="switch-label"
+                                    for="permision_{{ $role->id }}">{{ $role->language('name') }}</label>
                             </p>
                         @endforeach
                         <div class="clearfix"></div>
@@ -36,8 +38,8 @@
         @endcomponent
     </div>
 
-    <div class="col-lg-12">
-        @foreach($user_settings_fields as $field)
+    <div class="col-lg-5 col-md-12">
+        @foreach ($user_settings_fields as $field)
             @include($field)
         @endforeach
     </div>

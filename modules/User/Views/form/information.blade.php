@@ -4,7 +4,11 @@
         <div class="form-group">
             {!! Form::label('setting[birthday]', trans('user::language.birthday'), ['class' => 'col-md-3 control-label']) !!}
             <div class="col-md-6">
-                {!! Form::text('setting[birthday]', $user->getSetting('birthday'), ['class' => 'form-control input-datepicker', 'data-date-format' => 'dd/mm/yyyy', 'placeholder' => 'dd/mm/yyyy']) !!}
+                {!! Form::text('setting[birthday]', $user->getSetting('birthday'), [
+                    'class' => 'form-control input-datepicker',
+                    'data-date-format' => 'dd/mm/yyyy',
+                    'placeholder' => 'dd/mm/yyyy',
+                ]) !!}
             </div>
         </div>
 
@@ -39,14 +43,14 @@
         <div class="form-group">
             {!! Form::label('setting[favorite]', trans('user::language.favorite'), ['class' => 'col-md-3 control-label']) !!}
             <div class="col-md-6">
-                {!! Form::textarea('setting[favorite]', $user->getSetting('favorite'), ['class' => 'form-control']) !!}
+                {!! Form::textarea('setting[favorite]', $user->getSetting('favorite'), ['class' => 'form-control', 'rows' => 4]) !!}
             </div>
         </div>
 
         <div class="form-group">
             {!! Form::label('setting[about]', trans('user::language.about'), ['class' => 'col-md-3 control-label']) !!}
             <div class="col-md-6">
-                {!! Form::textarea('setting[about]', $user->getSetting('about'), ['class' => 'form-control']) !!}
+                {!! Form::textarea('setting[about]', $user->getSetting('about'), ['class' => 'form-control', 'rows' => 4]) !!}
             </div>
         </div>
     </div>

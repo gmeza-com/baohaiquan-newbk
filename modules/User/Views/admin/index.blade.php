@@ -2,26 +2,26 @@
 
 @section('page_header')
 
-    @can('user.user.create')
-    <div class="pull-right">
-        <a href="{{ admin_route('user.create') }}" class="btn btn-primary">
-            <i class="fa fa-plus"></i> {{ trans('language.create') }}
-        </a>
-    </div>
-    @endcan
+@can('user.user.create')
+<div class="pull-right">
+  <a href="{{ admin_route('user.create') }}" class="btn btn-primary">
+    <i class="fa fa-plus"></i> {{ trans('language.create') }}
+  </a>
+</div>
+@endcan
 
-    <h1>
-        {{ $title }}
-    </h1>
+<h1>
+  {{ $title }}
+</h1>
 @stop
 
 @section('content')
 
-    @component('components.block')
+@component('components.block')
 
-        @slot('title', trans('user::language.user_list'))
+@slot('title', trans('user::language.user_list'))
 
-        @include('partial.datatable')
-    @endcomponent
+@include('partial.datatable')
+@endcomponent
 
 @stop

@@ -11,9 +11,7 @@
         </button>
     </div>
 
-    <h1>
-        {{ $title }}
-    </h1>
+    <h1>{{ $title }}</h1>
 @stop
 
 @section('content')
@@ -22,7 +20,7 @@
         'method' => 'POST',
         'class' => 'form-validate',
         'id' => 'save',
-        'data-callback' => 'redirect_to'
+        'data-callback' => 'redirect_to',
     ]) !!}
     @include('news::admin.post.form')
     {!! Form::close() !!}
