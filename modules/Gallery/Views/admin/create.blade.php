@@ -22,7 +22,7 @@
         'method' => 'POST',
         'class' => 'form-validate',
         'id' => 'save',
-        'data-callback' => 'redirect_to'
+        'data-callback' => 'redirect_to',
     ]) !!}
     @include('gallery::admin.form')
     {!! Form::close() !!}
