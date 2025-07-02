@@ -1372,7 +1372,8 @@ a.widget.widget-hover-effect4:active {
 
 #login-container,
 #login-alt-container {
-  margin: 160px auto;
+  padding: 160px 32px;
+  margin: 0 auto;
 }
 
 #login-container .login-title {
