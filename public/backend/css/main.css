@@ -1366,32 +1366,17 @@ a.widget.widget-hover-effect4:active {
   position: relative;
 }
 
-#login-background > img {
-  position: absolute;
-  width: 2560px;
-  height: 400px;
-  left: 50%;
-  margin-left: -1280px;
-}
-
 #login-alt-container {
   display: none;
 }
 
 #login-container,
 #login-alt-container {
-  position: absolute;
-  width: 300px;
-  top: 10px;
-  left: 50%;
-  margin-left: -150px;
-  z-index: 1000;
+  margin: 160px auto;
 }
 
 #login-container .login-title {
   padding: 20px 10px;
-  background: #444444;
-  background: rgba(0, 0, 0, 0.6);
 }
 
 #login-container .login-title h1,
@@ -1406,14 +1391,14 @@ a.widget.widget-hover-effect4:active {
   color: #dddddd;
 }
 
-#login-container > .block {
-  border: none;
-}
-
 #login-container .register-terms {
   line-height: 30px;
   margin-right: 10px;
   float: left;
+}
+
+#login-container .form-group {
+  border-width: 0;
 }
 
 /* Full Background Image */
@@ -2160,7 +2145,7 @@ textarea.form-control {
 }
 
 .form-control {
-  font-size: 13px;
+  font-size: 1rem;
   padding: 6px 8px;
   max-width: 100%;
   margin: 1px 0;
@@ -2925,8 +2910,10 @@ li.dropdown-header {
 
 /* Buttons */
 .btn {
-  margin: 1px 0;
   background-color: #ffffff;
+  font-size: 1rem;
+  border-radius: 0.375rem;
+  font-weight: 500;
 }
 
 .btn .gi,
@@ -3800,8 +3787,6 @@ p,
   #login-container,
   #login-alt-container {
     width: 480px;
-    top: 186px;
-    margin-left: -240px;
   }
 
   .full-page-container {

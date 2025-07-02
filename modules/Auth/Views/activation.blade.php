@@ -2,8 +2,6 @@
 
 @section('layout')
 
-    <img src="{{ asset('backend/img/placeholders/backgrounds/login_full_bg.jpg') }}" alt="" class="full-bg animation-pulseSlow">
-
     <!-- Login Container -->
     <div id="login-container" class="animation-fadeIn">
         <!-- Login Title -->
