@@ -1,0 +1,27 @@
+.choose-thumbnail {
+    border: 2px dashed #efefef;
+    color: #efefef;
+    cursor: pointer;
+    text-align: center;
+    height: 300px;
+    position: relative;
+    overflow: hidden;
+}
+
+.choose-thumbnail:before {
+    font: normal normal normal 34px/1 'FontAwesome';
+    content: '\f1c5';
+    position: absolute;
+    top: 45%;
+    z-index: 0;
+}
+
+.choose-thumbnail img {
+    display: block;
+    height: auto !important;
+    transform: translate(-50%,-50%);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    max-width:100%;
+}

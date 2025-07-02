@@ -1,0 +1,14 @@
+/vendor
+vendor
+/storage
+/public/storage
+/public/system/storage
+/node_modules
+.env
+.env.backup
+.phpunit.result.cache
+docker-compose.override.yml
+Homestead.json
+Homestead.yaml
+npm-debug.log
+yarn-error.log
