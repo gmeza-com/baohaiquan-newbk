@@ -18,7 +18,6 @@
 @section('content')
 
     @component('components.block')
-
         @slot('title', trans('form::language.form_list'))
 
         @include('partial.datatable')

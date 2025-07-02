@@ -104,6 +104,9 @@ class UserController extends AdminController
           $model->activated ? trans('language.activated') : trans('language.inactivated')
         );
       })
+      ->editColumn("updated_at", function ($model) {
+        return $model->updated_at->format('d/m/Y H:i');
+      })
       ->rawColumns(['action', 'activated', 'avatar'])
       ->make(true);
   }

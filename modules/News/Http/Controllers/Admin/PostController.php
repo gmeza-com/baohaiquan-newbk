@@ -10,7 +10,7 @@ use Modules\News\Models\PostHistory;
 use Yajra\DataTables\Facades\DataTables;
 use App\Http\Controllers\AdminController;
 use DB;
-use Auth;
+use Illuminate\Support\Facades\Auth;
 
 class PostController extends AdminController
 {
@@ -34,11 +34,13 @@ class PostController extends AdminController
     $url = admin_route('post.index');
     $url = $url . '?filter=' . $filter;
     $this->tpl->datatable()->setSource($url);
+
     $this->tpl->datatable()->addColumn(
       '#',
       'id',
       ['class' => 'col-md-1']
     );
+
     $this->tpl->datatable()->addColumn(
       trans('language.name'),
       'name',
@@ -61,6 +63,7 @@ class PostController extends AdminController
       false,
       true
     );
+
     $this->tpl->datatable()->addColumn(
       trans('language.status'),
       'post.published',
@@ -79,7 +82,7 @@ class PostController extends AdminController
 
     $this->tpl->datatable()->addColumn(
       trans('language.updated_at'),
-      'post.updated_at'
+      'post.updated_at',
     );
 
     return $this->tpl->render();
@@ -96,7 +99,7 @@ class PostController extends AdminController
       });
     }
 
-    $user_id = \Auth::user()->id;
+    $user_id = Auth::user()->id;
 
     if (allow('news.post.only_show_my_post')) {
       $model = $model->whereHas('post', function ($query) use ($user_id) {
@@ -214,6 +217,10 @@ class PostController extends AdminController
         );
       })
 
+      ->editColumn('post.updated_at', function ($model) {
+        return Carbon::parse($model->post->updated_at)->format('d/m/Y H:i');
+      })
+
       ->editColumn('post.status', function ($model) {
         return sprintf(
           '<span class="label label-%s">%s</span>',
@@ -223,7 +230,7 @@ class PostController extends AdminController
       })
 
 
-      ->rawColumns(['name', 'action', 'published', 'featured', 'status', 'revision_history'])
+      ->rawColumns(['name', 'action', 'post.published', 'post.featured', 'post.status', 'revision_history'])
       ->make(true);
   }
 

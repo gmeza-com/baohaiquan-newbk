@@ -124,6 +124,9 @@ class CategoryController extends AdminController
           $model->published ? trans('language.published') : trans('language.trashed')
         );
       })
+      ->editColumn('updated_at', function ($model) {
+        return Carbon::parse($model->updated_at)->format('d/m/Y H:i');
+      })
       ->rawColumns(['name', 'action', 'published'])
       ->make(true);
   }

@@ -141,7 +141,10 @@ class GalleryController extends AdminController
           $model->gallery->published ? trans('language.published') : trans('language.trashed')
         );
       })
-      ->rawColumns(['name', 'action', 'published', 'thumbnail'])
+      ->editColumn('gallery.updated_at', function ($model) {
+        return Carbon::parse($model->gallery->updated_at)->format('d/m/Y H:i');
+      })
+      ->rawColumns(['name', 'action', 'gallery.published', 'thumbnail'])
       ->make(true);
   }
 

@@ -95,6 +95,9 @@ class FormController extends AdminController
 
         return cnv_action_block($button);
       })
+      ->editColumn('created_at', function ($model) {
+        return $model->created_at->format('d/m/Y H:i');
+      })
       ->rawColumns(['action', 'slug'])
       ->make(true);
   }

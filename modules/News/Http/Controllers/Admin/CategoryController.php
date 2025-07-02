@@ -10,6 +10,8 @@ use Modules\News\Models\PostCategoryLanguage;
 use Modules\Page\Http\Requests\PageRequest;
 use Yajra\DataTables\Facades\DataTables;
 use DB;
+use Illuminate\Support\Facades\Cache;
+
 
 class CategoryController extends AdminController
 {
@@ -128,6 +130,9 @@ class CategoryController extends AdminController
           $model->published ? trans('language.published') : trans('language.trashed')
         );
       })
+      ->editColumn('updated_at', function ($model) {
+        return Carbon::parse($model->updated_at)->format('d/m/Y H:i');
+      })
       ->rawColumns(['name', 'action', 'published'])
       ->make(true);
   }
@@ -166,7 +171,7 @@ class CategoryController extends AdminController
     if ($category = PostCategory::create($data)) {
       $category->saveLanguages($request->only('language'));
 
-      \Cache::flush();
+      Cache::flush();
       return response()->json([
         'status' => 200,
         'message' => trans('language.update_success'),
@@ -218,7 +223,7 @@ class CategoryController extends AdminController
     $postCategory->update($data);
     $postCategory->saveLanguages($request->only('language'));
 
-    \Cache::flush();
+    Cache::flush();
     return response()->json([
       'status' => 200,
       'message' => trans('language.update_success'),
@@ -263,7 +268,7 @@ class CategoryController extends AdminController
 
     if ($postCategory->delete()) {
 
-      \Cache::flush();
+      Cache::flush();
       return response()->json([
         'status' => 200,
         'message' => trans('language.delete_success')

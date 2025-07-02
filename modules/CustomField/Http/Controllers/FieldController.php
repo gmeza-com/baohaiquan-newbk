@@ -132,7 +132,7 @@ class FieldController extends AdminController
           $model->field->hidden ? trans('custom_field::language.hidden') : trans('custom_field::language.show')
         );
       })
-      ->rawColumns(['name', 'action', 'hidden'])
+      ->rawColumns(['name', 'action', 'field.hidden'])
       ->make(true);
   }
 

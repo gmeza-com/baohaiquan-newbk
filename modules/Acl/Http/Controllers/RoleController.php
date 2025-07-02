@@ -89,6 +89,9 @@ class RoleController extends AdminController
 
         return cnv_action_block($button);
       })
+      ->editColumn('updated_at', function ($model) {
+        return $model->updated_at->format('d/m/Y H:i');
+      })
       ->rawColumns(['action', 'name'])
       ->make(true);
   }
