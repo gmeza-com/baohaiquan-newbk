@@ -11,7 +11,7 @@
   background: transparent;
   text-decoration: none;
   color: #333;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 14px;
   text-shadow: none;
   float: none;
@@ -187,6 +187,7 @@ body .moxman-abs-layout-item,
 }
 .moxman-btn {
   border: 1px solid #b1b1b1;
+  border-radius: 0.375rem;
   border-color: transparent transparent transparent transparent;
   position: relative;
   text-shadow: 0 1px 1px rgba(255, 255, 255, 0.75);
@@ -271,7 +272,7 @@ body .moxman-abs-layout-item,
 }
 .moxman-btn-large button {
   padding: 9px 14px;
-  font-size: 16px;
+  font-size: 14px;
   line-height: normal;
 }
 .moxman-btn-large i {
@@ -455,6 +456,17 @@ i.moxman-i-checkbox {
   *zoom: 1;
   *height: 32px;
 }
+
+.moxman-combobox > input {
+  border-top-left-radius: 0.375rem;
+  border-bottom-left-radius: 0.375rem;
+}
+
+.moxman-combobox > .moxman-btn {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
 .moxman-combobox input {
   border: 1px solid #c5c5c5;
   border-right-color: #c5c5c5;
@@ -478,7 +490,7 @@ i.moxman-i-checkbox {
   zoom: 1;
 }
 .moxman-fieldset {
-  border: 0 solid #9E9E9E;
+  border: 0 solid #9e9e9e;
 }
 .moxman-fieldset > .moxman-container-body {
   margin-top: -15px;
@@ -527,7 +539,7 @@ i.moxman-i-checkbox {
 }
 .moxman-scrollbar:hover,
 .moxman-scrollbar.moxman-active {
-  background-color: #AAA;
+  background-color: #aaa;
   opacity: 0.6;
   filter: alpha(opacity=60);
   zoom: 1;
@@ -537,8 +549,8 @@ i.moxman-i-checkbox {
 }
 .moxman-panel {
   border: 0 solid #cacaca;
-  border: 0 solid rgba(0, 0, 0, 0.2);
-  background-color: #f0f0f0;
+  border: 0 solid #eaedf1;
+  background-color: #fff;
 }
 .moxman-floatpanel {
   position: absolute;
@@ -567,7 +579,7 @@ i.moxman-i-checkbox {
   background: transparent;
   top: 0;
   left: 0;
-  background: #FFF;
+  background: #fff;
   border: 1px solid rgba(0, 0, 0, 0.2);
   border: 1px solid rgba(0, 0, 0, 0.25);
 }
@@ -587,7 +599,7 @@ i.moxman-i-checkbox {
   top: 1px;
   margin-left: -10px;
   border-top-width: 0;
-  border-bottom-color: #FFF;
+  border-bottom-color: #fff;
 }
 .moxman-floatpanel.moxman-popover.moxman-bottom.moxman-start {
   margin-left: -22px;
@@ -668,7 +680,7 @@ div.moxman-fullscreen {
 .moxman-window {
   filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
   background: transparent;
-  background: #FFF;
+  background: #fff;
   position: fixed;
   top: 0;
   left: 0;
@@ -711,8 +723,8 @@ div.moxman-fullscreen {
 }
 .moxman-foot {
   display: block;
-  background-color: #FFF;
-  border-top: 1px solid #c5c5c5;
+  background-color: #fff;
+  border-top: 1px solid #eaedf1;
 }
 .moxman-window-head .moxman-dragh {
   position: absolute;
@@ -753,14 +765,15 @@ div.moxman-fullscreen {
 .moxman-imagecanvas-handle {
   position: absolute;
   border: 1px solid black;
-  background: #FFF;
+  background: #fff;
   width: 8px;
   height: 8px;
   margin: -4px 0 0 -4px;
   z-index: 10000;
   display: block;
 }
-@media (min-device-width: 800px) and (max-device-width: 1280px), (min-device-width: 768px) and (max-device-width: 1024px) {
+@media (min-device-width: 800px) and (max-device-width: 1280px),
+  (min-device-width: 768px) and (max-device-width: 1024px) {
   .moxman-imagecanvas-handle {
     width: 20px;
     height: 20px;
@@ -777,7 +790,7 @@ div.moxman-fullscreen {
   zoom: 1;
   display: block;
   position: absolute;
-  background: url('img/ants.gif') #FFF;
+  background: url("img/ants.gif") #fff;
   width: 1px;
   height: 1px;
   z-index: 1001;
@@ -922,7 +935,7 @@ div.moxman-fullscreen {
   color: white;
 }
 .moxman-menu-item.moxman-disabled:hover {
-  background: #CCC;
+  background: #ccc;
 }
 .moxman-menu-shortcut {
   display: inline-block;
@@ -1084,7 +1097,7 @@ div.moxman-menu .moxman-menu-item-sep,
   position: absolute;
   bottom: 10px;
   right: 30px;
-  background: #FDFDFD;
+  background: #fdfdfd;
   padding: 10px;
   border: 1px solid rgba(0, 0, 0, 0.2);
   min-width: 250px;
@@ -1177,8 +1190,8 @@ div.moxman-menu .moxman-menu-item-sep,
   transition: width 0.2s ease;
 }
 .moxman-slider {
-  border: 1px solid #AAA;
-  background: #EEE;
+  border: 1px solid #aaa;
+  background: #eee;
   width: 100px;
   height: 10px;
   position: relative;
@@ -1189,8 +1202,8 @@ div.moxman-menu .moxman-menu-item-sep,
   height: 100px;
 }
 .moxman-slider-handle {
-  border: 1px solid #BBB;
-  background: #DDD;
+  border: 1px solid #bbb;
+  background: #ddd;
   display: block;
   width: 13px;
   height: 13px;
@@ -1244,7 +1257,7 @@ div.moxman-menu .moxman-menu-item-sep,
 }
 .moxman-tabs,
 .moxman-tabs + .moxman-container-body {
-  background: #FFF;
+  background: #fff;
 }
 .moxman-tab {
   display: inline-block;
@@ -1259,10 +1272,10 @@ div.moxman-menu .moxman-menu-item-sep,
   cursor: pointer;
 }
 .moxman-tab:hover {
-  background: #FDFDFD;
+  background: #fdfdfd;
 }
 .moxman-tab.moxman-active {
-  background: #FDFDFD;
+  background: #fdfdfd;
   border-bottom-color: transparent;
   margin-bottom: -1px;
   height: 14px;
@@ -1278,8 +1291,8 @@ div.moxman-menu .moxman-menu-item-sep,
   background: #fff;
   border: 1px solid #c5c5c5;
   display: inline-block;
-  -webkit-transition: border linear .2s, box-shadow linear .2s;
-  transition: border linear .2s, box-shadow linear .2s;
+  -webkit-transition: border linear 0.2s, box-shadow linear 0.2s;
+  transition: border linear 0.2s, box-shadow linear 0.2s;
   height: 28px;
   resize: none;
   padding: 0 4px 0 4px;
@@ -1314,7 +1327,7 @@ div.moxman-menu .moxman-menu-item-sep,
   opacity: 0.6;
   filter: alpha(opacity=60);
   zoom: 1;
-  background: #fff url('img/loader.gif') no-repeat center center;
+  background: #fff url("img/loader.gif") no-repeat center center;
 }
 .moxman-throbber-inline {
   position: static;
@@ -1329,7 +1342,7 @@ div.moxman-menu .moxman-menu-item-sep,
   overflow: hidden;
   position: relative;
   cursor: pointer;
-  border: 1px solid #AAA;
+  border: 1px solid #aaa;
   opacity: 70;
   filter: alpha(opacity=7000);
   zoom: 1;
@@ -1353,10 +1366,10 @@ div.moxman-menu .moxman-menu-item-sep,
   opacity: 100;
   filter: alpha(opacity=10000);
   zoom: 1;
-  outline: 2px solid #00709F;
+  outline: 2px solid #00709f;
 }
 .moxman-thumb:hover {
-  outline: 2px solid #00709F;
+  outline: 2px solid #00709f;
 }
 .moxman-thumb.moxman-active {
   border: 1px solid #52a8ec;
@@ -1371,7 +1384,7 @@ div.moxman-menu .moxman-menu-item-sep,
   left: 0;
   width: 100%;
   background: #333;
-  color: #FFF;
+  color: #fff;
   padding: 3px;
   opacity: 80;
   filter: alpha(opacity=8000);
@@ -1384,10 +1397,10 @@ div.moxman-menu .moxman-menu-item-sep,
   top: 1px;
   right: 6px;
   margin: 1px;
-  border: 1px solid #FFF;
+  border: 1px solid #fff;
   background: transparent;
   background: #333;
-  color: #FFF;
+  color: #fff;
 }
 .moxman-thumb .moxman-i-checkbox {
   display: none;
@@ -1397,7 +1410,7 @@ div.moxman-menu .moxman-menu-item-sep,
   display: block;
 }
 .moxman-info .moxman-i-checkbox:before {
-  color: #FFF;
+  color: #fff;
 }
 .moxman-thumb .moxman-ico {
   color: #333;
@@ -1409,7 +1422,8 @@ div.moxman-menu .moxman-menu-item-sep,
   cursor: pointer;
   line-height: 24px;
 }
-@media (min-device-width: 800px) and (max-device-width: 1280px), (min-device-width: 768px) and (max-device-width: 1024px) {
+@media (min-device-width: 800px) and (max-device-width: 1280px),
+  (min-device-width: 768px) and (max-device-width: 1024px) {
   .moxman-treeitem .moxman-treeitem-title {
     line-height: 31px;
   }
@@ -1417,7 +1431,8 @@ div.moxman-menu .moxman-menu-item-sep,
 .moxman-treeitem .moxman-text {
   line-height: 24px;
 }
-@media (min-device-width: 800px) and (max-device-width: 1280px), (min-device-width: 768px) and (max-device-width: 1024px) {
+@media (min-device-width: 800px) and (max-device-width: 1280px),
+  (min-device-width: 768px) and (max-device-width: 1024px) {
   .moxman-treeitem .moxman-text {
     line-height: 31px;
   }
@@ -1474,7 +1489,7 @@ div.moxman-menu .moxman-menu-item-sep,
   padding: 0;
   margin: 0;
   overflow: hidden;
-  background: #FFF;
+  background: #fff;
   height: 100%;
 }
 div.moxman-viewport {
@@ -1523,7 +1538,7 @@ div.moxman-filelist-head {
 .moxman-filelist th {
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 14px;
 }
 .moxman-filelist-cell {
@@ -1545,7 +1560,8 @@ div.moxman-filelist-head {
   height: 28px;
   vertical-align: middle;
 }
-@media (min-device-width: 800px) and (max-device-width: 1280px), (min-device-width: 768px) and (max-device-width: 1024px) {
+@media (min-device-width: 800px) and (max-device-width: 1280px),
+  (min-device-width: 768px) and (max-device-width: 1024px) {
   .moxman-filelist-body tbody td {
     height: 32px;
   }
@@ -1592,7 +1608,8 @@ div.moxman-filelist-head {
   text-align: center;
   width: 25px;
 }
-@media (min-device-width: 800px) and (max-device-width: 1280px), (min-device-width: 768px) and (max-device-width: 1024px) {
+@media (min-device-width: 800px) and (max-device-width: 1280px),
+  (min-device-width: 768px) and (max-device-width: 1024px) {
   .moxman-checkbox-column {
     width: 40px;
   }
@@ -1621,7 +1638,7 @@ div.moxman-filelist-head {
   text-indent: 0;
 }
 .moxman-thumbnailview {
-  border: 0 solid #9E9E9E;
+  border: 0 solid #eaedf1;
   overflow: auto;
   overflow-x: hidden;
   overflow-y: scroll;
@@ -1659,14 +1676,17 @@ div.moxman-filelist-head {
 }
 /* Icons */
 @font-face {
-  font-family: 'moxman';
-  src: url('fonts/icomoon.eot');
-  src: url('fonts/icomoon.eot?#iefix') format('embedded-opentype'), url('fonts/icomoon.svg#icomoon') format('svg'), url('fonts/icomoon.woff') format('woff'), url('fonts/icomoon.ttf') format('truetype');
+  font-family: "moxman";
+  src: url("fonts/icomoon.eot");
+  src: url("fonts/icomoon.eot?#iefix") format("embedded-opentype"),
+    url("fonts/icomoon.svg#icomoon") format("svg"),
+    url("fonts/icomoon.woff") format("woff"),
+    url("fonts/icomoon.ttf") format("truetype");
   font-weight: normal;
   font-style: normal;
 }
 .moxman-ico {
-  font-family: 'moxman', Arial;
+  font-family: "moxman", Arial;
   font-style: normal;
   font-weight: normal;
   font-variant: normal;
