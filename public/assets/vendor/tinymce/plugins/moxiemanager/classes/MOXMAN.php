@@ -25,7 +25,6 @@ if (!defined('MOXMAN_ROOT')) {
    */
   define('MOXMAN_ROOT', preg_replace('/[\\/\\\][^\\/\\\]+$/', '', dirname(__FILE__)));
 }
-
 if (!defined('MOXMAN_CLASSES')) {
   /**
    * Path to the classes directory.

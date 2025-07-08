@@ -1,4 +1,5 @@
 <?php
+
 /**
  * FileInfoCommand.php
  *
@@ -10,90 +11,94 @@
  *
  * @package MOXMAN_Commands
  */
-class MOXMAN_Commands_FileInfoCommand extends MOXMAN_Commands_BaseCommand {
-	/**
-	 * Executes the command logic with the specified RPC parameters.
-	 *
-	 * @param Object $params Command parameters sent from client.
-	 * @return Object Result object to be passed back to client.
-	 */
-	public function execute($params) {
-		$create = isset($params->create) && $params->create === true;
+class MOXMAN_Commands_FileInfoCommand extends MOXMAN_Commands_BaseCommand
+{
+  /**
+   * Executes the command logic with the specified RPC parameters.
+   *
+   * @param Object $params Command parameters sent from client.
+   * @return Object Result object to be passed back to client.
+   */
+  public function execute($params)
+  {
+    $result = array();
+    $create = isset($params->create) && $params->create === true;
+    try {
+      if (isset($params->paths)) {
+        foreach ($params->paths as $path) {
+          $file = MOXMAN::getFile($path);
 
-		if (isset($params->paths)) {
-			$result = array();
+          if ($create) {
+            $args = $this->fireBeforeFileAction(MOXMAN_Vfs_FileActionEventArgs::ADD, $file);
+            $file = $args->getFile();
+          }
 
-			foreach ($params->paths as $path) {
-				$file = MOXMAN::getFile($path);
+          $fileInfo = $this->fileToJson($file, true);
 
-				if ($create) {
-					$args = $this->fireBeforeFileAction(MOXMAN_Vfs_FileActionEventArgs::ADD, $file);
-					$file = $args->getFile();
-				}
+          $args = $this->fireCustomInfo(MOXMAN_Vfs_CustomInfoEventArgs::INSERT_TYPE, $file);
+          $fileInfo->info = (object) $args->getInfo();
 
-				$fileInfo = $this->fileToJson($file, true);
+          if (isset($params->insert) && $params->insert) {
+            $this->addVideoMeta($file, $fileInfo->meta);
+            $this->fireFileAction(MOXMAN_Vfs_FileActionEventArgs::INSERT, $file);
+          }
 
-				$args = $this->fireCustomInfo(MOXMAN_Vfs_CustomInfoEventArgs::INSERT_TYPE, $file);
-				$fileInfo->info = (object) $args->getInfo();
+          $result[] = $fileInfo;
+        }
+      } else {
+        $file = MOXMAN::getFile($params->path);
 
-				if (isset($params->insert) && $params->insert) {
-					$this->addVideoMeta($file, $fileInfo->meta);
-					$this->fireFileAction(MOXMAN_Vfs_FileActionEventArgs::INSERT, $file);
-				}
+        if ($create) {
+          $args = $this->fireBeforeFileAction(MOXMAN_Vfs_FileActionEventArgs::ADD, $file);
+          $file = $args->getFile();
+        }
 
-				$result[] = $fileInfo;
-			}
-		} else {
-			$file = MOXMAN::getFile($params->path);
+        $fileInfo = $this->fileToJson($file, true);
 
-			if ($create) {
-				$args = $this->fireBeforeFileAction(MOXMAN_Vfs_FileActionEventArgs::ADD, $file);
-				$file = $args->getFile();
-			}
+        $args = $this->fireCustomInfo(MOXMAN_Vfs_CustomInfoEventArgs::INSERT_TYPE, $file);
+        $fileInfo->info = (object) $args->getInfo();
 
-			$fileInfo = $this->fileToJson($file, true);
+        if (isset($params->insert) && $params->insert) {
+          $this->addVideoMeta($file, $fileInfo->meta);
+          $this->fireFileAction(MOXMAN_Vfs_FileActionEventArgs::INSERT, $file);
+        }
 
-			$args = $this->fireCustomInfo(MOXMAN_Vfs_CustomInfoEventArgs::INSERT_TYPE, $file);
-			$fileInfo->info = (object) $args->getInfo();
+        $result = $fileInfo;
+      }
+    } catch (Exception $e) {
+      error_log($e->getTraceAsString());
+      error_log($e->getMessage());
+    }
 
-			if (isset($params->insert) && $params->insert) {
-				$this->addVideoMeta($file, $fileInfo->meta);
-				$this->fireFileAction(MOXMAN_Vfs_FileActionEventArgs::INSERT, $file);
-			}
+    return $result;
+  }
 
-			$result = $fileInfo;
-		}
+  private function addVideoMeta(MOXMAN_Vfs_IFile $file, $metaData)
+  {
+    $fileName = $file->getName();
+    $ext = strtolower(MOXMAN_Util_PathUtils::getExtension($fileName));
 
-		return $result;
-	}
+    if (preg_match('/^(mp4|ogv|webm)$/', $ext)) {
+      $metaData->url_type = MOXMAN_Util_Mime::get($fileName);
+      $name = substr($fileName, 0, strlen($fileName) - strlen($ext));
 
-	private function addVideoMeta(MOXMAN_Vfs_IFile $file, $metaData) {
-		$fileName = $file->getName();
-		$ext = strtolower(MOXMAN_Util_PathUtils::getExtension($fileName));
+      // Alternative video formats
+      $altExt = array("mp4", "ogv", "webm");
+      foreach ($altExt as $altExt) {
+        if ($ext != $altExt) {
+          $altFile = MOXMAN::getFile($file->getParent(), $name . $altExt);
+          if ($altFile->exists()) {
+            $metaData->alt_url = $altFile->getUrl();
+            break;
+          }
+        }
+      }
 
-		if (preg_match('/^(mp4|ogv|webm)$/', $ext)) {
-			$metaData->url_type = MOXMAN_Util_Mime::get($fileName);
-			$name = substr($fileName, 0, strlen($fileName) - strlen($ext));
-
-			// Alternative video formats
-			$altExt = array("mp4", "ogv", "webm");
-			foreach ($altExt as $altExt) {
-				if ($ext != $altExt) {
-					$altFile = MOXMAN::getFile($file->getParent(), $name . $altExt);
-					if ($altFile->exists()) {
-						$metaData->alt_url = $altFile->getUrl();
-						break;
-					}
-				}
-			}
-
-			// Alternative image format
-			$altFile = MOXMAN::getFile($file->getParent(), $name . "jpg");
-			if ($altFile->exists()) {
-				$metaData->alt_img = $altFile->getUrl();
-			}
-		}
-	}
+      // Alternative image format
+      $altFile = MOXMAN::getFile($file->getParent(), $name . "jpg");
+      if ($altFile->exists()) {
+        $metaData->alt_img = $altFile->getUrl();
+      }
+    }
+  }
 }
-
-?>

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * UploadHandler.php
  *
@@ -10,250 +11,252 @@
  *
  * @package MOXMAN_Handlers
  */
-class MOXMAN_Handlers_UploadHandler implements MOXMAN_Http_IHandler {
-	/**
-	 * Process a request using the specified context.
-	 *
-	 * @param MOXMAN_Http_Context $httpContext Context instance to pass to use for the handler.
-	 */
-	public function processRequest(MOXMAN_Http_Context $httpContext) {
-		$tempFilePath = null;
-		$chunkFilePath = null;
+class MOXMAN_Handlers_UploadHandler implements MOXMAN_Http_IHandler
+{
+  /**
+   * Process a request using the specified context.
+   *
+   * @param MOXMAN_Http_Context $httpContext Context instance to pass to use for the handler.
+   */
+  public function processRequest(MOXMAN_Http_Context $httpContext)
+  {
+    $tempFilePath = null;
+    $chunkFilePath = null;
 
-		$request = $httpContext->getRequest();
-		$response = $httpContext->getResponse();
-		$filename = MOXMAN_Util_Sanitize::fileName($request->get("name"));
-		$id = MOXMAN_Util_Sanitize::id($request->get("id", ""));
-		$loaded = intval($request->get("loaded", "0"));
-		$total = intval($request->get("total", "-1"));
-		$path = $request->get("path", "");
-		$resolution = $request->get("resolution", "default");
+    $request = $httpContext->getRequest();
+    $response = $httpContext->getResponse();
+    $filename = MOXMAN_Util_Sanitize::fileName($request->get("name"));
+    $id = MOXMAN_Util_Sanitize::id($request->get("id", ""));
+    $loaded = intval($request->get("loaded", "0"));
+    $total = intval($request->get("total", "-1"));
+    $path = $request->get("path", "");
+    $resolution = $request->get("resolution", "default");
 
-		try {
-			if ($request->getMethod() != 'POST') {
-				throw new MOXMAN_Exception("Not a HTTP post request.");
-			}
 
-			if (MOXMAN::getConfig()->get('general.csrf', true)) {
-				if (!MOXMAN_Http_Csrf::verifyToken(MOXMAN::getConfig()->get('general.license'), $request->get('csrf'))) {
-					throw new MOXMAN_Exception("Invalid csrf token.");
-				}
-			}
 
-			// Check if the user is authenticated or not
-			if (!MOXMAN::getAuthManager()->isAuthenticated()) {
-				if (!isset($json->method) || !preg_match('/^(login|logout)$/', $json->method)) {
-					throw new MOXMAN_Exception("Access denied by authenticator(s).", 10);
-				}
-			}
+    try {
+      if ($request->getMethod() != 'POST') {
+        throw new MOXMAN_Exception("Not a HTTP post request.");
+      }
 
-			$file = MOXMAN::getFile($path);
-			$config = $file->getConfig();
+      if (MOXMAN::getConfig()->get('general.csrf', true)) {
+        if (!MOXMAN_Http_Csrf::verifyToken(MOXMAN::getConfig()->get('general.license'), $request->get('csrf'))) {
+          throw new MOXMAN_Exception("Invalid csrf token.");
+        }
+      }
 
-			if ($config->get('general.demo')) {
-				throw new MOXMAN_Exception(
-					"This action is restricted in demo mode.",
-					MOXMAN_Exception::DEMO_MODE
-				);
-			}
+      // Check if the user is authenticated or not
+      if (!MOXMAN::getAuthManager()->isAuthenticated()) {
+        if (!isset($json->method) || !preg_match('/^(login|logout)$/', $json->method)) {
+          throw new MOXMAN_Exception("Access denied by authenticator(s).", 10);
+        }
+      }
 
-			$uploadMaxSize = $config->get("upload.maxsize", "10mb");
-			$maxSizeBytes = preg_replace("/[^0-9.]/", "", $uploadMaxSize);
+      $file = MOXMAN::getFile($path);
+      $config = $file->getConfig();
 
-			if (strpos(strtolower($uploadMaxSize), "k") > 0) {
-				$maxSizeBytes = round(floatval($maxSizeBytes) * 1024);
-			}
+      if ($config->get('general.demo')) {
+        throw new MOXMAN_Exception(
+          "This action is restricted in demo mode.",
+          MOXMAN_Exception::DEMO_MODE
+        );
+      }
 
-			if (strpos(strtolower($uploadMaxSize), "m") > 0) {
-				$maxSizeBytes = round(floatval($maxSizeBytes) * 1024 * 1024);
-			}
+      $uploadMaxSize = $config->get("upload.maxsize", "10mb");
+      $maxSizeBytes = preg_replace("/[^0-9.]/", "", $uploadMaxSize);
 
-			$file = MOXMAN::getFile($file->getPath(), $filename);
+      if (strpos(strtolower($uploadMaxSize), "k") > 0) {
+        $maxSizeBytes = round(floatval($maxSizeBytes) * 1024);
+      }
 
-			// Generate unique id for first chunk
-			// TODO: We should cleanup orphan ID:s if upload fails etc
-			if (!$id || $loaded == 0) {
-				$id = uniqid();
-			}
+      if (strpos(strtolower($uploadMaxSize), "m") > 0) {
+        $maxSizeBytes = round(floatval($maxSizeBytes) * 1024 * 1024);
+      }
 
-			// Setup path to temp file based on id
-			$tempFilePath = MOXMAN_Util_PathUtils::combine(
-				MOXMAN_Util_PathUtils::getTempDir(),
-				"mcupload_" . $id . "." . MOXMAN_Util_PathUtils::getExtension($file->getName())
-			);
+      $file = MOXMAN::getFile($file->getPath(), $filename);
 
-			$chunkFilePath = MOXMAN_Util_PathUtils::combine(
-				MOXMAN_Util_PathUtils::getTempDir(),
-				"mcupload_chunk_" . $id . "." . MOXMAN_Util_PathUtils::getExtension($file->getName())
-			);
+      // Generate unique id for first chunk
+      // TODO: We should cleanup orphan ID:s if upload fails etc
+      if (!$id || $loaded == 0) {
+        $id = uniqid();
+      }
 
-			if (!$file->canWrite()) {
-				throw new MOXMAN_Exception("No write access to path: " . $file->getPublicPath(), MOXMAN_Exception::NO_WRITE_ACCESS);
-			}
+      // Setup path to temp file based on id
+      $tempFilePath = MOXMAN_Util_PathUtils::combine(
+        MOXMAN_Util_PathUtils::getTempDir(),
+        "mcupload_" . $id . "." . MOXMAN_Util_PathUtils::getExtension($file->getName())
+      );
 
-			if ($total > $maxSizeBytes) {
-				throw new MOXMAN_Exception("File size too large: " . $file->getPublicPath(), MOXMAN_Exception::FILE_SIZE_TO_LARGE);
-			}
+      $chunkFilePath = MOXMAN_Util_PathUtils::combine(
+        MOXMAN_Util_PathUtils::getTempDir(),
+        "mcupload_chunk_" . $id . "." . MOXMAN_Util_PathUtils::getExtension($file->getName())
+      );
 
-			// Operations on first chunk
-			$filter = MOXMAN_Vfs_CombinedFileFilter::createFromConfig($config, "upload");
-			if (!$filter->accept($file)) {
-				throw new MOXMAN_Exception(
-					"Invalid file name for: " . $file->getPublicPath(),
-					MOXMAN_Exception::INVALID_FILE_NAME
-				);
-			}
+      if (!$file->canWrite()) {
+        throw new MOXMAN_Exception("No write access to path: " . $file->getPublicPath(), MOXMAN_Exception::NO_WRITE_ACCESS);
+      }
 
-			$blobSize = 0;
-			$inputFile = $request->getFile("file");
-			if (!$inputFile) {
-				throw new MOXMAN_Exception("No input file specified.");
-			}
+      if ($total > $maxSizeBytes) {
+        throw new MOXMAN_Exception("File size too large: " . $file->getPublicPath(), MOXMAN_Exception::FILE_SIZE_TO_LARGE);
+      }
 
-			if ($loaded === 0) {
-				// Check if we should mock or not
-				if (defined('PHPUNIT')) {
-					if (!copy($inputFile['tmp_name'], $tempFilePath)) {
-						throw new MOXMAN_Exception("Could not move the uploaded temp file.");
-					}
-				} else {
-					if (!move_uploaded_file($inputFile['tmp_name'], $tempFilePath)) {
-						throw new MOXMAN_Exception("Could not move the uploaded temp file.");
-					}
-				}
+      // Operations on first chunk
+      $filter = MOXMAN_Vfs_CombinedFileFilter::createFromConfig($config, "upload");
+      if (!$filter->accept($file)) {
+        throw new MOXMAN_Exception(
+          "Invalid file name for: " . $file->getPublicPath(),
+          MOXMAN_Exception::INVALID_FILE_NAME
+        );
+      }
 
-				$blobSize = filesize($tempFilePath);
-			} else {
-				// Check if we should mock or not
-				if (defined('PHPUNIT')) {
-					if (!copy($inputFile['tmp_name'], $chunkFilePath)) {
-						throw new MOXMAN_Exception("Could not move the uploaded temp file.");
-					}
-				} else {
-					if (!move_uploaded_file($inputFile['tmp_name'], $chunkFilePath)) {
-						throw new MOXMAN_Exception("Could not move the uploaded temp file.");
-					}
-				}
+      $blobSize = 0;
+      $inputFile = $request->getFile("file");
+      if (!$inputFile) {
+        throw new MOXMAN_Exception("No input file specified.");
+      }
 
-				$in = fopen($chunkFilePath, 'r');
-				if ($in) {
-					$out = fopen($tempFilePath, 'a');
-					if ($out) {
-						while ($buff = fread($in, 8192)) {
-							$blobSize += strlen($buff);
-							fwrite($out, $buff);
-						}
+      if ($loaded === 0) {
+        // Check if we should mock or not
+        if (defined('PHPUNIT')) {
+          if (!copy($inputFile['tmp_name'], $tempFilePath)) {
+            throw new MOXMAN_Exception("Could not move the uploaded temp file.");
+          }
+        } else {
+          if (!move_uploaded_file($inputFile['tmp_name'], $tempFilePath)) {
+            throw new MOXMAN_Exception("Could not move the uploaded temp file.");
+          }
+        }
 
-						fclose($out);
-					}
+        $blobSize = filesize($tempFilePath);
+      } else {
+        // Check if we should mock or not
+        if (defined('PHPUNIT')) {
+          if (!copy($inputFile['tmp_name'], $chunkFilePath)) {
+            throw new MOXMAN_Exception("Could not move the uploaded temp file.");
+          }
+        } else {
+          if (!move_uploaded_file($inputFile['tmp_name'], $chunkFilePath)) {
+            throw new MOXMAN_Exception("Could not move the uploaded temp file.");
+          }
+        }
 
-					fclose($in);
-				}
+        $in = fopen($chunkFilePath, 'r');
+        if ($in) {
+          $out = fopen($tempFilePath, 'a');
+          if ($out) {
+            while ($buff = fread($in, 8192)) {
+              $blobSize += strlen($buff);
+              fwrite($out, $buff);
+            }
 
-				unlink($chunkFilePath);
-			}
-			// Import file when all chunks are complete
-			if ($total == -1 || $loaded + $blobSize == $total) {
-				clearstatcache();
+            fclose($out);
+          }
 
-				// Fire off event before file is permanently written to disk
-				$args = new MOXMAN_Vfs_FileActionEventArgs("add", $file);
-				$args->getData()->fileSize = $total;
-				MOXMAN::getPluginManager()->get("core")->fire("BeforeFileAction", $args);
-				$file = $args->getFile();
+          fclose($in);
+        }
 
-				// Check if file is valid on last chunk we also check on first chunk but not in the onces in between
-				$filter = MOXMAN_Vfs_CombinedFileFilter::createFromConfig($config, "upload");
-				if (!$filter->accept($file)) {
-					throw new MOXMAN_Exception(
-						"Invalid file name for: " . $file->getPublicPath(),
-						MOXMAN_Exception::INVALID_FILE_NAME
-					);
-				}
+        unlink($chunkFilePath);
+      }
+      // Import file when all chunks are complete
+      if ($total == -1 || $loaded + $blobSize == $total) {
+        clearstatcache();
 
-				if ($file->exists()) {
-					if ($resolution == "overwrite") {
-						MOXMAN::getPluginManager()->get("core")->deleteFile($file);
-					} else if ($resolution == "rename") {
-						$file = MOXMAN_Util_FileUtils::uniqueFile($file);
-					} else {
-						throw new MOXMAN_Exception("Target file exists: " . $file->getPublicPath(), MOXMAN_Exception::FILE_EXISTS);
-					}
-				}
+        // Fire off event before file is permanently written to disk
+        $args = new MOXMAN_Vfs_FileActionEventArgs("add", $file);
+        $args->getData()->fileSize = $total;
+        MOXMAN::getPluginManager()->get("core")->fire("BeforeFileAction", $args);
+        $file = $args->getFile();
 
-				// Resize the temporary blob
-				if ($config->get("upload.autoresize") && preg_match('/gif|jpe?g|png/i', MOXMAN_Util_PathUtils::getExtension($tempFilePath)) === 1) {
-					$size = getimagesize($tempFilePath);
-					$maxWidth = $config->get('upload.max_width', -1);
-					$maxHeight = $config->get('upload.max_height', -1);
+        // Check if file is valid on last chunk we also check on first chunk but not in the onces in between
+        $filter = MOXMAN_Vfs_CombinedFileFilter::createFromConfig($config, "upload");
+        if (!$filter->accept($file)) {
+          throw new MOXMAN_Exception(
+            "Invalid file name for: " . $file->getPublicPath(),
+            MOXMAN_Exception::INVALID_FILE_NAME
+          );
+        }
 
-					if ($maxWidth > 0 && $maxHeight > 0 && ($size[0] > $maxWidth || $size[1] > $maxHeight)) {
-						$imageAlter = new MOXMAN_Media_ImageAlter();
-						$imageAlter->load($tempFilePath);
-						$imageAlter->resize($maxWidth, $maxHeight, true);
-						$imageAlter->save($tempFilePath, $config->get("upload.autoresize_jpeg_quality", 90));
-					}
-				}
+        if ($file->exists()) {
+          if ($resolution == "overwrite") {
+            MOXMAN::getPluginManager()->get("core")->deleteFile($file);
+          } else if ($resolution == "rename") {
+            $file = MOXMAN_Util_FileUtils::uniqueFile($file);
+          } else {
+            throw new MOXMAN_Exception("Target file exists: " . $file->getPublicPath(), MOXMAN_Exception::FILE_EXISTS);
+          }
+        }
 
-				// Create thumbnail and upload then import local blob
-				MOXMAN::getPluginManager()->get("core")->createThumbnail($file, $tempFilePath);
-				$file->importFrom($tempFilePath);
-				unlink($tempFilePath);
+        // Resize the temporary blob
+        if ($config->get("upload.autoresize") && preg_match('/gif|jpe?g|png/i', MOXMAN_Util_PathUtils::getExtension($tempFilePath)) === 1) {
+          $size = getimagesize($tempFilePath);
+          $maxWidth = $config->get('upload.max_width', -1);
+          $maxHeight = $config->get('upload.max_height', -1);
 
-				$args = new MOXMAN_Vfs_FileActionEventArgs("add", $file);
-				MOXMAN::getPluginManager()->get("core")->fire("FileAction", $args);
+          if ($maxWidth > 0 && $maxHeight > 0 && ($size[0] > $maxWidth || $size[1] > $maxHeight)) {
+            $imageAlter = new MOXMAN_Media_ImageAlter();
+            $imageAlter->load($tempFilePath);
+            $imageAlter->resize($maxWidth, $maxHeight, true);
+            $imageAlter->save($tempFilePath, $config->get("upload.autoresize_jpeg_quality", 90));
+          }
+        }
 
-				$result = array(
-					"file" => MOXMAN_CorePlugin::fileToJson($args->getFile(), true),
-					"files" => MOXMAN_CorePlugin::filesToJson($args->getFileList(), true)
-				);
-			} else {
-				$result = $id;
-			}
+        // Create thumbnail and upload then import local blob
+        MOXMAN::getPluginManager()->get("core")->createThumbnail($file, $tempFilePath);
+        $file->importFrom($tempFilePath);
+        unlink($tempFilePath);
 
-			$response->sendJson(array(
-				"jsonrpc" => "2.0",
-				"result" => $result,
-				"id" => null
-			));
-		} catch (Exception $e) {
-			if ($tempFilePath && file_exists($tempFilePath)) {
-				unlink($tempFilePath);
-			}
+        $args = new MOXMAN_Vfs_FileActionEventArgs("add", $file);
+        MOXMAN::getPluginManager()->get("core")->fire("FileAction", $args);
 
-			if ($chunkFilePath && file_exists($chunkFilePath)) {
-				unlink($chunkFilePath);
-			}
+        $result = array(
+          "file" => MOXMAN_CorePlugin::fileToJson($args->getFile(), true),
+          "files" => MOXMAN_CorePlugin::filesToJson($args->getFileList(), true)
+        );
+      } else {
+        $result = $id;
+      }
 
-			MOXMAN::dispose(); // Closes any open file systems/connections
+      $response->sendJson(array(
+        "jsonrpc" => "2.0",
+        "result" => $result,
+        "id" => null
+      ));
+    } catch (Exception $e) {
+      if ($tempFilePath && file_exists($tempFilePath)) {
+        unlink($tempFilePath);
+      }
 
-			$message = $e->getMessage();
-			$data = null;
+      if ($chunkFilePath && file_exists($chunkFilePath)) {
+        unlink($chunkFilePath);
+      }
 
-			// Add file and line number when running in debug mode
-			// @codeCoverageIgnoreStart
-			if (MOXMAN::getConfig()->get("general.debug")) {
-				$message .= " " . $e->getFile() . " (" . $e->getLine() . ")";
-			}
-			// @codeCoverageIgnoreEnd
+      MOXMAN::dispose(); // Closes any open file systems/connections
 
-			// Grab the data from the exception
-			if ($e instanceof MOXMAN_Exception && !$data) {
-				$data = $e->getData();
-			}
+      $message = $e->getMessage();
+      $data = null;
 
-			// Json encode error response
-			$response->sendJson((object) array(
-				"jsonrpc" => "2.0",
-				"error" => array(
-					"code" => $e->getCode(),
-					"message" => $message,
-					"data" => $data
-				),
-				"id" => null
-			));
-		}
-	}
+      // Add file and line number when running in debug mode
+      // @codeCoverageIgnoreStart
+      if (MOXMAN::getConfig()->get("general.debug")) {
+        $message .= " " . $e->getFile() . " (" . $e->getLine() . ")";
+      }
+      // @codeCoverageIgnoreEnd
+
+      // Grab the data from the exception
+      if ($e instanceof MOXMAN_Exception && !$data) {
+        $data = $e->getData();
+      }
+
+      // Json encode error response
+      $response->sendJson((object) array(
+        "jsonrpc" => "2.0",
+        "error" => array(
+          "code" => $e->getCode(),
+          "message" => $message,
+          "data" => $data
+        ),
+        "id" => null
+      ));
+    }
+  }
 }
-
-?>
