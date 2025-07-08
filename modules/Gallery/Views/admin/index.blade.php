@@ -19,14 +19,13 @@
     @include('partial.datatable_mutillang', ['url' => admin_route('gallery.index')])
 
     @component('components.block')
-
         @slot('title', trans('gallery::language.gallery_list'))
 
         @slot('action')
             <form action="{{ request()->url() }}" id="filter" method="GET">
                 <select name="category" id="flter_by_category" class="form-control non-select2" style="min-width: 500px">
                     <option value="*">{{ trans('news::language.include_categories') }}</option>
-                    @foreach(get_all_gallery_categories() as $category)
+                    @foreach (get_all_gallery_categories() as $category)
                         <option value="{{ $category->id }}" {{ $category->id == request()->get('category') ? 'selected' : '' }}>
                             {{ $category->language('name') }}
                         </option>
@@ -36,15 +35,15 @@
             <div class="clearfix"></div>
         @endslot
 
-            @include('partial.datatable')
-            @endcomponent
+        @include('partial.datatable')
+    @endcomponent
 
 @stop
 
 @push('footer')
-<script>
-    $('#flter_by_category').change(function (e) {
-        $('#filter').trigger('submit');
-    });
-</script>
+    <script>
+        $('#flter_by_category').change(function(e) {
+            $('#filter').trigger('submit');
+        });
+    </script>
 @endpush

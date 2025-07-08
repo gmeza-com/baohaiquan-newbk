@@ -19,10 +19,9 @@
     @include('partial.datatable_mutillang', ['url' => admin_route('post.category.index')])
 
     @component('components.block')
-
         @slot('title', trans('news::language.category_list'))
 
-            @include('partial.datatable')
-            @endcomponent
+        @include('partial.datatable')
+    @endcomponent
 
 @stop

@@ -20,8 +20,30 @@
         @slot('title', trans('news::language.post_list'))
 
         @slot('action')
-            <form action="{{ request()->url() }}" id="filter" method="GET">
-                <select name="category" id="flter_by_category" class="form-control non-select2" style="min-width: 500px">
+            <form action="{{ request()->url() }}" id="filter" method="GET" style="display:flex">
+                <select name="published" id="filter_by_status" class="form-control non-select2"
+                    style="min-width: 60px; max-width:160px; margin-right: 5px">
+                    <option value="*" {{ request()->has('published') && request('published') == '*' ? 'selected' : '' }}>
+                        Tất cả trạng thái
+                    </option>
+                    <option value="3" {{ request()->has('published') && request('published') == 3 ? 'selected' : '' }}>
+                        {{ trans('news::language.approved_by_level_3') }}
+                    </option>
+                    <option value="0" {{ request()->has('published') && request('published') == 0 ? 'selected' : '' }}>
+                        {{ trans('news::language.waiting_level_1') }}
+                    </option>
+                    <option value="1" {{ request()->has('published') && request('published') == 1 ? 'selected' : '' }}>
+                        {{ trans('news::language.waiting_level_2') }}
+                    </option>
+                    <option value="2" {{ request()->has('published') && request('published') == 2 ? 'selected' : '' }}>
+                        {{ trans('news::language.waiting_level_3') }}
+                    </option>
+                    <option value="-1" {{ request()->has('published') && request('published') == -1 ? 'selected' : '' }}>
+                        Đã hủy
+                    </option>
+                </select>
+                <select name="category" id="flter_by_category" class="form-control non-select2"
+                    style="min-width: 120px; max-width:320px">
                     <option value="*">{{ trans('news::language.include_categories') }}</option>
                     @foreach (get_all_categories() as $category)
                         <option value="{{ $category->id }}" {{ $category->id == request()->get('category') ? 'selected' : '' }}>
@@ -33,41 +55,6 @@
 
             <div class="clearfix"></div>
         @endslot
-
-        <div class="text-center" style="padding: 8px 16px">
-            <a href="{{ admin_route('post.revision.index') }}" class="btn btn-danger btn-alt">
-                Lịch sử bài viết
-            </a>
-
-            <a href="{{ request()->url() }}"
-                class="btn btn-default btn-alt {{ !request()->has('published') ? 'active' : '' }}">
-                Tất cả
-            </a>
-            <a href="{{ request()->url() }}?published=-1"
-                class="btn btn-danger btn-alt {{ request()->has('published') && request('published') == -1 ? 'active' : '' }}">
-                Đã hủy
-            </a>
-            <a href="{{ request()->url() }}?published=0"
-                class="btn btn-warning btn-alt {{ request()->has('published') && request('published') == 0 ? 'active' : '' }}">
-                {{ trans('news::language.waiting_level_1') }}
-            </a>
-            @if (allow('news.post.approved_level_2') || allow('news.post.approved_admin'))
-                <a href="{{ request()->url() }}?published=1"
-                    class="btn btn-info btn-alt {{ request('published') == 1 ? 'active' : '' }}">
-                    {{ trans('news::language.waiting_level_2') }}
-                </a>
-            @endif
-            <a href="{{ request()->url() }}?published=2"
-                class="btn btn-primary btn-alt {{ request('published') == 2 ? 'active' : '' }}">
-                {{ trans('news::language.waiting_level_3') }}
-            </a>
-            <a href="{{ request()->url() }}?published=3"
-                class="btn btn-success btn-alt {{ request('published') == 3 ? 'active' : '' }}">
-                {{ trans('news::language.approved_by_level_3') }}
-            </a>
-        </div>
-
-        <div class="clearfix" style="margin-bottom: 1px; border-bottom: solid 1px #eaedf1"></div>
 
         @include('partial.datatable')
     @endcomponent
@@ -148,7 +135,7 @@
             });
         });
 
-        $('#flter_by_category').change(function(e) {
+        $('#flter_by_category,#filter_by_status').change(function(e) {
             $('#filter').trigger('submit');
         });
     </script>

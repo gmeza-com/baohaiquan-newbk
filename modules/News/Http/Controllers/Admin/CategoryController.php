@@ -7,10 +7,9 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Modules\News\Models\PostCategory;
 use Modules\News\Models\PostCategoryLanguage;
-use Modules\Page\Http\Requests\PageRequest;
 use Yajra\DataTables\Facades\DataTables;
-use DB;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 
 class CategoryController extends AdminController

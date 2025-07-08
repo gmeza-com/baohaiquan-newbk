@@ -107,7 +107,7 @@ class PostController extends AdminController
       });
     }
 
-    if (isset($filter['published'])) {
+    if (isset($filter['published']) && $filter['published'] !== '*') {
       $published = intval($filter['published']);
       $model = $model->whereHas('post', function ($query) use ($published) {
         $query->where('published', $published ?: 0);

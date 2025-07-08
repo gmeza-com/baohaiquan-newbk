@@ -2,24 +2,20 @@
 
 namespace Modules\News\Http\Controllers\Admin;
 
-use Carbon\Carbon;
+
 use Illuminate\Http\Request;
-use Modules\News\Models\Post;
-use Modules\News\Models\PostLanguage;
 use Modules\News\Models\PostHistory;
 use Yajra\DataTables\Facades\DataTables;
 use App\Http\Controllers\AdminController;
-use DB;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class RevisionController extends AdminController
 {
   public function index(Request $request)
   {
 
-    if ($request->ajax()) {
-      return $this->data($request);
-    }
-
+    if ($request->ajax()) return $this->data($request);
 
     $this->tpl->setData('title', 'Danh sách lịch sử bài viết');
     $this->tpl->setTemplate('news::admin.revision.index');
@@ -61,17 +57,16 @@ class RevisionController extends AdminController
         $query->where('id', $request->get('post_id'));
       });
     }
-    return DataTables::eloquent($model)
+    return Datatables::eloquent($model)
       ->editColumn('name', function ($model) {
         $html = '<h4>';
-        $html .= link_to_route('admin.post.revision.edit', $model->name, ['page' => $model->id]);
+        $html .= link_to_route('admin.post.revision.edit', $model->name, ['postHistory' => $model->id]);
         $html .= '</h4>';
         return $html;
       })
       ->addColumn('action', function ($model) {
         app('helper')->load('buttons');
         $button = [];
-
 
         // edit role
         if (allow('news.revision.edit')) {
@@ -90,6 +85,9 @@ class RevisionController extends AdminController
 
       ->editColumn('author_post', function ($model) {
         return sprintf('<span style="color:blue;font-weight:blod">%s</span>', $model->author->name);
+      })
+      ->editColumn('updated_at', function ($model) {
+        return Carbon::parse($model->updated_at)->format('d/m/Y H:i');
       })
       ->rawColumns(['name', 'author_post', 'action'])
       ->make(true);
