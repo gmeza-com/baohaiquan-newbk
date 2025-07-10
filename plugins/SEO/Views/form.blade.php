@@ -28,7 +28,8 @@
                                     {{ @$model->seo ? @$model->seo->language('title', $language['locale']) : 'This is sample url' }}
                                 </h4>
                                 <div class="seo_plugin_url">
-                                    {{ get_option('site_url') }}/<span data="base_{{ $language['locale'] }}">{{ $base ? $base . '/' : '' }}</span><strong
+                                    {{ get_option('site_url') }}/<span
+                                        data="base_{{ $language['locale'] }}">{{ $base ? $base . '/' : '' }}</span><strong
                                         data="url_{{ $language['locale'] }}">{{ @$model->language('slug', $language['locale']) ?: 'sample-url' }}</strong>
                                 </div>
                                 <div class="seo_plugin_description" data="description_{{ $language['locale'] }}">
@@ -169,30 +170,6 @@
                     $('[name="seo[language][{{ $language['locale'] }}][description]"]').keyup(function() {
                         var target = $(this).next().find('[data=count]');
                         target.text($(this).val().length);
-                    });
-
-
-                    $('[name="category[]"]').on('change', function() {
-                        var selectedCategories = $(this).val();
-
-                        if(!selectedCategories || (selectedCategories?.length ?? 0) < 1) {
-
-                            $('[data="base_{{ $language['locale'] }}"]').text(':slug/');
-                            
-
-                            return;
-                        }
-
-                        $.ajax({
-                            url: '{{ route("api.gallery.category.get", ["id" => ":id"]) }}'.replace(':id', selectedCategories[0]),
-                            method: 'GET',
-                            success: function(response) {
-                                const catSlug = response?.result?.languages?.find(lang => lang.locale === '{{ $language['locale'] }}')?.slug;
-
-                                $('[data="base_{{ $language['locale'] }}"]').text(catSlug + '/');
-
-                            }
-                        });
                     });
                 @endforeach
             })(jQuery);

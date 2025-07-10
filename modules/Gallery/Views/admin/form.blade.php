@@ -42,7 +42,12 @@
         @endcomponent
 
 
-        @include('seo_plugin::form', ['base' => @$gallery->categories->first() ? @$gallery->categories->first()->language('slug', config('cnv.languages')[0]['locale']) : ':slug', 'model' => $gallery])
+        @include('seo_plugin::form', [
+            'base' => @$gallery->categories->first()
+                ? @$gallery->categories->first()->language('slug', config('cnv.languages')[0]['locale'])
+                : ':slug',
+            'model' => $gallery,
+        ])
         <div id="form-gallery"></div>
 
     </div>
@@ -162,6 +167,32 @@
                         $('select[name=type]').change(function(e) {
                             e.preventDefault();
                             loadFormWidget($(this).val());
+                        });
+                    });
+
+
+                    $('[name="category[]"]').on('change', function() {
+                        var selectedCategories = $(this).val();
+
+                        if (!selectedCategories || (selectedCategories?.length ?? 0) < 1) {
+
+                            $('[data="base_{{ $language['locale'] }}"]').text(':slug/');
+
+
+                            return;
+                        }
+
+                        $.ajax({
+                            url: '{{ route('api.gallery.category.get', ['id' => ':id']) }}'.replace(':id',
+                                selectedCategories[0]),
+                            method: 'GET',
+                            success: function(response) {
+                                const catSlug = response?.result?.languages?.find(lang => lang.locale ===
+                                    '{{ $language['locale'] }}')?.slug;
+
+                                $('[data="base_{{ $language['locale'] }}"]').text(catSlug + '/');
+
+                            }
                         });
                     });
                 })(jQuery);
