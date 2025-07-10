@@ -52,7 +52,7 @@
                 </div>
             </div>
         @endcomponent
-        @include('seo_plugin::form', ['base' => 'ban-tin', 'model' => $category])
+        @include('seo_plugin::form', ['base' => 'danh-muc', 'model' => $category])
     </div>
     <div class="col-lg-4">
         @component('components.block')
