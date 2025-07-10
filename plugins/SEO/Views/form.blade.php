@@ -28,7 +28,8 @@
                                     {{ @$model->seo ? @$model->seo->language('title', $language['locale']) : 'This is sample url' }}
                                 </h4>
                                 <div class="seo_plugin_url">
-                                    {{ get_option('site_url') }}/{{ $base ? $base . '/' : '' }}<strong
+                                    {{ get_option('site_url') }}/<span
+                                        data="base_{{ $language['locale'] }}">{{ $base ? $base . '/' : '' }}</span><strong
                                         data="url_{{ $language['locale'] }}">{{ @$model->language('slug', $language['locale']) ?: 'sample-url' }}</strong>
                                 </div>
                                 <div class="seo_plugin_description" data="description_{{ $language['locale'] }}">

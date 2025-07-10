@@ -37,7 +37,7 @@
                 </div>
             </div>
         @endcomponent
-        @include('seo_plugin::form', ['base' => 'blogs', 'model' => $category])
+        @include('seo_plugin::form', ['base' => '', 'model' => $category])
     </div>
     <div class="col-lg-4">
         @component('components.block')
