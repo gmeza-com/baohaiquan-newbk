@@ -9,8 +9,12 @@ use Modules\News\Models\PostLanguage;
 use Modules\News\Models\PostHistory;
 use Yajra\DataTables\Facades\DataTables;
 use App\Http\Controllers\AdminController;
-use DB;
+// use DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use Illuminate\Support\Arr;
 
 class PostController extends AdminController
 {
@@ -286,7 +290,7 @@ class PostController extends AdminController
 
     $languages = $request->input('language');
     foreach ($languages as $locale => $dataLanguage) {
-      $languages[$locale]['slug'] = isset($dataLanguage['slug']) ? $dataLanguage['slug'] : str_slug($dataLanguage['name']);
+      $languages[$locale]['slug'] = isset($dataLanguage['slug']) ? $dataLanguage['slug'] : Str::slug($dataLanguage['name']);
       if ($languagePost = PostLanguage::query()->whereLocale($locale)->whereSlug(@$dataLanguage['slug'])->first()) {
         return response()->json([
           'status' => 500,
@@ -297,7 +301,7 @@ class PostController extends AdminController
     if ($post = Post::create($data)) {
       /*$languages = $request->input('language');
             foreach ($languages as $locale => $dataLanguage) {
-                $languages[$locale]['slug'] = isset($dataLanguage['slug']) ? $dataLanguage['slug'] : str_slug($dataLanguage['name']);
+                $languages[$locale]['slug'] = isset($dataLanguage['slug']) ? $dataLanguage['slug'] : Str::slug($dataLanguage['name']);
                 if ($PostLanguage = PostLanguage::query()->whereLocale($locale)->whereSlug(@$dataLanguage['slug'])->first()) {
                     $languages[$locale]['slug'] = @$dataLanguage['slug'] . '-' . $post->id;
                 }
@@ -317,7 +321,7 @@ class PostController extends AdminController
         ]);
       }
       $post->categories()->sync($data['category']);
-      \Cache::flush();
+      Cache::flush();
       return response()->json([
         'status' => 200,
         'message' => trans('language.update_success'),
@@ -333,7 +337,7 @@ class PostController extends AdminController
 
   public function edit(Post $post)
   {
-    if ((allow('news.post.only_show_my_post') && $post->user_id !== \Auth::user()->id)) {
+    if ((allow('news.post.only_show_my_post') && $post->user_id !== Auth::user()->id)) {
       abort(403);
     }
 
@@ -358,7 +362,7 @@ class PostController extends AdminController
       $post->update(['published' => -1, 'cancel_message' => $request->input('message')]);
     }
 
-    if ((allow('news.post.only_show_my_post') && $post->user_id !== \Auth::user()->id)) {
+    if ((allow('news.post.only_show_my_post') && $post->user_id !== Auth::user()->id)) {
       abort(403);
     }
     $data = $request->except(['_token', 'language']);
@@ -377,7 +381,7 @@ class PostController extends AdminController
 
     $languages = $request->input('language');
     foreach ($languages as $locale => $dataLanguage) {
-      $languages[$locale]['slug'] = isset($dataLanguage['slug']) ? $dataLanguage['slug'] : str_slug($dataLanguage['name']);
+      $languages[$locale]['slug'] = isset($dataLanguage['slug']) ? $dataLanguage['slug'] : Str::slug($dataLanguage['name']);
       if ($languagePost = PostLanguage::query()->whereLocale($locale)->whereSlug(@$dataLanguage['slug'])->first()) {
         if ($languagePost->post_id != $post->id) {
           return response()->json([
@@ -414,7 +418,7 @@ class PostController extends AdminController
 
         $post->categories()->sync($data['category']);
       }
-      \Cache::flush();
+      Cache::flush();
       return response()->json([
         'status' => 200,
         'message' => trans('language.update_success'),
@@ -432,12 +436,12 @@ class PostController extends AdminController
       return;
     }
 
-    if ((allow('news.post.only_show_my_post') && $post->user_id !== \Auth::user()->id) || !$this->allowToDo($post->published)) {
+    if ((allow('news.post.only_show_my_post') && $post->user_id !== Auth::user()->id) || !$this->allowToDo($post->published)) {
       abort(403);
     }
     DB::table('post_histories')->where('post_id', $post->id)->delete();
     if ($post->delete()) {
-      \Cache::flush();
+      Cache::flush();
       return response()->json([
         'status' => 200,
         'message' => trans('language.delete_success')
@@ -483,8 +487,7 @@ class PostController extends AdminController
       'date_published',
       'time_published'
     ];
-
-    return array_except($data, $except);
+    return Arr::except($data, $except);
   }
 
   protected function approved($approved = false)

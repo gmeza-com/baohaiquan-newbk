@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Lấy bài viết
  *
@@ -11,15 +12,14 @@
  * @return mixed
  */
 function get_list_gallery(
-    $limit = 10,
-    $category_id = 0,
-    $onlyShowPublished = true,
-    $orderBy = 'latest',
-    $locale = null
-)
-{
-    $repository = app()->make(\Modules\Gallery\Repositories\GalleryRepository::class);
-    return $repository->getGallery($limit, $category_id, $onlyShowPublished, $orderBy, $locale);
+  $limit = 10,
+  $category_id = 0,
+  $onlyShowPublished = true,
+  $orderBy = 'latest',
+  $locale = null
+) {
+  $repository = app()->make(\Modules\Gallery\Repositories\GalleryRepository::class);
+  return $repository->getGallery($limit, $category_id, $onlyShowPublished, $orderBy, $locale);
 }
 
 /**
@@ -32,8 +32,8 @@ function get_list_gallery(
  */
 function get_list_gallery_categories($parent_id = 0, $onlyShowPublished = true, $locale = null)
 {
-    $repository = app()->make(\Modules\Blog\Repositories\PostCategoryRepository::class);
-    return $repository->getCategories($parent_id, $onlyShowPublished, $locale);
+  $repository = app()->make(\Modules\Gallery\Repositories\GalleryCategoryRepository::class);
+  return $repository->getCategories($parent_id, $onlyShowPublished, $locale);
 }
 
 /**
@@ -41,13 +41,14 @@ function get_list_gallery_categories($parent_id = 0, $onlyShowPublished = true, 
  * @param $id
  * @return mixed
  */
-function get_gallery_category_by_id($id) {
-    $repository = app()->make(\Modules\Blog\Repositories\PostCategoryRepository::Class);
-    return $repository->getViaId($id);
+function get_gallery_category_by_id($id)
+{
+  $repository = app()->make(\Modules\Gallery\Repositories\GalleryCategoryRepository::class);
+  return $repository->getViaId($id);
 }
 
 function get_all_gallery_categories()
 {
-    $repository = app()->make(\Modules\Gallery\Repositories\GalleryCategoryRepository::Class);
-    return $repository->all();
+  $repository = app()->make(\Modules\Gallery\Repositories\GalleryCategoryRepository::class);
+  return $repository->all();
 }

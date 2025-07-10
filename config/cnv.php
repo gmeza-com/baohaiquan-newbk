@@ -7,6 +7,12 @@ return [
       'timezone' => 'Asia/Ho_Chi_Minh',
       'flag' => 'vi',
     ],
+    // 1 => [
+    //   'name' => 'English',
+    //   'locale' => 'en',
+    //   'timezone' => 'Asia/Ho_Chi_Minh',
+    //   'flag' => 'en',
+    // ],
   ],
   'language_default' => 'vi',
   'theme_default' => 'default',
