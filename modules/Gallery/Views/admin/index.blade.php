@@ -23,7 +23,8 @@
 
         @slot('action')
             <form action="{{ request()->url() }}" id="filter" method="GET">
-                <select name="category" id="flter_by_category" class="form-control non-select2" style="min-width: 500px">
+                <select name="category" id="flter_by_category" class="form-control non-select2"
+                    style="min-width: 120px; max-width:320px">
                     <option value="*">{{ trans('news::language.include_categories') }}</option>
                     @foreach (get_all_gallery_categories() as $category)
                         <option value="{{ $category->id }}" {{ $category->id == request()->get('category') ? 'selected' : '' }}>

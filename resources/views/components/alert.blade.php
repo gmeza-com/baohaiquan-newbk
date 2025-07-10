@@ -2,7 +2,7 @@
     <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
 
     <h4>
-        @if($type == 'success')
+        @if ($type == 'success')
             <i class="fa fa-check-circle"></i> {{ trans('language.success') }}
         @elseif($type == 'info')
             <i class="fa fa-info-circle"></i> {{ trans('language.infor') }}
