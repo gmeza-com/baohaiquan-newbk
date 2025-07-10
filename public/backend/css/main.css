@@ -2172,6 +2172,11 @@ textarea.form-control {
   margin-top: 0;
 }
 
+.input-group input.form-control {
+  line-height: 23px;
+  height: auto;
+}
+
 .form-control:focus {
   border-color: #1bbae1;
 }

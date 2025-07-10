@@ -22,7 +22,7 @@
         'method' => 'POST',
         'class' => 'form-validate',
         'id' => 'save',
-        'data-callback' => 'nothing_to_do'
+        'data-callback' => 'nothing_to_do',
     ]) !!}
     {{ method_field('PUT') }}
     @include('widget::form')

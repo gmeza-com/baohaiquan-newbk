@@ -22,7 +22,7 @@
         'method' => 'put',
         'class' => 'form-validate',
         'id' => 'role_edit',
-        'data-callback' => 'nothing_to_do'
+        'data-callback' => 'nothing_to_do',
     ]) !!}
 
     @include('acl::role.form')

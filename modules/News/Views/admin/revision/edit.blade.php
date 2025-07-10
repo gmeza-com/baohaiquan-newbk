@@ -22,7 +22,7 @@
         'method' => 'POST',
         'class' => 'form-validate',
         'id' => 'save',
-        'data-callback' => 'redirect_to'
+        'data-callback' => 'redirect_to',
     ]) !!}
     {!! method_field('PUT') !!}
     @include('news::admin.revision.form')
