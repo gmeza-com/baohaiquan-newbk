@@ -60,7 +60,9 @@
                         <div class="form-group">
                             {!! Form::label('type', trans('gallery::language.type'), ['class' => 'control-label col-md-4']) !!}
                             <div class="col-md-8">
-                                {!! Form::select('type', ['album' => 'Album', 'video' => 'Video'], null, ['class' => 'form-control']) !!}
+                                {!! Form::select('type', ['album' => 'Album', 'video' => 'Video', 'audio' => 'Audio'], null, [
+                                    'class' => 'form-control',
+                                ]) !!}
                             </div>
                         </div>
                     @endif
@@ -146,6 +148,8 @@
                 "use strict";
                 (function($) {
                     var loadFormWidget = function($type) {
+
+
                         $.get('{{ request()->fullUrl() }}?type=' + $type, function($data) {
                             $('#form-gallery').html($data);
                             editor().init();
@@ -166,6 +170,7 @@
 
                         $('select[name=type]').change(function(e) {
                             e.preventDefault();
+
                             loadFormWidget($(this).val());
                         });
                     });

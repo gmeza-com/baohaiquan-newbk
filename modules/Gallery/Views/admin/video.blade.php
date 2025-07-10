@@ -26,7 +26,13 @@
                                 ]) !!}
                                 <span class="input-group-btn">
                                     <button type="button" class="btn btn-primary" data-toggle="files"
-                                        data-target="map-icon"><i class="fa fa-video-camera"></i></button>
+                                        data-target="map-icon">
+                                        @if ($type === 'video')
+                                            <i class="fa fa-video-camera"></i>
+                                        @else
+                                            <i class="fa fa-file-audio-o"></i>
+                                        @endif
+                                    </button>
                                 </span>
                             </div>
                         </div>
