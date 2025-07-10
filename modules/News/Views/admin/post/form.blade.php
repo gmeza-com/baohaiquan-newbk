@@ -101,7 +101,6 @@
         @endcomponent
         @include('seo_plugin::form', ['base' => 'tin-tuc', 'model' => $post])
         @include('custom_field::custom_fields', ['module' => 'blog', 'model' => $post])
-
     </div>
     <div class="col-lg-4">
         @component('components.block')
@@ -141,6 +140,54 @@
                         </div>
                     </div>
 
+                    <div class="show_featured_datetime {{ @$post->featured ? '' : 'hide' }}">
+                        <div class="form-group">
+                            <div class="col-md-12 help-block">
+                                <span>Ngày hiển thị tin tiêu điểm</span>
+                            </div>
+                            <div class="col-md-7">
+                                {!! Form::text(
+                                    'date_featured_started_at',
+                                    @$post->getOriginal('featured_started_at') ? @$post->featured_started_at->format('d-m-Y') : '',
+                                    ['class' => 'form-control input-datepicker'],
+                                ) !!}
+                            </div>
+                            <div class="col-md-5">
+                                <div class="input-group bootstrap-timepicker timepicker">
+                                    {!! Form::text(
+                                        'time_featured_started_at',
+                                        @$post->getOriginal('featured_started_at') ? @$post->featured_started_at->format('H:i') : '',
+                                        ['class' => 'form-control input-timepicker24'],
+                                    ) !!}
+                                    <span class="input-group-addon"><i class="fa fa-clock-o"></i></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-md-12 help-block">
+                                <span>Ngày ẩn tin tiêu điểm</span>
+                            </div>
+                            <div class="col-md-7">
+                                {!! Form::text(
+                                    'date_featured_ended_at',
+                                    @$post->getOriginal('featured_ended_at') ? @$post->featured_ended_at->format('d-m-Y') : '',
+                                    ['class' => 'form-control input-datepicker'],
+                                ) !!}
+                            </div>
+                            <div class="col-md-5">
+                                <div class="input-group bootstrap-timepicker timepicker">
+                                    {!! Form::text(
+                                        'time_featured_ended_at',
+                                        @$post->getOriginal('featured_ended_at') ? @$post->featured_ended_at->format('H:i') : '',
+                                        ['class' => 'form-control input-timepicker24'],
+                                    ) !!}
+                                    <span class="input-group-addon"><i class="fa fa-clock-o"></i></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
 
                     <div class="form-group">
                         {!! Form::label('status', 'Ẩn bản tin', ['class' => 'control-label col-md-4']) !!}
@@ -152,62 +199,33 @@
                         </div>
                     </div>
 
-
-                    <div class="form-group" id="show_publish_datetime">
-                        <div class="col-md-12 help-block">
-                            <span>Ngày hiển thị tin tiêu điểm</span>
-                        </div>
-                        <div class="col-md-7">
-                            {!! Form::text(
-                                'date_featured_started_at',
-                                @$post->getOriginal('featured_started_at') ? @$post->featured_started_at->format('d-m-Y') : '',
-                                ['class' => 'form-control input-datepicker'],
-                            ) !!}
-                        </div>
-                        <div class="col-md-5">
-                            <div class="input-group bootstrap-timepicker timepicker">
+                    @if (allow('news.post.approved_level_1') && $post->published >= 3)
+                        <div class="form-group show_publish_datetime">
+                            <div class="col-md-12 help-block">
+                                <span>Ngày bắt đầu hiển thị</span>
+                            </div>
+                            <div class="col-md-7">
                                 {!! Form::text(
-                                    'time_featured_started_at',
-                                    @$post->getOriginal('featured_started_at') ? @$post->featured_started_at->format('H:i') : '',
-                                    ['class' => 'form-control input-timepicker24'],
+                                    'date_published',
+                                    @$post->getOriginal('published_at') ? @$post->published_at->format('d-m-Y') : '',
+                                    ['class' => 'form-control input-datepicker'],
                                 ) !!}
-                                <span class="input-group-addon"><i class="fa fa-clock-o"></i></span>
+                            </div>
+                            <div class="col-md-5">
+                                <div class="input-group bootstrap-timepicker timepicker">
+                                    {!! Form::text(
+                                        'time_published',
+                                        @$post->getOriginal('published_at') ? @$post->published_at->format('H:i') : '',
+                                        ['class' => 'form-control input-timepicker24'],
+                                    ) !!}
+                                    <span class="input-group-addon"><i class="fa fa-clock-o"></i></span>
+                                </div>
+                            </div>
+                            <div class="col-md-12 help-block">
+                                <p>Để trống các ô trên để ẩn bài viết</p>
                             </div>
                         </div>
-                    </div>
-
-                    <div class="form-group" id="show_publish_datetime">
-                        <div class="col-md-12 help-block">
-                            <span>Ngày ẩn tin tiêu điểm</span>
-                        </div>
-                        <div class="col-md-7">
-                            {!! Form::text(
-                                'date_featured_ended_at',
-                                @$post->getOriginal('featured_ended_at') ? @$post->featured_ended_at->format('d-m-Y') : '',
-                                ['class' => 'form-control input-datepicker'],
-                            ) !!}
-                        </div>
-                        <div class="col-md-5">
-                            <div class="input-group bootstrap-timepicker timepicker">
-                                {!! Form::text(
-                                    'time_featured_ended_at',
-                                    @$post->getOriginal('featured_ended_at') ? @$post->featured_ended_at->format('H:i') : '',
-                                    ['class' => 'form-control input-timepicker24'],
-                                ) !!}
-                                <span class="input-group-addon"><i class="fa fa-clock-o"></i></span>
-                            </div>
-                        </div>
-                    </div>
-
-                    {{-- <div class="form-group">
-                        {!! Form::label('hide', 'Ẩn bản tin', ['class' => 'control-label col-md-4']) !!}
-                        <div class="col-md-8">
-                            <label class="switch switch-warning">
-                                <input type="checkbox" name="hide" value="1" {{ @$post->hide ? 'checked' : '' }}>
-                                <span></span>
-                            </label>
-                        </div>
-                </div> --}}
+                    @endif
 
                     @if ($post->could_be_approved_post)
                         <div class="form-group">
@@ -270,30 +288,7 @@
                             @endif
                         </div>
                     </div>
-                    @if (allow('news.post.approved_level_1') && $post->published >= 3)
-                        <div class="form-group" id="show_publish_datetime">
-                            <div class="col-md-7">
-                                {!! Form::text(
-                                    'date_published',
-                                    @$post->getOriginal('published_at') ? @$post->published_at->format('d-m-Y') : '',
-                                    ['class' => 'form-control input-datepicker'],
-                                ) !!}
-                            </div>
-                            <div class="col-md-5">
-                                <div class="input-group bootstrap-timepicker timepicker">
-                                    {!! Form::text(
-                                        'time_published',
-                                        @$post->getOriginal('published_at') ? @$post->published_at->format('H:i') : '',
-                                        ['class' => 'form-control input-timepicker24'],
-                                    ) !!}
-                                    <span class="input-group-addon"><i class="fa fa-clock-o"></i></span>
-                                </div>
-                            </div>
-                            <div class="col-md-12 help-block">
-                                <p>Để trống các ô trên để ẩn bài viết</p>
-                            </div>
-                        </div>
-                    @endif
+
                 </div>
             </div>
         @endcomponent
@@ -327,3 +322,20 @@
     </div>
 
     @include('partial.editor')
+
+    @push('footer')
+        <script>
+            "use strict";
+            (function($) {
+                $('input[name="featured"]').on('change', function() {
+                    if ($(this).is(":checked")) $('.show_featured_datetime').removeClass('hide');
+                    else $('.show_featured_datetime').addClass('hide');
+                });
+
+                $('input[name="status"]').on('change', function() {
+                    if (!$(this).is(":checked")) $('.show_publish_datetime').removeClass('hide');
+                    else $('.show_publish_datetime').addClass('hide');
+                });
+            })(jQuery);
+        </script>
+    @endpush

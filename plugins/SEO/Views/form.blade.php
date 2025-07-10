@@ -34,9 +34,7 @@
                                 <div class="seo_plugin_description" data="description_{{ $language['locale'] }}">
                                     {{ @$model->seo
                                         ? @$model->seo->language('description', $language['locale'])
-                                        : '
-                                                                                                                                                                                                                                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. In enim ligula, euismod vel pulvinar rhoncus, varius ut lacus. Aenean et nulla nunc. Maecenas volutpat.
-                                                                                                                                                                                                                                                    ' }}
+                                        : 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. In enim ligula, euismod vel pulvinar rhoncus, varius ut lacus. Aenean et nulla nunc. Maecenas volutpat.' }}
                                 </div>
                             </div>
                         @endforeach
@@ -116,8 +114,6 @@
                 margin-bottom: 2px;
             }
 
-
-
             .seo_plugin_url {
                 display: block;
                 word-wrap: break-word;
@@ -155,6 +151,7 @@
                         $('[data="url_{{ $language['locale'] }}"]').html(slugify($(this).val()));
                         $('[name="language[{{ $language['locale'] }}][slug]"]').val(slugify($(this).val()));
                     });
+
                     $('[name="language[{{ $language['locale'] }}][description]"]').keyup(function() {
                         $('[data="description_{{ $language['locale'] }}"]').html($(this).val().substr(0, 169));
                         $('[name="seo[language][{{ $language['locale'] }}][description]"]').val($(this).val()
