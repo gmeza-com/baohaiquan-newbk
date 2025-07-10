@@ -305,8 +305,9 @@ class GalleryController extends AdminController
 
   protected function getForm($type, $gallery)
   {
-    if ($type == 'video') {
-      return view('gallery::admin.video', compact('gallery'));
+
+    if (in_array($type, ['video', 'audio'])) {
+      return view('gallery::admin.video', compact('gallery', 'type'));
     }
 
     return view('gallery::admin.album', compact('gallery'));
