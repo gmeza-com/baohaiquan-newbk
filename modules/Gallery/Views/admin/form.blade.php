@@ -40,7 +40,9 @@
                 </div>
             </div>
         @endcomponent
-        @include('seo_plugin::form', ['base' => 'gallery', 'model' => $gallery])
+
+
+        @include('seo_plugin::form', ['base' => @$gallery->categories->first() ? @$gallery->categories->first()->language('slug', config('cnv.languages')[0]['locale']) : ':slug', 'model' => $gallery])
         <div id="form-gallery"></div>
 
     </div>
