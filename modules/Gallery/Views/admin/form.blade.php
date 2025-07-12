@@ -1,3 +1,7 @@
+@push('header')
+    <link rel="stylesheet" href="/backend/css/longform.css">
+@endpush
+
 <meta name="gallery-type" content="{{ @$gallery->type }}">
 <div class="row">
     <div class="col-lg-8">
@@ -60,9 +64,14 @@
                         <div class="form-group">
                             {!! Form::label('type', trans('gallery::language.type'), ['class' => 'control-label col-md-4']) !!}
                             <div class="col-md-8">
-                                {!! Form::select('type', ['album' => 'Album', 'video' => 'Video', 'audio' => 'Audio'], null, [
-                                    'class' => 'form-control',
-                                ]) !!}
+                                {!! Form::select(
+                                    'type',
+                                    ['album' => 'Album', 'video' => 'Video', 'audio' => 'Audio', 'longform' => 'Longform'],
+                                    null,
+                                    [
+                                        'class' => 'form-control',
+                                    ],
+                                ) !!}
                             </div>
                         </div>
                     @endif
@@ -142,20 +151,134 @@
         </div>
 
         @include('partial.editor')
+        @include('partial.editor-js')
 
         @push('footer')
             <script>
                 "use strict";
                 (function($) {
                     var loadFormWidget = function($type) {
-
-
                         $.get('{{ request()->fullUrl() }}?type=' + $type, function($data) {
                             $('#form-gallery').html($data);
                             editor().init();
                             Main().init();
+
+                            if ($type === 'longform') {
+                                // first define the tools to be made avaliable in the columns
+                                let column_tools = {
+                                    header: {
+                                        class: Header,
+                                    },
+                                    paragraph: {
+                                        class: Paragraph,
+                                        inlineToolbar: true,
+                                    },
+                                    delimiter: Delimiter
+                                }
+
+
+                                const editor = new EditorJS({
+                                    holder: 'longform-content-' + '{{ $language['locale'] }}',
+                                    tools: {
+                                        embed: Embed,
+
+                                        quote: {
+                                            class: Quote,
+                                            config: {
+                                                defaultType: "quotationMark",
+                                            },
+                                            shortcut: "CMD+SHIFT+O",
+                                        },
+
+                                        header: {
+                                            class: Header,
+                                        },
+                                        paragraph: {
+                                            class: Paragraph,
+                                            inlineToolbar: true,
+                                        },
+                                        columns: {
+                                            class: editorjsColumns,
+                                            config: {
+                                                EditorJsLibrary: EditorJS, // Pass the library instance to the columns instance.
+                                                tools: column_tools // IMPORTANT! ref the column_tools
+                                            }
+                                        },
+                                        delimiter: Delimiter,
+                                        image: {
+                                            class: ImageTool,
+                                            config: {
+                                                moxman: moxman,
+                                                captionPlaceholder: "Nhập mô tả hình ảnh",
+                                                buttonContent: "Chọn hình ảnh",
+                                            }
+                                        },
+                                    },
+                                    data: {},
+                                    i18n: {
+                                        messages: {
+                                            ui: {
+                                                blockTunes: {
+                                                    toggler: {
+                                                        "Click to tune": "Bấm để điều chỉnh",
+                                                        "or drag to move": "hoặc nắm kéo để di chuyển",
+                                                    },
+                                                },
+                                                inlineToolbar: {
+                                                    converter: {
+                                                        "Convert to": "Chuyển thành",
+                                                    },
+                                                },
+                                                toolbar: {
+                                                    toolbox: {
+                                                        Add: "Thêm",
+                                                    },
+                                                },
+                                            },
+                                            toolNames: {
+                                                Text: "Đoạn văn",
+                                                Heading: "Tiêu đề đoạn",
+                                                List: "Danh sách",
+                                                // Checklist: "Danh mục kiểm tra",
+                                                Quote: "Trích dẫn",
+                                                Delimiter: "Dấu phân cách",
+                                                Link: "Liên kết",
+                                                Bold: "Đậm",
+                                                Italic: "Nghiêng",
+                                                SimpleImage: "Hình ảnh",
+                                                Image: "Hình ảnh",
+                                            },
+                                            blockTunes: {
+                                                delete: {
+                                                    Delete: "Xóa bỏ",
+                                                },
+                                                moveUp: {
+                                                    "Move up": "Di chuyển lên",
+                                                },
+                                                moveDown: {
+                                                    "Move down": "Di chuyển xuống",
+                                                },
+                                            },
+                                        },
+                                    }
+
+
+                                });
+
+                                // Trigger EditorJS ready event
+                                $(document).trigger('editorjs:ready');
+
+                                // Ensure EditorJS content is ignored by form validation
+                                $('.longform-content, .ignore-validation').find('input, textarea, select').each(
+                                    function() {
+                                        $(this).rules('add', {
+                                            ignoreEditorJS: true
+                                        });
+                                    });
+                            }
                         });
                     };
+
 
                     $(document).ready(function() {
                         var defaultWidget = $('select[name=type]').val();
@@ -173,33 +296,60 @@
 
                             loadFormWidget($(this).val());
                         });
-                    });
+
+                        $('[name="category[]"]').on('change', function() {
+                            var selectedCategories = $(this).val();
+
+                            if (!selectedCategories || (selectedCategories?.length ?? 0) < 1) {
+
+                                $('[data="base_{{ $language['locale'] }}"]').text(':slug/');
 
 
-                    $('[name="category[]"]').on('change', function() {
-                        var selectedCategories = $(this).val();
-
-                        if (!selectedCategories || (selectedCategories?.length ?? 0) < 1) {
-
-                            $('[data="base_{{ $language['locale'] }}"]').text(':slug/');
-
-
-                            return;
-                        }
-
-                        $.ajax({
-                            url: '{{ route('api.gallery.category.get', ['id' => ':id']) }}'.replace(':id',
-                                selectedCategories[0]),
-                            method: 'GET',
-                            success: function(response) {
-                                const catSlug = response?.result?.languages?.find(lang => lang.locale ===
-                                    '{{ $language['locale'] }}')?.slug;
-
-                                $('[data="base_{{ $language['locale'] }}"]').text(catSlug + '/');
-
+                                return;
                             }
+
+                            $.ajax({
+                                url: '{{ route('api.gallery.category.get', ['id' => ':id']) }}'
+                                    .replace(':id',
+                                        selectedCategories[0]),
+                                method: 'GET',
+                                success: function(response) {
+                                    const catSlug = response?.result?.languages?.find(lang => lang
+                                        .locale ===
+                                        '{{ $language['locale'] }}')?.slug;
+
+                                    $('[data="base_{{ $language['locale'] }}"]').text(catSlug +
+                                        '/');
+
+                                }
+                            });
                         });
+
+
+                        // Use event delegation to handle dynamically loaded elements
+                        $(document).on('click', '#longform-nav-desktop', function() {
+                            console.log('Desktop');
+                        });
+
+                        // Handle EditorJS validation ignoring for dynamically created content
+                        $(document).on('DOMNodeInserted', '.longform-content, .ignore-validation', function() {
+                            var $container = $(this);
+                            // Add a small delay to ensure EditorJS is fully initialized
+                            setTimeout(function() {
+                                $container.find(
+                                    'input, textarea, select, .codex-editor__redactor, .codex-editor__redactor *'
+                                ).each(function() {
+                                    $(this).rules('add', {
+                                        ignoreEditorJS: true
+                                    });
+                                });
+                            }, 100);
+                        });
+
                     });
+
+
+
                 })(jQuery);
             </script>
         @endpush
