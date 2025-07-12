@@ -145,20 +145,26 @@ var Main = function () {
       var validator = b.validate();
       var btn = b.find('[type="submit"], button.btn-primary');
       b.data("validator", validator);
-      
+
       // Add custom validation rules for EditorJS
-      $.validator.addMethod("ignoreEditorJS", function(value, element) {
-        // Always return true for EditorJS elements to ignore validation
-        return true;
-      }, "");
-      
+      $.validator.addMethod(
+        "ignoreEditorJS",
+        function (value, element) {
+          // Always return true for EditorJS elements to ignore validation
+          return true;
+        },
+        ""
+      );
+
       // Apply ignore rule to EditorJS containers
-      $('.longform-content, .ignore-validation').find('input, textarea, select').each(function() {
-        $(this).rules('add', {
-          ignoreEditorJS: true
+      $(".longform-content, .ignore-validation")
+        .find("input, textarea, select")
+        .each(function () {
+          $(this).rules("add", {
+            ignoreEditorJS: true,
+          });
         });
-      });
-      
+
       b.ajaxForm({
         dataType: "json",
         beforeSerialize: function (form, options) {},
@@ -208,24 +214,32 @@ var Main = function () {
     $(document).on("change", ".select-select2", function () {
       $(this).trigger("blur");
     });
-    
+
     // Handle dynamically loaded EditorJS content
-    $(document).on('DOMNodeInserted', '.longform-content, .ignore-validation, .codex-editor__redactor', function() {
-      var $container = $(this);
-      // Add a small delay to ensure EditorJS is fully initialized
-      setTimeout(function() {
-        $container.find('input, textarea, select, [contenteditable], .codex-editor__redactor *').each(function() {
-          if ($(this).rules) {
-            $(this).rules('add', {
-              ignoreEditorJS: true
+    $(document).on(
+      "DOMNodeInserted",
+      ".longform-content, .ignore-validation, .codex-editor__redactor",
+      function () {
+        var $container = $(this);
+        // Add a small delay to ensure EditorJS is fully initialized
+        setTimeout(function () {
+          $container
+            .find(
+              "input, textarea, select, [contenteditable], .codex-editor__redactor *"
+            )
+            .each(function () {
+              if ($(this).rules) {
+                $(this).rules("add", {
+                  ignoreEditorJS: true,
+                });
+              }
             });
-          }
-        });
-      }, 100);
-    });
-    
+        }, 100);
+      }
+    );
+
     // Also handle EditorJS initialization events
-    $(document).on('editorjs:ready', function() {
+    $(document).on("editorjs:ready", function () {
       handleEditorJSValidation();
     });
   };
@@ -253,7 +267,8 @@ var Main = function () {
         e.closest(".help-block").remove();
       },
       // Ignore EditorJS containers and their content
-      ignore: ".longform-content, .longform-content *, .ignore-validation, .ignore-validation *",
+      ignore:
+        ".longform-content, .longform-content *, .ignore-validation, .ignore-validation *",
     });
   };
 
@@ -280,20 +295,26 @@ var Main = function () {
       }
     });
   };
-  
+
   var handleEditorJSValidation = function () {
     // Add custom validation method for EditorJS
     if ($.validator && $.validator.addMethod) {
-      $.validator.addMethod("ignoreEditorJS", function(value, element) {
-        return true; // Always return true to ignore validation
-      }, "");
-      
+      $.validator.addMethod(
+        "ignoreEditorJS",
+        function (value, element) {
+          return true; // Always return true to ignore validation
+        },
+        ""
+      );
+
       // Apply to existing EditorJS elements
-      $('.longform-content, .ignore-validation, .codex-editor__redactor').find('input, textarea, select, [contenteditable]').each(function() {
-        $(this).rules('add', {
-          ignoreEditorJS: true
+      $(".longform-content, .ignore-validation, .codex-editor__redactor")
+        .find("input, textarea, select, [contenteditable]")
+        .each(function () {
+          $(this).rules("add", {
+            ignoreEditorJS: true,
+          });
         });
-      });
     }
   };
 

@@ -177,17 +177,15 @@
                                 }
 
 
-                                const editor = new EditorJS({
+                                const editorjs = new EditorJS({
                                     holder: 'longform-content-' + '{{ $language['locale'] }}',
                                     tools: {
                                         embed: Embed,
-
                                         quote: {
                                             class: Quote,
                                             config: {
                                                 defaultType: "quotationMark",
                                             },
-                                            shortcut: "CMD+SHIFT+O",
                                         },
 
                                         header: {
@@ -275,6 +273,10 @@
                                             ignoreEditorJS: true
                                         });
                                     });
+
+
+                                // Store editorjs instance globally for form submission handling
+                                window.editorjsInstance = editorjs;
                             }
                         });
                     };
@@ -282,10 +284,14 @@
 
                     $(document).ready(function() {
                         var defaultWidget = $('select[name=type]').val();
+                        var currentWidget = defaultWidget;
+
+
                         if ($('select[name=type]').length > 0) {
                             loadFormWidget(defaultWidget);
                         } else {
                             defaultWidget = $('meta[name="gallery-type"]');
+                            currentWidget = defaultWidget;
                             if (defaultWidget.length > 0) {
                                 loadFormWidget(defaultWidget.attr('content'));
                             }
@@ -293,8 +299,11 @@
 
                         $('select[name=type]').change(function(e) {
                             e.preventDefault();
-
-                            loadFormWidget($(this).val());
+                            const _nextWidget = $(this).val();
+                            if (_nextWidget !== currentWidget) {
+                                loadFormWidget(_nextWidget);
+                                currentWidget = _nextWidget;
+                            }
                         });
 
                         $('[name="category[]"]').on('change', function() {
@@ -326,11 +335,6 @@
                         });
 
 
-                        // Use event delegation to handle dynamically loaded elements
-                        $(document).on('click', '#longform-nav-desktop', function() {
-                            console.log('Desktop');
-                        });
-
                         // Handle EditorJS validation ignoring for dynamically created content
                         $(document).on('DOMNodeInserted', '.longform-content, .ignore-validation', function() {
                             var $container = $(this);
@@ -346,8 +350,29 @@
                             }, 100);
                         });
 
-                    });
+                        var handleSubmit = function() {
+                            if (currentWidget === 'longform') {
 
+                                window.editorjsInstance.save().then((data) => {
+
+                                    $('#editor-content-{{ $language['locale'] }}').val(JSON.stringify(
+                                        data));
+
+                                    // Use this.submit() instead of $(this).submit() to avoid infinite loop
+                                    $('#save').submit();
+                                }).catch((error) => {
+                                    console.error('Error saving EditorJS data:', error);
+                                    alert('Please check the content before saving.');
+                                });
+
+
+                            } else {
+                                $('#save').submit();
+                            }
+                        }
+
+                        window.handleSubmit = handleSubmit;
+                    });
 
 
                 })(jQuery);

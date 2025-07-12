@@ -17,15 +17,10 @@
                     <div class="tab-pane {{ $loop->first ? 'active' : '' }}" id="{{ $language['locale'] }}_longform">
                         <div class="longform-container ignore-validation">
                             <div class="longform-nav">
-                                <button id="longform-nav-desktop" type="button" class="btn btn-primary"><i
-                                        class="fa fa-desktop" aria-hidden="true"></i></button>
-                                <button id="longform-nav-mobile" type="button" class="btn btn-default"><i
-                                        class="fa fa-mobile" aria-hidden="true"></i></button>
-                                <button type="button" class="btn btn-default"><i class="fa fa-arrows-alt"
-                                        aria-hidden="true"></i></button>
+
                             </div>
 
-                            <textarea id="editor-content" name="editor_content" hidden></textarea>
+                            <textarea id="editor-content-{{ $language['locale'] }}" name="language[{{ $language['locale'] }}][content]" hidden></textarea>
                             <div id="longform-content-{{ $language['locale'] }}" class="longform-content"></div>
 
                         </div>
