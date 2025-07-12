@@ -6,7 +6,7 @@
         <a href="{{ admin_route('gallery.index') }}" class="btn btn-default">
             <i class="fa fa-arrow-circle-left"></i> {{ trans('language.back') }}
         </a>
-        <button type="button" class="btn btn-primary" onclick="submitForm('#save');">
+        <button type="button" class="btn btn-primary" onclick="handleSubmit();">
             <i class="fa fa-save"></i> {{ trans('language.save') }}
         </button>
     </div>
@@ -22,7 +22,7 @@
         'method' => 'POST',
         'class' => 'form-validate',
         'id' => 'save',
-        'data-callback' => 'nothing_to_do'
+        'data-callback' => 'nothing_to_do',
     ]) !!}
     {!! method_field('PUT') !!}
     @include('gallery::admin.form')

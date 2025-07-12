@@ -1,5 +1,5 @@
 @component('components.block')
-    @slot('title', 'Video')
+    @slot('title', $type === 'video' ? 'Video' : 'Audio')
     <div class="block-body">
         <div class="form-bordered">
             <ul class="nav nav-tabs" data-toggle="tabs">
