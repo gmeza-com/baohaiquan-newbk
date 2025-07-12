@@ -1,0 +1,16 @@
+.longform-container {
+  padding: 1rem;
+}
+
+.longform-container .longform-nav {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+}
+
+.longform-container .longform-content {
+  border: 1px solid #ccc;
+  min-height: 300px;
+  margin-top: 16px;
+}
