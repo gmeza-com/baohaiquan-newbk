@@ -153,6 +153,10 @@
         @include('partial.editor')
         @include('partial.editor-js')
 
+        @php
+            $content = @$gallery->language('content', $language['locale']);
+        @endphp
+
         @push('footer')
             <script>
                 "use strict";
@@ -164,6 +168,9 @@
                             Main().init();
 
                             if ($type === 'longform') {
+
+                                const data = JSON.parse(@json($content)?.[0]);
+
                                 // first define the tools to be made avaliable in the columns
                                 let column_tools = {
                                     header: {
@@ -175,7 +182,6 @@
                                     },
                                     delimiter: Delimiter
                                 }
-
 
                                 const editorjs = new EditorJS({
                                     holder: 'longform-content-' + '{{ $language['locale'] }}',
@@ -212,7 +218,7 @@
                                             }
                                         },
                                     },
-                                    data: {},
+                                    data,
                                     i18n: {
                                         messages: {
                                             ui: {
@@ -259,8 +265,6 @@
                                             },
                                         },
                                     }
-
-
                                 });
 
                                 // Trigger EditorJS ready event
@@ -284,16 +288,18 @@
 
                     $(document).ready(function() {
                         var defaultWidget = $('select[name=type]').val();
-                        var currentWidget = defaultWidget;
-
 
                         if ($('select[name=type]').length > 0) {
                             loadFormWidget(defaultWidget);
+                            var currentWidget = defaultWidget;
+
                         } else {
                             defaultWidget = $('meta[name="gallery-type"]');
-                            currentWidget = defaultWidget;
+
+
                             if (defaultWidget.length > 0) {
                                 loadFormWidget(defaultWidget.attr('content'));
+                                currentWidget = defaultWidget.attr('content');
                             }
                         }
 
@@ -351,12 +357,14 @@
                         });
 
                         var handleSubmit = function() {
+
                             if (currentWidget === 'longform') {
 
                                 window.editorjsInstance.save().then((data) => {
 
-                                    $('#editor-content-{{ $language['locale'] }}').val(JSON.stringify(
-                                        data));
+                                    const dataJson = JSON.stringify(data);
+
+                                    $('#editor-content-{{ $language['locale'] }}').val(dataJson);
 
                                     // Use this.submit() instead of $(this).submit() to avoid infinite loop
                                     $('#save').submit();
