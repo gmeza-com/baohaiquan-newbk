@@ -17,7 +17,9 @@
                     <div class="tab-pane {{ $loop->first ? 'active' : '' }}" id="{{ $language['locale'] }}_longform">
                         <div class="longform-container ignore-validation">
                             <div class="longform-nav">
-
+                                <button onclick="showData({{ $gallery->id }}, '{{ $language['locale'] }}')" type="button"
+                                    class="btn btn-primary"><i class="fa fa-eye" aria-hidden="true"></i></i> Xem
+                                    trước</button>
                             </div>
 
                             <textarea id="editor-content-{{ $language['locale'] }}" name="language[{{ $language['locale'] }}][content]" hidden></textarea>
