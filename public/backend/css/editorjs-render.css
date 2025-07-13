@@ -1,0 +1,426 @@
+/* Editor.js Render Styles */
+
+/* Image blocks */
+.editor-image {
+  /* margin: 20px 0; */
+  text-align: center;
+  padding: 16px 0;
+}
+
+.editor-image.first {
+  padding-top: 0;
+}
+
+.editor-image img {
+  max-width: 668px;
+  height: auto;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.editor-image.stretched img {
+  width: 100%;
+  max-width: none;
+}
+
+.editor-image figcaption {
+  font-size: 16px;
+  font-weight: 500;
+  color: #0059b2;
+  text-align: center;
+  font-style: italic;
+  max-width: 568px;
+  margin: 0 auto;
+  margin-top: 8px;
+}
+
+/* Quote blocks */
+.editor-quote {
+  margin: 20px 0;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-left: 4px solid #007bff;
+  border-radius: 4px;
+}
+
+.editor-quote p {
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.5;
+  color: #333;
+}
+
+.editor-quote cite {
+  display: block;
+  margin-top: 10px;
+  font-size: 14px;
+  color: #666;
+  font-style: italic;
+}
+
+/* Delimiter blocks */
+.editor-delimiter {
+  padding: 32px 0;
+  width: 100%;
+  max-width: 568px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.editor-delimiter .delimiter-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+/* Star delimiter */
+.editor-delimiter-star .star-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.editor-delimiter-star .star {
+  color: #1d4ed8;
+}
+
+.editor-delimiter-star .star-large {
+  font-size: 24px;
+}
+
+.editor-delimiter-star .star-medium {
+  font-size: 20px;
+}
+
+/* Dash delimiter */
+.editor-delimiter-dash .dash-container {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.editor-delimiter-dash .dash {
+  width: 12px;
+  height: 1px;
+  background-color: #9ca3af;
+  display: block;
+}
+
+/* Line delimiter */
+.editor-delimiter-line .line-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.editor-delimiter-line .line {
+  background-color: #9ca3af;
+  border-radius: 9999px;
+}
+
+/* Width classes */
+.editor-delimiter-line .width-8 {
+  width: 8%;
+}
+
+.editor-delimiter-line .width-15 {
+  width: 15%;
+}
+
+.editor-delimiter-line .width-25 {
+  width: 25%;
+}
+
+.editor-delimiter-line .width-35 {
+  width: 35%;
+}
+
+.editor-delimiter-line .width-50 {
+  width: 50%;
+}
+
+.editor-delimiter-line .width-60 {
+  width: 60%;
+}
+
+.editor-delimiter-line .width-100 {
+  width: 100%;
+}
+
+/* Height classes */
+.editor-delimiter-line .height-1 {
+  height: 1px;
+}
+
+.editor-delimiter-line .height-2 {
+  height: 2px;
+}
+
+.editor-delimiter-line .height-3 {
+  height: 3px;
+}
+
+.editor-delimiter-line .height-4 {
+  height: 4px;
+}
+
+.editor-delimiter-line .height-5 {
+  height: 6px;
+}
+
+.editor-delimiter-line .height-6 {
+  height: 8px;
+}
+
+/* Embed blocks */
+.editor-embed {
+  margin: 20px 0;
+  text-align: center;
+}
+
+.editor-embed .embed-container {
+  position: relative;
+  padding-bottom: 56.25%; /* 16:9 aspect ratio */
+  height: 0;
+  overflow: hidden;
+  max-width: 100%;
+}
+
+.editor-embed .embed-container iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.editor-embed figcaption {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #666;
+  font-style: italic;
+}
+
+/* Column blocks - Legacy */
+.editor-columns {
+  display: flex;
+  gap: 20px;
+  margin: 20px 0;
+}
+
+.editor-column {
+  flex: 1;
+  min-width: 0;
+}
+
+@media (max-width: 768px) {
+  .editor-columns {
+    flex-direction: column;
+    gap: 15px;
+  }
+}
+
+/* Columns block - New implementation */
+.editor-columns-block {
+  display: grid;
+  gap: 1.75rem;
+  padding: 1rem 0;
+  width: 100%;
+  max-width: 568px;
+  margin: 0 auto;
+}
+
+.editor-columns-block .editor-column {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.editor-columns-block .editor-column p {
+  padding: 0;
+  margin: 0;
+}
+
+.editor-columns-block .editor-image.column-image {
+  padding: 0;
+  margin: 0;
+  transform: scale(1.5);
+}
+
+.editor-columns-block .editor-image.column-image img {
+  width: 100%;
+  height: auto;
+}
+
+.editor-columns-block .editor-column[data-col-index="0"] .editor-image.column-image {
+  transform-origin: top right;
+}
+
+.editor-columns-block .editor-column[data-col-index="1"] .editor-image.column-image {
+  transform-origin: top left;
+}
+
+/* Responsive columns */
+@media (max-width: 768px) {
+  .editor-columns-block {
+    grid-template-columns: 1fr !important;
+    gap: 1rem;
+  }
+  
+  .editor-columns-block .editor-image.column-image {
+    transform: scale(1);
+    transform-origin: center;
+  }
+}
+
+/* Header blocks */
+.editor-content h1,
+.editor-content h2,
+.editor-content h3,
+.editor-content h4,
+.editor-content h5,
+.editor-content h6 {
+  margin-top: 30px;
+  margin-bottom: 15px;
+  line-height: 1.2;
+  color: #333;
+  width: 100%;
+  max-width: 568px;
+  margin: 0 auto;
+}
+
+.editor-content h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+}
+
+.editor-content h2 {
+  font-size: 2rem;
+  font-weight: 600;
+}
+
+.editor-content h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.editor-content h4 {
+  font-size: 1.25rem;
+  font-weight: 500;
+}
+
+.editor-content h5 {
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.editor-content h6 {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+/* Paragraph blocks */
+.editor-content p {
+  line-height: 1.6;
+  color: #222222;
+  max-width: 568px;
+  margin: 0 auto;
+  padding: 16px 0;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 160%;
+  letter-spacing: 0%;
+  width: 100%;
+}
+
+/* General container for editor content */
+.editor-content {
+  max-width: 100%;
+  word-wrap: break-word;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* List blocks */
+.editor-list {
+  margin: 15px 0;
+  padding-left: 20px;
+}
+
+.editor-list li {
+  margin-bottom: 5px;
+  line-height: 1.6;
+}
+
+/* Checklist blocks */
+.editor-checklist {
+  margin: 15px 0;
+}
+
+.checklist-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.checklist-item input[type="checkbox"] {
+  margin-right: 10px;
+  cursor: not-allowed;
+}
+
+.checklist-item span {
+  line-height: 1.6;
+}
+
+/* Code blocks */
+.editor-code {
+  background-color: #f4f4f4;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 15px;
+  margin: 20px 0;
+  overflow-x: auto;
+  font-family: "Courier New", Courier, monospace;
+}
+
+.editor-code code {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 14px;
+  line-height: 1.4;
+  color: #333;
+}
+
+/* Table blocks */
+.editor-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  border: 1px solid #ddd;
+}
+
+.editor-table th,
+.editor-table td {
+  border: 1px solid #ddd;
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.editor-table th {
+  background-color: #f5f5f5;
+  font-weight: bold;
+}
+
+.editor-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.editor-table tr:hover {
+  background-color: #f0f0f0;
+}

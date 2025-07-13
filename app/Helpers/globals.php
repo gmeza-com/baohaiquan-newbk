@@ -171,6 +171,13 @@ if (!function_exists('do_filter')) {
 
     app('hook')->doFilter($hookName, $string, $args);
   }
-} else {
+}
+
+/**
+ * Load additional helpers
+ */
+require_once __DIR__ . '/editorjs.php';
+
+if (!function_exists('admin_path')) {
   exit;
 }

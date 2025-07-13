@@ -8,6 +8,7 @@ use Modules\News\Models\PostCategory;
 use Modules\News\Models\PostLanguage;
 use Modules\News\Models\Post;
 use Plugins\ViewCounter\Models\View;
+use Illuminate\Support\Facades\Cache;
 
 class PostRepository
 {
@@ -29,7 +30,7 @@ class PostRepository
     {
         $key = 'post.' . md5($slug);
 
-        if (!\Cache::has($key)) {
+        if (!Cache::has($key)) {
             $post = $this->postLanguage->where([
                 ['slug', '=', $slug]
             ])->with(['post.seo', 'post.categories', 'post.view']);
@@ -48,10 +49,10 @@ class PostRepository
             $post = $post->firstOrFail();
             session(['lang' => $post->locale]);
 
-            \Cache::put($key, $post, 3600);
+            Cache::put($key, $post, 3600);
         }
 
-        return \Cache::get($key);
+        return Cache::get($key);
     }
 
     public function getViaId($id)
@@ -88,7 +89,7 @@ class PostRepository
     {
 
         $key = 'post.get_post_via_category.' . md5($category->id . $perPage . $onlyPublished . $orderBy . request('page'));
-        if (!\Cache::has($key)) {
+        if (!Cache::has($key)) {
             $query = $this->posts->query();
             $query->whereHas('categories', function ($q) use ($category) {
                 $categories = $this->getAllPostCategoriesBy($category->id);
@@ -110,9 +111,9 @@ class PostRepository
             $query = $query->orderBy('published_at', 'desc');
             $query = $query->where('status',false);
             $posts = $perPage ? $query->paginate($perPage) : $query->get();
-            \Cache::put($key, $posts, 3600);
+            Cache::put($key, $posts, 3600);
         }
-        return \Cache::get($key);
+        return Cache::get($key);
     }
 
     public function getPosts(
@@ -124,7 +125,7 @@ class PostRepository
     ) {
         $locale = $locale ? $locale : session('lang');
         $key = 'get_lists_posts_' . md5($limit . (is_array($category_id) ? implode('.', $category_id) : $category_id) . $onlyShowPublished . $orderBy . $locale);
-        if (!\Cache::has($key)) {
+        if (!Cache::has($key)) {
             $query = $this->posts->query();
 
             if ($onlyShowPublished) {
@@ -173,10 +174,10 @@ class PostRepository
             $query = $query->where('status',false);
             $posts = $query->limit($limit)->get();
 
-            \Cache::put($key, $posts, 3660);
+            Cache::put($key, $posts, 3660);
         }
 
-        return \Cache::get($key);
+        return Cache::get($key);
     }
 
     public function getPostsFeatured(
@@ -188,7 +189,7 @@ class PostRepository
     ) {
         $locale = $locale ? $locale : session('lang');
         $key = 'get_lists_posts_' . md5($limit . (is_array($category_id) ? implode('.', $category_id) : $category_id) . $onlyShowPublished . $orderBy . $locale);
-        if (!\Cache::has($key)) {
+        if (!Cache::has($key)) {
             $query = $this->posts->query();
 
             if ($onlyShowPublished) {
@@ -240,10 +241,10 @@ class PostRepository
             }
             $posts = $query->limit($limit)->get();
 
-            \Cache::put($key, $posts, 3660);
+            Cache::put($key, $posts, 3660);
         }
 
-        return \Cache::get($key);
+        return Cache::get($key);
     }
 
     protected function getAllPostCategoriesBy($category)
