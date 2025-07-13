@@ -61,6 +61,11 @@ class Post extends Model
     return $this->belongsToMany(PostCategory::class, 'post_category', 'post_id', 'post_category_id');
   }
 
+  public function royalties()
+  {
+    return $this->hasMany(\Modules\Royalty\Models\Royalty::class, 'post_id');
+  }
+
   /**
    * @param $value
    * @return string

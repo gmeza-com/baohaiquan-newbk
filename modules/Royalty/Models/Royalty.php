@@ -8,7 +8,7 @@ use Modules\User\Models\User;
 class Royalty extends Model
 {
   protected $table = 'royalty';
-  protected $fillable = ['user_id', 'caregory_id', 'status_id'];
+  protected $fillable = ['user_id', 'category_id', 'status_id', 'amount', 'note', 'post_id', 'gallery_id', 'created_at', 'updated_at'];
   protected $dates = ['updated_at', 'created_at'];
 
   public function author()
@@ -24,6 +24,16 @@ class Royalty extends Model
   public function status()
   {
     return $this->belongsTo(RoyaltyStatus::class, 'status_id');
+  }
+
+  public function post()
+  {
+    return $this->belongsTo(\Modules\News\Models\Post::class, 'post_id');
+  }
+
+  public function gallery()
+  {
+    return $this->belongsTo(\Modules\Gallery\Models\Gallery::class, 'gallery_id');
   }
 
 

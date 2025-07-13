@@ -1,4 +1,7 @@
 <?php
+
+use Illuminate\Support\Number;
+
 /**
  * Lấy bài viết
  *
@@ -11,27 +14,25 @@
  * @return mixed
  */
 function get_list_news_posts(
-    $limit = 10,
-    $category_id = 0,
-    $onlyShowPublished = true,
-    $orderBy = 'latest',
-    $locale = null
-)
-{
-    $repository = app()->make(\Modules\News\Repositories\PostRepository::class);
-    return $repository->getPosts($limit, $category_id, $onlyShowPublished, $orderBy, $locale);
+  $limit = 10,
+  $category_id = 0,
+  $onlyShowPublished = true,
+  $orderBy = 'latest',
+  $locale = null
+) {
+  $repository = app()->make(\Modules\News\Repositories\PostRepository::class);
+  return $repository->getPosts($limit, $category_id, $onlyShowPublished, $orderBy, $locale);
 }
 
 function get_list_news_featured_posts(
-    $limit = 10,
-    $category_id = 0,
-    $onlyShowPublished = true,
-    $orderBy = 'latest',
-    $locale = null
-)
-{
-    $repository = app()->make(\Modules\News\Repositories\PostRepository::class);
-    return $repository->getPostsFeatured($limit, $category_id, $onlyShowPublished, $orderBy, $locale);
+  $limit = 10,
+  $category_id = 0,
+  $onlyShowPublished = true,
+  $orderBy = 'latest',
+  $locale = null
+) {
+  $repository = app()->make(\Modules\News\Repositories\PostRepository::class);
+  return $repository->getPostsFeatured($limit, $category_id, $onlyShowPublished, $orderBy, $locale);
 }
 
 /**
@@ -44,8 +45,8 @@ function get_list_news_featured_posts(
  */
 function get_list_news_categories($parent_id = 0, $onlyShowPublished = true, $locale = null)
 {
-    $repository = app()->make(\Modules\News\Repositories\PostCategoryRepository::class);
-    return $repository->getCategories($parent_id, $onlyShowPublished, $locale);
+  $repository = app()->make(\Modules\News\Repositories\PostCategoryRepository::class);
+  return $repository->getCategories($parent_id, $onlyShowPublished, $locale);
 }
 
 /**
@@ -53,21 +54,32 @@ function get_list_news_categories($parent_id = 0, $onlyShowPublished = true, $lo
  * @param $id
  * @return mixed
  */
-function get_news_category_by_id($id) {
-    $repository = app()->make(\Modules\News\Repositories\PostCategoryRepository::Class);
-    return $repository->getViaId($id);
+function get_news_category_by_id($id)
+{
+  $repository = app()->make(\Modules\News\Repositories\PostCategoryRepository::class);
+  return $repository->getViaId($id);
 }
 
-function get_list_authors_for_choose() {
-    $users = \Modules\User\Models\User::all();
+function get_list_authors_for_choose()
+{
+  $users = \Modules\User\Models\User::all();
 
-    return $users->mapWithKeys(function ($model) {
-        return [$model->id => $model->name];
-    })->toArray();
+  return $users->mapWithKeys(function ($model) {
+    return [$model->id => $model->name];
+  })->toArray();
+}
+
+function get_list_royalty_category_to_choose()
+{
+  $cats = \Modules\Royalty\Models\RoyaltyCategory::all();
+
+  return $cats->mapWithKeys(function ($model) {
+    return [$model->id => $model->name . ' (' . Number::currency($model->amount, 'VND', 'vi') . ')'];
+  })->toArray();
 }
 
 function get_all_categories()
 {
-    $repository = app()->make(\Modules\News\Repositories\PostCategoryRepository::Class);
-    return $repository->all();
+  $repository = app()->make(\Modules\News\Repositories\PostCategoryRepository::class);
+  return $repository->all();
 }

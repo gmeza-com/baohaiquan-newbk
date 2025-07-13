@@ -26,7 +26,6 @@ Route::group([
   Route::name('royalty.status.destroy')->delete('/royalty/status/{royaltyStatus}', 'StatusController@destroy');
 
   // Royalty
-  // Route::resource('royalty', 'RoyaltyController');
   Route::name('royalty.index')->get('/royalty', 'RoyaltyController@index');
   Route::name('royalty.create')->get('/royalty/create', 'RoyaltyController@create');
   Route::name('royalty.store')->post('/royalty', 'RoyaltyController@store');

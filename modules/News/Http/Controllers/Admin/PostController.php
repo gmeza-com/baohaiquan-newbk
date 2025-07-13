@@ -15,6 +15,8 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Arr;
+use Modules\Royalty\Models\Royalty;
+use Modules\Royalty\Models\RoyaltyCategory;
 
 class PostController extends AdminController
 {
@@ -272,9 +274,7 @@ class PostController extends AdminController
 
   public function store(Request $request, Post $post)
   {
-    if (!$request->ajax()) {
-      return;
-    }
+    if (!$request->ajax()) return;
 
     $data = $request->except(['_token', 'language']);
     $data = $this->readyData($request, $data);
@@ -311,6 +311,9 @@ class PostController extends AdminController
             }*/
 
       // $post->saveLanguages(['language' => $languages]);
+
+      // save royalty
+      $this->updateRoyalty($request, $post);
 
       $post->saveLanguages($request->only('language'));
 
@@ -357,9 +360,8 @@ class PostController extends AdminController
 
   public function update(Request $request, Post $post)
   {
-    if (!$request->ajax()) {
-      return;
-    }
+    if (!$request->ajax())  return;
+
 
     if ($request->action === 'cancel' && (allow('news.post.approved_level_2') || allow('news.post.approved_level_3'))) {
       $post->update(['published' => -1, 'cancel_message' => $request->input('message')]);
@@ -409,6 +411,8 @@ class PostController extends AdminController
 
         $post->saveLanguages($request->only('language'));
 
+        $this->updateRoyalty($request, $post);
+
         foreach ($languages as $locale => $dataLanguage) {
           PostHistory::create([
             'locale' => $locale,
@@ -431,6 +435,48 @@ class PostController extends AdminController
       'status' => 500,
       'message' => trans('language.update_fail'),
     ]);
+  }
+
+  protected function updateRoyalty(Request $request, Post $post)
+  {
+    // check if the add-royalty is enabled
+    $isAdd = $request->input('add-royalty');
+    if ($isAdd) {
+      $royalty = $request->input('royalty');
+      if (isset($royalty['id']) && $royalty['id'] > 0) {
+        // update royalty if status_id == 1
+        if ($royalty['status_id'] == 1) {
+          $royalty['amount'] = RoyaltyCategory::query()
+            ->where('id', $royalty['category_id'])
+            ->value('amount');
+
+          $post->royalties()->updateOrCreate(
+            ['id' => $royalty['id']],
+            [
+              'user_id' => $royalty['user_id'],
+              'category_id' => $royalty['category_id'],
+              'status_id' => $royalty['status_id'],
+              'amount' => $royalty['amount']
+            ]
+          );
+        }
+      } else {
+        // create royalty. must get the amount from category_id
+        $royalty['amount'] = RoyaltyCategory::query()
+          ->where('id', $royalty['category_id'])
+          ->value('amount');
+
+        $post->royalties()->create([
+          'user_id' => $royalty['user_id'],
+          'category_id' => $royalty['category_id'],
+          'status_id' => $royalty['status_id'],
+          'amount' => $royalty['amount']
+        ]);
+      }
+    } else {
+      // update the royalty to status_id = 4
+      $post->royalties()->update(['status_id' => 4]);
+    }
   }
 
   public function destroy(Request $request, Post $post)

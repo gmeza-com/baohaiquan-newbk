@@ -30,12 +30,7 @@ class RoyaltyController extends AdminController
     $url = $url . '?filter=' . $filter;
     $this->tpl->datatable()->setSource($url);
 
-    $this->tpl->datatable()->addColumn(
-      '#',
-      'id',
-      ['class' => 'col-md-1']
-    );
-
+    $this->tpl->datatable()->addColumn('#', 'id');
     $this->tpl->datatable()->addColumn(
       trans('royalty::language.author'),
       'author',
@@ -50,7 +45,15 @@ class RoyaltyController extends AdminController
     $this->tpl->datatable()->addColumn(
       trans('royalty::language.category'),
       'category',
+      ['class' => 'col-md-1'],
+    );
+
+    $this->tpl->datatable()->addColumn(
+      trans('royalty::language.post'),
+      'post',
       ['class' => 'col-md-2'],
+      false,
+      false
     );
 
     $this->tpl->datatable()->addColumn(
@@ -127,9 +130,30 @@ class RoyaltyController extends AdminController
       });
     })->addColumn('category', function ($model) {
       return $model->category->name;
+    })->addColumn('post', function ($model) {
+      $title = '';
+      $route = '';
+      $isAllowEdit = false;
+      if ($model->post_id > 0) {
+        $title = $model->post->languages->where('locale', 'vi')->first()->name;
+        $route = admin_route('post.edit', $model->post_id);
+        $isAllowEdit = allow('news.post.edit');
+      } else if ($model->gallery_id > 0) {
+        $title = $model->gallery->languages->where('locale', 'vi')->first()->name;
+        $route = admin_route('gallery.edit', $model->gallery_id);
+        $isAllowEdit = allow('gallery.gallery.edit');
+      }
+
+      if ($title) {
+        return $isAllowEdit ? sprintf(
+          '<a href="%s" class="truncate" target="_blank"><strong>%s</strong></a>',
+          $route,
+          $title
+        ) : sprintf('<strong class="truncate">%s</strong>', $title);
+      } else return '';
     })->editColumn('note', function ($model) {
       return sprintf(
-        '<div class="text-muted">%s</div>',
+        '<div class="text-muted truncate">%s</div>',
         $model->note
       );
     })->addColumn('action', function ($model) {
@@ -186,7 +210,7 @@ class RoyaltyController extends AdminController
       return Carbon::parse($model->created_at)->format('m/Y');
     })->editColumn('amount', function ($model) {
       return Number::currency($model->amount, 'VND', 'vi_VN');
-    })->rawColumns(['status', 'action', 'note'])->make(true);
+    })->rawColumns(['status', 'action', 'note', 'post'])->make(true);
   }
 
   public function create(Request $request, Royalty $royalty)
