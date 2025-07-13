@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Modules\Gallery\Models\Gallery;
 
 Route::group([
     'middleware' => ['api'],
@@ -64,7 +65,7 @@ Route::group([
     Route::name('api.gallery.category.get')->get('/gallery/category/{id}', function ($id) {
         try {
             $category = \Modules\Gallery\Models\GalleryCategory::with('languages')->find($id);
-            
+
             if (!$category) {
                 return response()->json([
                     'status' => 404,
@@ -72,7 +73,7 @@ Route::group([
                     'result' => null
                 ], 404);
             }
-            
+
             return response()->json([
                 'status' => 200,
                 'result' => [
@@ -95,4 +96,10 @@ Route::group([
         }
     });
 
+    Route::name('api.gallery.show')->get('/gallery/show/{id}', function ($id) {
+        $locale = request()->query('locale');
+        $gallery = Gallery::find($id);
+
+        return view('gallery::admin.show', compact('gallery', 'locale'));
+    });
 });

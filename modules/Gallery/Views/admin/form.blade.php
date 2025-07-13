@@ -1,5 +1,6 @@
 @push('header')
     <link rel="stylesheet" href="/backend/css/longform.css">
+    <link rel="stylesheet" href="/backend/css/editorjs-render.css">
 @endpush
 
 <meta name="gallery-type" content="{{ @$gallery->type }}">
@@ -158,9 +159,37 @@
         @endphp
 
         @push('footer')
+            <div class="modal fade longform-preview" id="data" role="dialog">
+                <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                    aria-hidden="true">&times;</span></button>
+                        </div>
+                        <div class="modal-body"></div>
+                    </div><!-- /.modal-content -->
+                </div><!-- /.modal-dialog -->
+            </div><!-- /.modal -->
+
+
             <script>
                 "use strict";
+
                 (function($) {
+                    var showData = function(id, locale) {
+                        $('.modal-body').html('');
+
+                        $.get(`{{ route('api.gallery.show', ['id' => ':id']) }}?locale=${locale}`.replace(
+                                ':id', id),
+                            function(data) {
+                                $('.modal-body').html(data);
+                                $('#data').modal('show');
+                            });
+                    }
+
+                    window.showData = showData;
+
+
                     var loadFormWidget = function($type) {
                         $.get('{{ request()->fullUrl() }}?type=' + $type, function($data) {
                             $('#form-gallery').html($data);
@@ -178,9 +207,20 @@
                                     },
                                     paragraph: {
                                         class: Paragraph,
-                                        inlineToolbar: true,
                                     },
-                                    delimiter: Delimiter
+                                    image: {
+                                        class: ImageTool,
+                                        config: {
+                                            moxman: moxman,
+                                            captionPlaceholder: "Nhập mô tả hình ảnh",
+                                            buttonContent: "Chọn hình ảnh",
+                                            features: {
+                                                background: false,
+                                                border: false,
+                                                stretch: false,
+                                            }
+                                        }
+                                    }
                                 }
 
                                 const editorjs = new EditorJS({
@@ -215,6 +255,10 @@
                                                 moxman: moxman,
                                                 captionPlaceholder: "Nhập mô tả hình ảnh",
                                                 buttonContent: "Chọn hình ảnh",
+                                                features: {
+                                                    background: false,
+                                                    border: false,
+                                                }
                                             }
                                         },
                                     },
@@ -227,6 +271,7 @@
                                                         "Click to tune": "Bấm để điều chỉnh",
                                                         "or drag to move": "hoặc nắm kéo để di chuyển",
                                                     },
+
                                                 },
                                                 inlineToolbar: {
                                                     converter: {
@@ -238,6 +283,11 @@
                                                         Add: "Thêm",
                                                     },
                                                 },
+                                            },
+                                            tools: {
+                                                image: {
+                                                    "Stretch image": "Mở rộng",
+                                                }
                                             },
                                             toolNames: {
                                                 Text: "Đoạn văn",
@@ -329,7 +379,8 @@
                                         selectedCategories[0]),
                                 method: 'GET',
                                 success: function(response) {
-                                    const catSlug = response?.result?.languages?.find(lang => lang
+                                    const catSlug = response?.result?.languages?.find(lang =>
+                                        lang
                                         .locale ===
                                         '{{ $language['locale'] }}')?.slug;
 

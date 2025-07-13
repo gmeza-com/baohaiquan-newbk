@@ -13,4 +13,10 @@
   border: 1px solid #ccc;
   min-height: 300px;
   margin-top: 16px;
+  max-height: 700px;
+  overflow-y: auto;
+}
+
+.modal.longform-preview .modal-body {
+  padding: 0;
 }
