@@ -2,12 +2,12 @@
 
 namespace App\Console;
 
-if(! defined('TYHJKNKLMJKHBVTCRETRYFGIJMLKJNUYVTYCDRTU')) exit;
+if (! defined('TYHJKNKLMJKHBVTCRETRYFGIJMLKJNUYVTYCDRTU')) exit;
 
 /** Check File Exists */
-if(
-    !file_exists(base_path('modules/Acl/Libraries/APIVerifyWebService.php')) ||
-    !file_exists(base_path('modules/Acl/Http/Middleware/VerifyRoleAndPermission.php'))
+if (
+  !file_exists(base_path('modules/Acl/Libraries/APIVerifyWebService.php')) ||
+  !file_exists(base_path('modules/Acl/Http/Middleware/VerifyRoleAndPermission.php'))
 ) exit;
 
 use Illuminate\Console\Scheduling\Schedule;
@@ -15,34 +15,34 @@ use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
 class Kernel extends ConsoleKernel
 {
-    /**
-     * The Artisan commands provided by your application.
-     *
-     * @var array
-     */
-    protected $commands = [
-        Commands\ModuleMakeCommand::class
-    ];
+  /**
+   * The Artisan commands provided by your application.
+   *
+   * @var array
+   */
+  protected $commands = [
+    Commands\ModuleMakeCommand::class
+  ];
 
-    /**
-     * Define the application's command schedule.
-     *
-     * @param  \Illuminate\Console\Scheduling\Schedule $schedule
-     * @return void
-     */
-    protected function schedule(Schedule $schedule)
-    {
-        // $schedule->command('inspire')
-        //          ->hourly();
-    }
+  /**
+   * Define the application's command schedule.
+   *
+   * @param  \Illuminate\Console\Scheduling\Schedule $schedule
+   * @return void
+   */
+  protected function schedule(Schedule $schedule)
+  {
+    // $schedule->command('inspire')
+    //          ->hourly();
+  }
 
-    /**
-     * Register the Closure based commands for the application.
-     *
-     * @return void
-     */
-    protected function commands()
-    {
-        // require base_path('Routes/console.php');
-    }
+  /**
+   * Register the Closure based commands for the application.
+   *
+   * @return void
+   */
+  protected function commands()
+  {
+    // require base_path('Routes/console.php');
+  }
 }

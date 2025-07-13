@@ -10,21 +10,21 @@ use Illuminate\Routing\Controller as BaseController;
 
 class Controller extends BaseController
 {
-    use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
+  use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
-    /**
-     * @var \App\Core\Template\Template
-     */
-    public $tpl;
-    /**
-     * @var array
-     */
-    public $languages;
+  /**
+   * @var \App\Core\Template\Template
+   */
+  public $tpl;
+  /**
+   * @var array
+   */
+  public $languages;
 
-    public $currentLanguage;
+  public $currentLanguage;
 
-    public function __construct(TemplateInterface $template)
-    {
-        $this->tpl = $template;
-    }
+  public function __construct(TemplateInterface $template)
+  {
+    $this->tpl = $template;
+  }
 }

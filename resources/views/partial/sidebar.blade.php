@@ -1,4 +1,11 @@
 <!-- Main Sidebar -->
+@php
+    use Illuminate\Support\Str;
+    $currentUrl = request()->url();
+    $fullUrl = request()->fullUrl();
+    $root = request()->root();
+@endphp
+
 <div id="sidebar">
     <!-- Wrapper for scrolling functionality -->
     <div id="sidebar-scroll">
@@ -16,10 +23,18 @@
             <ul class="sidebar-nav">
                 @foreach ($menu_items as $item)
                     @php
-                        if ($item->children->count()) {
-                            $class = 'class="sidebar-nav-menu"';
-                        } else {
-                            $class = '';
+                        $class = $item->children->count() ? 'sidebar-nav-menu' : '';
+                        $isOpen = false;
+
+                        // check if any of the children url attributes contains the current URL
+                        if (
+                            $item->children->count() &&
+                            $item->children->contains(function ($child) use ($currentUrl) {
+                                return strpos($currentUrl, @$child->attributes['url']) !== false;
+                            })
+                        ) {
+                            $class .= ' open';
+                            $isOpen = true;
                         }
                     @endphp
                     @if (
@@ -27,7 +42,7 @@
                             ($item->attributes['permission'] !== '*' && allow($item->attributes['permission'])))
                         <li>
                             <a href="{{ @$item->attributes['url'] == '#' ? 'javascript:void(0);' : @$item->attributes['url'] }}"
-                                {!! $class !!}>
+                                class="{!! $class !!}">
                                 @if ($item->children->count())
                                     <i class="fa fa-angle-right sidebar-nav-indicator sidebar-nav-mini-hide"></i>
                                 @endif
@@ -37,13 +52,19 @@
                                 <span class="sidebar-nav-mini-hide">{{ @$item->language('name') }}</span>
                             </a>
                             @if ($item->children->count())
-                                <ul>
+                                <ul style="{{ $isOpen ? 'display:block' : '' }}"">
                                     @foreach ($item->children->sortBy('position') as $child)
+                                        @php
+                                            $active =
+                                                Str::before($fullUrl, '?') == $root . $child->attributes['url']
+                                                    ? 'active'
+                                                    : '';
+                                        @endphp
                                         @if (
                                             $child->attributes['permission'] === '*' ||
                                                 ($child->attributes['permission'] !== '*' && allow($child->attributes['permission'])))
                                             <li>
-                                                <a href="{{ @$child->attributes['url'] }}">
+                                                <a href="{{ @$child->attributes['url'] }}" class="{{ $active }}">
                                                     {{ @$child->language('name') }}
                                                 </a>
                                             </li>

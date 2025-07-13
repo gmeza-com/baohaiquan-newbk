@@ -42,7 +42,8 @@ class PostController extends AdminController
     $this->tpl->datatable()->addColumn(
       '#',
       'id',
-      ['class' => 'col-md-1']
+      ['class' => 'col-md-1'],
+      false
     );
 
     $this->tpl->datatable()->addColumn(
@@ -87,6 +88,8 @@ class PostController extends AdminController
     $this->tpl->datatable()->addColumn(
       trans('language.updated_at'),
       'post.updated_at',
+      [],
+      false
     );
 
     return $this->tpl->render();

@@ -10,6 +10,7 @@ use Modules\News\Models\PostCategoryLanguage;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 
 class CategoryController extends AdminController
@@ -157,7 +158,7 @@ class CategoryController extends AdminController
 
     $languages = $request->input('language');
     foreach ($languages as $locale => $dataLanguage) {
-      $languages[$locale]['slug'] = isset($dataLanguage['slug']) ? $dataLanguage['slug'] : str_slug($dataLanguage['name']);
+      $languages[$locale]['slug'] = isset($dataLanguage['slug']) ? $dataLanguage['slug'] : Str::slug($dataLanguage['name']);
       if ($languageCatePost = PostCategoryLanguage::query()->whereLocale($locale)->whereSlug(@$dataLanguage['slug'])->first()) {
         return response()->json([
           'status' => 500,
@@ -208,7 +209,7 @@ class CategoryController extends AdminController
 
     $languages = $request->input('language');
     foreach ($languages as $locale => $dataLanguage) {
-      $languages[$locale]['slug'] = isset($dataLanguage['slug']) ? $dataLanguage['slug'] : str_slug($dataLanguage['name']);
+      $languages[$locale]['slug'] = isset($dataLanguage['slug']) ? $dataLanguage['slug'] : Str::slug($dataLanguage['name']);
       if ($languageCatePost = PostCategoryLanguage::query()->whereLocale($locale)->whereSlug(@$dataLanguage['slug'])->first()) {
         if ($languageCatePost->post_category_id != $postCategory->id) {
           return response()->json([

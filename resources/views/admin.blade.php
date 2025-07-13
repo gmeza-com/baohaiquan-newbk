@@ -2,7 +2,6 @@
 
 @section('layout')
     <div id="page-wrapper" class="page-loading">
-
         <!-- Preloader -->
         <div class="preloader themed-background">
             <div class="inner">
@@ -13,14 +12,10 @@
 
         <!-- page container -->
         <div id="page-container" class="sidebar-partial sidebar-visible-lg sidebar-no-animations">
-
             @include('partial.sidebar')
-
             <!-- Main Container -->
             <div id="main-container">
-
                 @include('partial.navbar')
-
                 <!-- Page content -->
                 <div id="page-content">
                     @include('partial.breadcrumb')
@@ -31,25 +26,14 @@
                             @yield('page_header')
                         </div>
                     </div>
-
-
-
-
                     <!-- END Blank Header -->
-
                     @yield('content')
-
                 </div>
                 <!-- END Page Content -->
-
                 @include('partial.footer')
-
             </div>
             <!-- END Main Container -->
         </div>
-
     </div>
-
     <a href="#" id="to-top"><i class="fa fa-angle-double-up"></i></a>
-
 @stop

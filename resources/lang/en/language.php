@@ -19,7 +19,7 @@ return [
   'warning' => 'Cảnh báo',
   'infor' => 'Thông tin',
   'notify' => 'Thông báo',
-  'status' => 'Tình trạng',
+  'status' => 'Trạng thái',
   'type' => 'Loại',
 
   'submit' => 'Gửi',
