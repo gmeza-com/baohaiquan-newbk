@@ -215,6 +215,10 @@
                                                 moxman: moxman,
                                                 captionPlaceholder: "Nhập mô tả hình ảnh",
                                                 buttonContent: "Chọn hình ảnh",
+                                                features: {
+                                                    background: false,
+                                                    border: false,
+                                                }
                                             }
                                         },
                                     },
@@ -227,6 +231,7 @@
                                                         "Click to tune": "Bấm để điều chỉnh",
                                                         "or drag to move": "hoặc nắm kéo để di chuyển",
                                                     },
+
                                                 },
                                                 inlineToolbar: {
                                                     converter: {
@@ -238,6 +243,11 @@
                                                         Add: "Thêm",
                                                     },
                                                 },
+                                            },
+                                            tools: {
+                                                image: {
+                                                    "Stretch image": "Mở rộng",
+                                                }
                                             },
                                             toolNames: {
                                                 Text: "Đoạn văn",
