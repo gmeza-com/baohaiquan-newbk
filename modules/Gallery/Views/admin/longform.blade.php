@@ -37,7 +37,7 @@
                 <div class="modal-header">
                     <div class="header-container">
                         <div class="btn-group" role="group" aria-label="...">
-                            <button id="edit-modal" type="button" class="btn btn-primary">Chỉnh sửa</button>
+                            <button id="edit-modal" type="button" class="btn btn-default">Chỉnh sửa</button>
                             <button id="preview-modal" type="button" class="btn btn-default">Xem trước</button>
                         </div>
 
@@ -61,6 +61,12 @@
         var currentModalData = {};
 
         $('#edit-modal').on('click', function() {
+            // TODO: kiểm tra nếu đang active thì không làm gì
+            if (this.classList.contains('btn-primary')) {
+                return;
+            }
+
+
             this.classList.add('btn-primary');
             this.classList.remove('btn-default');
 
@@ -85,6 +91,12 @@
         });
 
         $('#preview-modal').on('click', async function() {
+
+            // TODO: kiểm tra nếu đang active thì không làm gì
+            if (this.classList.contains('btn-primary')) {
+                return;
+            }
+
             currentModalData = await window['editorjsInModal'].save();
 
 
@@ -118,6 +130,10 @@
             await window['editorjsInstance_' + currentLocale].render(editorjsModalData);
 
             $('#data').modal('hide');
+
+            // reset 2 cái button
+            $('#edit-modal').removeClass('btn-primary').addClass('btn-default');
+            $('#preview-modal').removeClass('btn-primary').addClass('btn-default');
 
         });
 
@@ -273,21 +289,11 @@
         var expandEditor = async function(locale) {
             currentLocale = locale;
 
-            $('.modal-body').html('');
-
             const editorjsData = await window['editorjsInstance_' + locale].save();
 
-            $.ajax({
-                url: `{{ route('api.gallery.show') }}`,
-                method: 'POST',
-                data: {
-                    editorjs_data: editorjsData,
-                },
-                success: function(data) {
-                    $('.modal-body').html(data);
-                    $('#data').modal('show');
-                }
-            });
+            currentModalData = editorjsData;
+
+            $('#edit-modal').trigger('click');
         };
 
         // Handle form submission for longform
