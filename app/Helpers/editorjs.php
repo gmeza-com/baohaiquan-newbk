@@ -111,8 +111,9 @@ function render_image_block($data, $index)
 {
     $url = $data['file']['url'] ?? '';
     $caption = $data['caption'] ?? '';
-    $stretched = $data['stretched'] ?? false;
 
+    // Chuyển đổi thành boolean chính xác
+    $stretched = filter_var($data['stretched'] ?? false, FILTER_VALIDATE_BOOLEAN);
 
     if (empty($url)) {
         return '';
