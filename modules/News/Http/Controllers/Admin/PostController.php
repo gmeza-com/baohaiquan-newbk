@@ -15,7 +15,6 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Arr;
-use Modules\Royalty\Models\Royalty;
 use Modules\Royalty\Models\RoyaltyCategory;
 
 class PostController extends AdminController

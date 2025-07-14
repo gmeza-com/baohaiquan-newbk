@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Cache;
 use Modules\Gallery\Models\Gallery;
 use Modules\Gallery\Models\GalleryLanguage;
 use Yajra\DataTables\Facades\DataTables;
+use Modules\Royalty\Models\RoyaltyCategory;
 
 class GalleryController extends AdminController
 {
@@ -199,7 +200,11 @@ class GalleryController extends AdminController
     }
 
     if ($gallery = Gallery::create($data)) {
+      // save royalty
+      $this->updateRoyalty($request, $gallery);
+
       $gallery->saveLanguages($languages);
+
       $gallery->categories()->sync($data['category']);
 
       Cache::flush();
@@ -266,6 +271,8 @@ class GalleryController extends AdminController
     }
 
     if ($gallery->update($data)) {
+      $this->updateRoyalty($request, $gallery);
+
       $gallery->saveLanguages($languages);
       $gallery->categories()->sync($data['category']);
 
@@ -280,6 +287,48 @@ class GalleryController extends AdminController
         'status' => 500,
         'message' => trans('language.update_fail'),
       ]);
+    }
+  }
+
+  protected function updateRoyalty(Request $request, Gallery $gallery)
+  {
+    // check if the add-royalty is enabled
+    $isAdd = $request->input('add-royalty');
+    if ($isAdd) {
+      $royalty = $request->input('royalty');
+      if (isset($royalty['id']) && $royalty['id'] > 0) {
+        // update royalty if status_id == 1
+        if ($royalty['status_id'] == 1) {
+          $royalty['amount'] = RoyaltyCategory::query()
+            ->where('id', $royalty['category_id'])
+            ->value('amount');
+
+          $gallery->royalties()->updateOrCreate(
+            ['id' => $royalty['id']],
+            [
+              'user_id' => $royalty['user_id'],
+              'category_id' => $royalty['category_id'],
+              'status_id' => $royalty['status_id'],
+              'amount' => $royalty['amount']
+            ]
+          );
+        }
+      } else {
+        // create royalty. must get the amount from category_id
+        $royalty['amount'] = RoyaltyCategory::query()
+          ->where('id', $royalty['category_id'])
+          ->value('amount');
+
+        $gallery->royalties()->create([
+          'user_id' => $royalty['user_id'],
+          'category_id' => $royalty['category_id'],
+          'status_id' => $royalty['status_id'],
+          'amount' => $royalty['amount']
+        ]);
+      }
+    } else {
+      // update the royalty to status_id = 4
+      $gallery->royalties()->update(['status_id' => 4]);
     }
   }
 

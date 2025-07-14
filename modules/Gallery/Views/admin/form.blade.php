@@ -3,6 +3,14 @@
     <link rel="stylesheet" href="/backend/css/editorjs-render.css">
 @endpush
 
+@php
+    $royalty = $gallery
+        ->royalties()
+        ->whereIn('status_id', [1, 2, 3])
+        ->get()
+        ->first();
+@endphp
+
 <meta name="gallery-type" content="{{ @$gallery->type }}">
 <div class="row">
     <div class="col-lg-8">
@@ -148,7 +156,81 @@
                     </div>
                 </div>
             @endcomponent
-            </>
+
+            @if (allow('royalty.royalty.index') && allow('royalty.royalty.create'))
+                @component('components.block')
+                    @slot('title', trans('royalty::language.choose_category'))
+                    <div class="block-body">
+                        @php
+                            $readonly = false;
+                            if (isset($royalty) && isset($royalty->status)) {
+                                $classes = ['', 'warning', 'info', 'success', 'danger'];
+                                echo '<div class="alert alert-' .
+                                    $classes[$royalty->status_id] .
+                                    '">' .
+                                    $royalty->status->name .
+                                    '</div>';
+
+                                if ($royalty->status_id == 2 || $royalty->status_id == 3) {
+                                    $readonly = true;
+                                }
+                            }
+                        @endphp
+                        <div class="form-horizontal form-bordered">
+                            <div class="form-group">
+                                {!! Form::label('royalty', 'Có nhuận bút', ['class' => 'control-label col-md-4']) !!}
+                                <div class="col-md-8">
+                                    <label class="switch switch-success {{ @$readonly ? 'disabled' : '' }}">
+                                        <input type="checkbox" {{ @$readonly ? 'disabled readonly' : '' }} name="add-royalty"
+                                            value="1" {{ @$royalty ? 'checked' : '' }}>
+                                        <span></span>
+                                    </label>
+                                </div>
+                                <input type="hidden" name="royalty[id]" value="{{ @$royalty ? $royalty->id : 0 }}">
+                                <input type="hidden" name="royalty[status_id]"
+                                    value="{{ @$royalty ? $royalty->status_id : 1 }}">
+                                <input type="hidden" name="royalty[amount]" value="{{ @$royalty ? $royalty->amount : 0 }}">
+                            </div>
+                            <div id="royalty-config-wrapper" class="{{ @$royalty ? '' : 'hide' }}">
+                                <div class="form-group">
+                                    {!! Form::label('royalty[user_id]', trans('royalty::language.claim_for'), [
+                                        'class' => 'control-label col-md-4',
+                                    ]) !!}
+                                    <div class="col-md-8">
+                                        {!! @$readonly
+                                            ? '<div style="padding: 7px 0"><b>' . $royalty->author->name . '</b></div>'
+                                            : Form::select(
+                                                'royalty[user_id]',
+                                                get_list_authors_for_choose(),
+                                                isset($royalty) && $royalty->user_id ? $royalty->user_id : auth()->user()->id,
+                                                [
+                                                    'class' => 'form-control',
+                                                    'style' => 'width: 100%!important',
+                                                ],
+                                            ) !!}
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    {!! Form::label('royalty[category_id]', trans('royalty::language.type_category'), [
+                                        'class' => 'control-label col-md-4',
+                                    ]) !!}
+                                    <div class="col-md-8">
+                                        {!! @$readonly
+                                            ? '<div style="padding: 7px 0">' . $royalty->category->name . '</div>'
+                                            : Form::select(
+                                                'royalty[category_id]',
+                                                get_list_royalty_category_to_choose(),
+                                                isset($royalty) && $royalty->cateogry_id ? $royalty->cateogry_id : 0,
+                                                ['class' => 'form-control', 'style' => 'width: 100%!important'],
+                                            ) !!}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endcomponent
+            @endif
         </div>
 
         @include('partial.editor')
@@ -432,8 +514,10 @@
 
                         window.handleSubmit = handleSubmit;
                     });
-
-
+                    $('input[name="add-royalty"]').on('change', function() {
+                        if ($(this).is(":checked")) $('#royalty-config-wrapper').removeClass('hide');
+                        else $('#royalty-config-wrapper').addClass('hide');
+                    });
                 })(jQuery);
             </script>
         @endpush
