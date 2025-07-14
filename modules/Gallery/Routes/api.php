@@ -101,4 +101,12 @@ Route::group([
 
         return view('gallery::admin.show', compact('data'));
     });
+
+    Route::name('api.gallery.preview')->post('/gallery/preview', function () {
+        $data = request()->input('editorjs_data');
+
+        $data = is_array($data) ? json_encode($data) : (string) $data;
+
+        return view('gallery::admin.preview', compact('data'));
+    });
 });

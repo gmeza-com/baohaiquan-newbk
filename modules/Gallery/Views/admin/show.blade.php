@@ -1,7 +1,5 @@
 @php
-
     $blocks = $data['blocks'] ?? [];
-
 @endphp
 
 <div class="longform-preview-and-edit">

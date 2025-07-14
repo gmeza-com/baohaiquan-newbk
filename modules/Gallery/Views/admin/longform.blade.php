@@ -96,6 +96,18 @@
 
             $(`#data .modal-body`).html('');
 
+            $.ajax({
+                url: `{{ route('api.gallery.preview') }}`,
+                method: 'POST',
+                data: {
+                    editorjs_data: currentModalData,
+                },
+                success: function(data) {
+                    $('#data .modal-body').html(data);
+                    $('#data').modal('show');
+                }
+            });
+
         });
 
         $('#close-modal').on('click', async function() {
