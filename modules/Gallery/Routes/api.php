@@ -96,10 +96,9 @@ Route::group([
         }
     });
 
-    Route::name('api.gallery.show')->get('/gallery/show/{id}', function ($id) {
-        $locale = request()->query('locale');
-        $gallery = Gallery::find($id);
+    Route::name('api.gallery.show')->post('/gallery/show', function () {
+        $data = request()->input('editorjs_data');
 
-        return view('gallery::admin.show', compact('gallery', 'locale'));
+        return view('gallery::admin.show', compact('data'));
     });
 });

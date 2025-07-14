@@ -13,10 +13,39 @@
   border: 1px solid #ccc;
   min-height: 300px;
   margin-top: 16px;
+  padding-left: 70px;
   max-height: 700px;
   overflow-y: auto;
 }
 
+.modal.longform-preview .modal-dialog.modal-fullscreen {
+  width: 100%;
+  margin: 0;
+  min-height: 100vh;
+}
+.modal.longform-preview .modal-dialog.modal-fullscreen .modal-content {
+  height: 100vh;
+  overflow: hidden;
+}
+
+.modal.longform-preview .modal-content .modal-header {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+}
+
 .modal.longform-preview .modal-body {
   padding: 0;
+  overflow-y: auto;
+  height: 100%;
+}
+
+.longform-preview-and-edit {
+  .longform-edit-container {
+    width: 100%;
+    max-width: 700px;
+    margin: 0 auto;
+    /* min-height: 300px; */
+  }
 }

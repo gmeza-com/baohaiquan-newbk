@@ -154,40 +154,13 @@
         @include('partial.editor')
         @include('partial.editor-js')
 
-        @php
-            $content = @$gallery->language('content', $language['locale']);
-        @endphp
 
         @push('footer')
-            <div class="modal fade longform-preview" id="data" role="dialog">
-                <div class="modal-dialog modal-lg" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
-                                    aria-hidden="true">&times;</span></button>
-                        </div>
-                        <div class="modal-body"></div>
-                    </div><!-- /.modal-content -->
-                </div><!-- /.modal-dialog -->
-            </div><!-- /.modal -->
-
-
             <script>
                 "use strict";
 
                 (function($) {
-                    var showData = function(id, locale) {
-                        $('.modal-body').html('');
 
-                        $.get(`{{ route('api.gallery.show', ['id' => ':id']) }}?locale=${locale}`.replace(
-                                ':id', id),
-                            function(data) {
-                                $('.modal-body').html(data);
-                                $('#data').modal('show');
-                            });
-                    }
-
-                    window.showData = showData;
 
 
                     var loadFormWidget = function($type) {
@@ -197,140 +170,10 @@
                             Main().init();
 
                             if ($type === 'longform') {
-
-                                const data = JSON.parse(@json($content)?.[0]);
-
-                                // first define the tools to be made avaliable in the columns
-                                let column_tools = {
-                                    header: {
-                                        class: Header,
-                                    },
-                                    paragraph: {
-                                        class: Paragraph,
-                                    },
-                                    image: {
-                                        class: ImageTool,
-                                        config: {
-                                            moxman: moxman,
-                                            captionPlaceholder: "Nhập mô tả hình ảnh",
-                                            buttonContent: "Chọn hình ảnh",
-                                            features: {
-                                                background: false,
-                                                border: false,
-                                                stretch: false,
-                                            }
-                                        }
-                                    }
+                                // Initialize longform editor from longform.blade.php
+                                if (typeof window.initializeLongformEditor === 'function') {
+                                    window.initializeLongformEditor();
                                 }
-
-                                const editorjs = new EditorJS({
-                                    holder: 'longform-content-' + '{{ $language['locale'] }}',
-                                    tools: {
-                                        embed: Embed,
-                                        quote: {
-                                            class: Quote,
-                                            config: {
-                                                defaultType: "quotationMark",
-                                            },
-                                        },
-
-                                        header: {
-                                            class: Header,
-                                        },
-                                        paragraph: {
-                                            class: Paragraph,
-                                            inlineToolbar: true,
-                                        },
-                                        columns: {
-                                            class: editorjsColumns,
-                                            config: {
-                                                EditorJsLibrary: EditorJS, // Pass the library instance to the columns instance.
-                                                tools: column_tools // IMPORTANT! ref the column_tools
-                                            }
-                                        },
-                                        delimiter: Delimiter,
-                                        image: {
-                                            class: ImageTool,
-                                            config: {
-                                                moxman: moxman,
-                                                captionPlaceholder: "Nhập mô tả hình ảnh",
-                                                buttonContent: "Chọn hình ảnh",
-                                                features: {
-                                                    background: false,
-                                                    border: false,
-                                                }
-                                            }
-                                        },
-                                    },
-                                    data,
-                                    i18n: {
-                                        messages: {
-                                            ui: {
-                                                blockTunes: {
-                                                    toggler: {
-                                                        "Click to tune": "Bấm để điều chỉnh",
-                                                        "or drag to move": "hoặc nắm kéo để di chuyển",
-                                                    },
-
-                                                },
-                                                inlineToolbar: {
-                                                    converter: {
-                                                        "Convert to": "Chuyển thành",
-                                                    },
-                                                },
-                                                toolbar: {
-                                                    toolbox: {
-                                                        Add: "Thêm",
-                                                    },
-                                                },
-                                            },
-                                            tools: {
-                                                image: {
-                                                    "Stretch image": "Mở rộng",
-                                                }
-                                            },
-                                            toolNames: {
-                                                Text: "Đoạn văn",
-                                                Heading: "Tiêu đề đoạn",
-                                                List: "Danh sách",
-                                                // Checklist: "Danh mục kiểm tra",
-                                                Quote: "Trích dẫn",
-                                                Delimiter: "Dấu phân cách",
-                                                Link: "Liên kết",
-                                                Bold: "Đậm",
-                                                Italic: "Nghiêng",
-                                                SimpleImage: "Hình ảnh",
-                                                Image: "Hình ảnh",
-                                            },
-                                            blockTunes: {
-                                                delete: {
-                                                    Delete: "Xóa bỏ",
-                                                },
-                                                moveUp: {
-                                                    "Move up": "Di chuyển lên",
-                                                },
-                                                moveDown: {
-                                                    "Move down": "Di chuyển xuống",
-                                                },
-                                            },
-                                        },
-                                    }
-                                });
-
-                                // Trigger EditorJS ready event
-                                $(document).trigger('editorjs:ready');
-
-                                // Ensure EditorJS content is ignored by form validation
-                                $('.longform-content, .ignore-validation').find('input, textarea, select').each(
-                                    function() {
-                                        $(this).rules('add', {
-                                            ignoreEditorJS: true
-                                        });
-                                    });
-
-
-                                // Store editorjs instance globally for form submission handling
-                                window.editorjsInstance = editorjs;
                             }
                         });
                     };
@@ -392,45 +235,24 @@
                         });
 
 
-                        // Handle EditorJS validation ignoring for dynamically created content
-                        $(document).on('DOMNodeInserted', '.longform-content, .ignore-validation', function() {
-                            var $container = $(this);
-                            // Add a small delay to ensure EditorJS is fully initialized
-                            setTimeout(function() {
-                                $container.find(
-                                    'input, textarea, select, .codex-editor__redactor, .codex-editor__redactor *'
-                                ).each(function() {
-                                    $(this).rules('add', {
-                                        ignoreEditorJS: true
-                                    });
-                                });
-                            }, 100);
-                        });
+                        // EditorJS validation handling moved to longform.blade.php
 
                         var handleSubmit = function() {
-
                             if (currentWidget === 'longform') {
-
-                                window.editorjsInstance.save().then((data) => {
-
-                                    const dataJson = JSON.stringify(data);
-
-                                    $('#editor-content-{{ $language['locale'] }}').val(dataJson);
-
-                                    // Use this.submit() instead of $(this).submit() to avoid infinite loop
+                                // Use the longform submit handler from longform.blade.php
+                                if (typeof window.handleLongformSubmit === 'function') {
+                                    window.handleLongformSubmit();
+                                } else {
                                     $('#save').submit();
-                                }).catch((error) => {
-                                    console.error('Error saving EditorJS data:', error);
-                                    alert('Please check the content before saving.');
-                                });
-
-
+                                }
                             } else {
                                 $('#save').submit();
                             }
                         }
 
                         window.handleSubmit = handleSubmit;
+
+                        // expandEditor function moved to longform.blade.php
                     });
 
 
