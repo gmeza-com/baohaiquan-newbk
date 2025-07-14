@@ -144,14 +144,55 @@ function render_quote_block($data)
     $caption = $data['caption'] ?? '';
     $alignment = $data['alignment'] ?? 'left';
 
-    $html = '<blockquote style="text-align: ' . htmlspecialchars($alignment) . '">';
-    $html .= '<p>' . $text . '</p>';
+    // Wrapper div with padding and max-width
+    $html = '<div style="padding-top: 1rem; padding-bottom: 1rem; width: 100%; max-width: 568px; margin-left: auto; margin-right: auto;">';
+    
+    // Blockquote styling
+    $blockquoteStyles = [
+        'position: relative',
+        'font-style: italic',
+        'font-size: 1.25rem',
+        'line-height: 160%',
+        'letter-spacing: 0%',
+        'color: #374151'
+    ];
 
-    if (!empty($caption)) {
-        $html .= '<cite>' . htmlspecialchars($caption) . '</cite>';
+    // Add alignment-specific styles
+    if ($alignment === 'center') {
+        $blockquoteStyles[] = 'text-align: center';
+        $blockquoteStyles[] = 'padding-left: 0';
+    } else {
+        $blockquoteStyles[] = 'text-align: left';
+        $blockquoteStyles[] = 'border-left: 4px solid #d1d5db';
+        $blockquoteStyles[] = 'padding-left: 1.5rem';
     }
 
+    $html .= '<blockquote style="' . implode('; ', $blockquoteStyles) . '">';
+    $html .= $text;
     $html .= '</blockquote>';
+
+    if (!empty($caption)) {
+        $citeStyles = [
+            'display: block',
+            'margin-top: 0.5rem',
+            'font-size: 0.875rem',
+            'line-height: 1.25rem',
+            'color: #6b7280',
+            'font-style: normal'
+        ];
+
+        if ($alignment === 'center') {
+            $citeStyles[] = 'text-align: center';
+        } else {
+            $citeStyles[] = 'text-align: left';
+        }
+
+        $html .= '<cite style="' . implode('; ', $citeStyles) . '">';
+        $html .= $caption;
+        $html .= '</cite>';
+    }
+
+    $html .= '</div>';
 
     return $html;
 }

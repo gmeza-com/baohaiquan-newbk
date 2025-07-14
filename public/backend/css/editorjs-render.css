@@ -63,28 +63,9 @@
   margin-top: 8px;
 }
 
-/* Quote blocks */
-.editor-quote {
-  margin: 20px 0;
-  padding: 20px;
-  background-color: #f9f9f9;
-  border-left: 4px solid #007bff;
-  border-radius: 4px;
-}
-
-.editor-quote p {
-  margin: 0;
-  font-size: 18px;
-  line-height: 1.5;
-  color: #333;
-}
-
-.editor-quote cite {
-  display: block;
-  margin-top: 10px;
-  font-size: 14px;
-  color: #666;
-  font-style: italic;
+.editor-content blockquote::before {
+  content: none !important;
+  display: none !important;
 }
 
 /* Delimiter blocks */
