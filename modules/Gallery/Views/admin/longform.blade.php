@@ -83,8 +83,12 @@
                     editorjs_data: currentModalData,
                 },
                 success: function(data) {
-                    $('#data .modal-body').html(data);
                     $('#data').modal('show');
+
+                    setTimeout(() => {
+                        $('#data .modal-body').html(data);
+                    }, 200);
+
                 }
             });
 
