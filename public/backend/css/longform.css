@@ -29,8 +29,13 @@
 }
 
 .modal.longform-preview .modal-content .modal-header {
+  width: 100%;
+}
+
+.modal.longform-preview .modal-content .modal-header .header-container {
+  width: 100%;
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   align-items: center;
   gap: 12px;
 }

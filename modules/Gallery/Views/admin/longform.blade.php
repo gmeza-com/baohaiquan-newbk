@@ -35,8 +35,17 @@
         <div class="modal-dialog modal-fullscreen" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button id="close-modal" type="button" class="btn btn-primary">
-                        <i class="fa fa-compress" aria-hidden="true"></i> Thu gọn</button>
+                    <div class="header-container">
+                        <div class="btn-group" role="group" aria-label="...">
+                            <button id="edit-modal" type="button" class="btn btn-primary">Chỉnh sửa</button>
+                            <button id="preview-modal" type="button" class="btn btn-default">Xem trước</button>
+                        </div>
+
+                        <button id="close-modal" type="button" class="btn btn-primary">
+                            <i class="fa fa-compress" aria-hidden="true"></i> Thu gọn</button>
+                    </div>
+
+
                 </div>
                 <div class="modal-body"></div>
             </div><!-- /.modal-content -->
@@ -49,7 +58,45 @@
 
     (function($) {
         var currentLocale = '{{ config('cnv.languages')[0]['locale'] }}';
+        var currentModalData = {};
 
+        $('#edit-modal').on('click', function() {
+            this.classList.add('btn-primary');
+            this.classList.remove('btn-default');
+
+            $('#preview-modal').removeClass('btn-primary');
+            $('#preview-modal').addClass('btn-default');
+
+
+            $('#data .modal-body').html('');
+
+            $.ajax({
+                url: `{{ route('api.gallery.show') }}`,
+                method: 'POST',
+                data: {
+                    editorjs_data: currentModalData,
+                },
+                success: function(data) {
+                    $('#data .modal-body').html(data);
+                    $('#data').modal('show');
+                }
+            });
+
+        });
+
+        $('#preview-modal').on('click', async function() {
+            currentModalData = await window['editorjsInModal'].save();
+
+
+            this.classList.add('btn-primary');
+            this.classList.remove('btn-default');
+
+            $('#edit-modal').removeClass('btn-primary');
+            $('#edit-modal').addClass('btn-default');
+
+            $(`#data .modal-body`).html('');
+
+        });
 
         $('#close-modal').on('click', async function() {
 
