@@ -61,6 +61,20 @@ class GalleryController extends AdminController
     return $this->tpl->render();
   }
 
+  private function getGalleryTypeColor($type)
+  {
+    switch ($type) {
+      case 'video':
+        return 'info';
+      case 'album':
+        return 'success';
+      case 'longform':
+        return 'warning';
+      default:
+        return 'default';
+    }
+  }
+
   public function data(Request $request)
   {
     $filter = decrypt($request->get('filter'));
@@ -82,8 +96,8 @@ class GalleryController extends AdminController
         $html = '<strong>';
         $html .= sprintf(
           '<span class="label label-%s">%s</span> ',
-          $model->gallery->type == 'video' ? 'info' : 'success',
-          $model->gallery->type == 'video' ? 'video' : 'album'
+          $this->getGalleryTypeColor($model->gallery->type),
+          $model->gallery->type
         );
         $html .= link_to_route('admin.gallery.edit', $model->name, ['gallery' => $model->gallery->id]);
         $html .= '</strong>';
