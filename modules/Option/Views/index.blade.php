@@ -16,8 +16,7 @@
 @section('content')
 
     @component('components.block')
-
-       @slot('title', $title)
+        @slot('title', $title)
 
         {!! Form::open([
             'url' => admin_url('option'),
@@ -25,18 +24,17 @@
             'class' => 'form-validate form-horizontal',
             'id' => 'save',
             'enctype' => 'multipart/form-data',
-            'data-callback' => 'reload_page'
+            'data-callback' => 'reload_page',
         ]) !!}
-            @foreach($options as $option)
-                <div class="form-group">
-                    {!! Form::label($option->name, $option->name, ['class' => 'control-label col-md-3']) !!}
-                    <div class="col-md-6">
-                        {!! Form::text($option->name, $option->value, ['class' => 'form-control']) !!}
-                    </div>
+        @foreach ($options as $option)
+            <div class="form-group">
+                {!! Form::label($option->name, $option->name, ['class' => 'control-label col-md-3']) !!}
+                <div class="col-md-6">
+                    {!! Form::text($option->name, $option->value, ['class' => 'form-control']) !!}
                 </div>
-            @endforeach
+            </div>
+        @endforeach
         {!! Form::close() !!}
-
     @endcomponent
 
 @stop
