@@ -58,7 +58,7 @@ class RoyaltyController extends AdminController
 
     $this->tpl->datatable()->addColumn(
       trans('royalty::language.month'),
-      'created_at',
+      'month',
       [],
       false,
       true
@@ -109,9 +109,8 @@ class RoyaltyController extends AdminController
 
     // filter by month
     if (@$filter['month'] && @$filter['month'] !== '*') {
-      $date = Carbon::createFromFormat('m/Y', $filter['month']);
-      $model->whereMonth('created_at', $date->month)
-        ->whereYear('created_at', $date->year);
+      $month = Carbon::createFromFormat('m/Y', $filter['month'])->format('Y-m');
+      $model->where('month', $month);
     }
 
     $classes = ['', 'default', 'info', 'success', 'danger'];
@@ -130,6 +129,8 @@ class RoyaltyController extends AdminController
       });
     })->addColumn('category', function ($model) {
       return $model->category->name;
+    })->addColumn('month', function ($model) {
+      return Carbon::createFromFormat('Y-m', $model->month)->format('m/Y');
     })->addColumn('post', function ($model) {
       $title = '';
       $route = '';
@@ -235,37 +236,26 @@ class RoyaltyController extends AdminController
 
   public function store(Request $request)
   {
-    if (! $request->ajax()) {
-      return;
-    }
+    if (! $request->ajax()) return;
 
-    $data = $request->except(['_token', 'language']);
+    $data = $request->except(['_token']);
 
-    $data['featured'] = $request->has('featured') ? true : false;
-    $data['published'] = $request->has('published') ? true : false;
-    $data['published_at'] = Carbon::createFromFormat('d-m-Y H:i', $this->getDatetimeOrCreateFromNow($request));
 
-    $data['category'] = @$data['category'] ?: [];
+    $data['category_id'] = @$data['category_id'] ?: 0;
     // required category
-    if (!$data['category']) {
+    if (!$data['category_id']) {
       return response()->json([
         'status' => 500,
         'message' => trans('royalty::language.required_category'),
       ]);
     }
 
-    $languages = $request->only('language');
+    // month
+    $data['month'] = $data['year'] . '-' . $data['month'];
 
-    if (! @$languages['language']['vi']['content']) {
-      return response()->json([
-        'status' => 500,
-        'message' => 'Các trường album hoặc video bị thiếu, không thể lưu !',
-      ]);
-    }
 
     if ($royalty = Royalty::create($data)) {
-      $royalty->saveLanguages($languages);
-      $royalty->category()->sync($data['category']);
+      // $royalty->category()->sync($data['category_id']);
 
       Cache::flush();
       return response()->json([
@@ -303,8 +293,7 @@ class RoyaltyController extends AdminController
     // filter by month
     if (@$filter['month'] && @$filter['month'] !== '*') {
       $date = Carbon::createFromFormat('m/Y', $filter['month']);
-      $model->whereMonth('created_at', $date->month)
-        ->whereYear('created_at', $date->year);
+      $model->where('month', $date->month);
     }
 
     $csvData = [];

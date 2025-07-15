@@ -19,6 +19,7 @@ return [
   'category_edit' => 'Sửa Danh mục',
   'note' => 'Ghi chú',
   'month' => 'Tháng',
+  'claim_month' => 'Tháng tính nhuận bút',
   "manager_category" => 'Quản lý danh mục Nhuận bút',
   "manager_status" => 'Quản lý Trạng thái',
   'status_list' => 'Danh sách Trạng thái',

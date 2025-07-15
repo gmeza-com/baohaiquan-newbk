@@ -309,7 +309,8 @@ class GalleryController extends AdminController
               'user_id' => $royalty['user_id'],
               'category_id' => $royalty['category_id'],
               'status_id' => $royalty['status_id'],
-              'amount' => $royalty['amount']
+              'amount' => $royalty['amount'],
+              'month' => $royalty['month']
             ]
           );
         }
@@ -323,7 +324,8 @@ class GalleryController extends AdminController
           'user_id' => $royalty['user_id'],
           'category_id' => $royalty['category_id'],
           'status_id' => $royalty['status_id'],
-          'amount' => $royalty['amount']
+          'amount' => $royalty['amount'],
+          'month' => $royalty['month']
         ]);
       }
     } else {

@@ -56,3 +56,12 @@ function get_all_royalty_status()
   $repository = app()->make(\Modules\Royalty\Repositories\RoyaltyStatusRepository::class);
   return $repository->all();
 }
+
+function get_all_royalty_status_to_choose()
+{
+  $status = \Modules\Royalty\Models\RoyaltyStatus::all();
+
+  return $status->mapWithKeys(function ($model) {
+    return [$model->id => $model->name];
+  })->toArray();
+}

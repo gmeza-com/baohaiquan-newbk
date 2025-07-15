@@ -8,7 +8,7 @@ use Modules\User\Models\User;
 class Royalty extends Model
 {
   protected $table = 'royalty';
-  protected $fillable = ['user_id', 'category_id', 'status_id', 'amount', 'note', 'post_id', 'gallery_id', 'created_at', 'updated_at'];
+  protected $fillable = ['user_id', 'month', 'category_id', 'status_id', 'amount', 'note', 'post_id', 'gallery_id', 'created_at', 'updated_at'];
   protected $dates = ['updated_at', 'created_at'];
 
   public function author()

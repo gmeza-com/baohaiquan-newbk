@@ -357,6 +357,8 @@
                                     </label>
                                 </div>
                                 <input type="hidden" name="royalty[id]" value="{{ @$royalty ? $royalty->id : 0 }}">
+                                <input type="hidden" name="royalty[month]"
+                                    value="{{ @$royalty ? $royalty->month : Carbon\Carbon::now()->format('Y-m') }}">
                                 <input type="hidden" name="royalty[status_id]"
                                     value="{{ @$royalty ? $royalty->status_id : 1 }}">
                                 <input type="hidden" name="royalty[amount]" value="{{ @$royalty ? $royalty->amount : 0 }}">
