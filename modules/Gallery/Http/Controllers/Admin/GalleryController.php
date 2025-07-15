@@ -389,19 +389,4 @@ class GalleryController extends AdminController
 
     return $date . ' ' . $time;
   }
-
-
-  public function preview(Request $request)
-  {
-    $data = $request->input('editorjs_data');
-
-    return view('gallery::admin.preview', compact('data'));
-  }
-
-  public function show(Request $request)
-  {
-    $data = $request->input('editorjs_data');
-
-    return view('gallery::admin.show', compact('data'));
-  }
 }

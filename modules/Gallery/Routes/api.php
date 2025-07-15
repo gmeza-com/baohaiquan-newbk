@@ -95,4 +95,18 @@ Route::group([
             ], 500);
         }
     });
+
+    Route::name('longform.show')->post('/iadmin/longform/show', function () {
+        $data = request()->input('editorjs_data');
+
+        return view('gallery::admin.show', compact('data'));
+    });
+
+    Route::name('longform.preview')->post('/iadmin/longform/preview', function () {
+        $data = request()->input('editorjs_data');
+
+        $data = is_array($data) ? json_encode($data) : (string) $data;
+
+        return view('gallery::admin.preview', compact('data'));
+    });
 });
