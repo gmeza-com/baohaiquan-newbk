@@ -112,19 +112,42 @@ function render_image_block($data, $index)
     $url = $data['file']['url'] ?? '';
     $caption = $data['caption'] ?? '';
 
-    // Chuyển đổi thành boolean chính xác
-    $stretched = filter_var($data['stretched'] ?? false, FILTER_VALIDATE_BOOLEAN);
+    // dd($data);
+
+    // Lấy size thay vì stretched
+    $size = $data['size'] ?? 'normal';
 
     if (empty($url)) {
         return '';
     }
 
     $classes = ['editor-image'];
-    if ($stretched) $classes[] = 'stretched';
+    
+    // Thêm class dựa trên size
+    switch ($size) {
+        case 'large':
+            $classes[] = 'stretched';
+            break;
+        case 'small':
+            $classes[] = 'small';
+            break;
+        case 'normal':
+        default:
+            // Không thêm class đặc biệt cho normal
+            break;
+    }
+
+    
     if ($index == 0) $classes[] = 'first';
 
     $html = '<figure class="' . implode(' ', $classes) . '">';
-    $html .= '<img src="' . htmlspecialchars($url) . '" alt="' . htmlspecialchars($caption) . '">';
+    
+    // Thêm style cho size small
+    if ($size === 'small') {
+        $html .= '<img src="' . htmlspecialchars($url) . '" alt="' . htmlspecialchars($caption) . '">';
+    } else {
+        $html .= '<img src="' . htmlspecialchars($url) . '" alt="' . htmlspecialchars($caption) . '">';
+    }
 
     if (!empty($caption)) {
         $html .= '<figcaption>' . htmlspecialchars($caption) . '</figcaption>';

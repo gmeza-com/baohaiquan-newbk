@@ -242,6 +242,9 @@
                             tools: {
                                 image: {
                                     "Stretch image": "Mở rộng",
+                                    "Large": 'Rộng',
+                                    "Normal": "Vừa",
+                                    "Small": "Nhỏ",
                                 }
                             },
                             toolNames: {
