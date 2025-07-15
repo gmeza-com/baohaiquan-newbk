@@ -111,4 +111,6 @@ return [
   'quote_post' => 'Giới thiệu',
   'note_post' => 'Ghi chú',
   'show' => 'Xem trước',
+  'add' => 'Thêm',
+  'remove' => 'Xóa',
 ];
