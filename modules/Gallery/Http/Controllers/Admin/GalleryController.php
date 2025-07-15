@@ -390,20 +390,18 @@ class GalleryController extends AdminController
     return $date . ' ' . $time;
   }
 
-  public function show(Request $request, Gallery $gallery)
+
+  public function preview(Request $request)
   {
-    $locale = $request->get('locale', config('cnv.language_default'));
+    $data = $request->input('editorjs_data');
 
-    $this->tpl->setData('title', 'Xem trước: ' . $gallery->language('name', $locale));
-    $this->tpl->setData('gallery', $gallery);
-    $this->tpl->setData('locale', $locale);
-    $this->tpl->setTemplate('gallery::admin.show');
+    return view('gallery::admin.preview', compact('data'));
+  }
 
-    // breadcrumb
-    $this->tpl->breadcrumb()->add(admin_route('gallery.index'), trans('gallery::language.manager'));
-    $this->tpl->breadcrumb()->add(admin_route('gallery.edit', $gallery->id), trans('gallery::language.gallery_edit'));
-    $this->tpl->breadcrumb()->add(admin_route('gallery.show', $gallery->id), 'Xem trước');
+  public function show(Request $request)
+  {
+    $data = $request->input('editorjs_data');
 
-    return $this->tpl->render();
+    return view('gallery::admin.show', compact('data'));
   }
 }

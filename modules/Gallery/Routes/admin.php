@@ -17,4 +17,8 @@ Route::group([
   Route::name('gallery.category.destroy')->delete('/gallery/category/{galleryCategory}', 'CategoryController@destroy');
 
   Route::resource('gallery', 'GalleryController');
+
+
+  Route::name('longform.show')->post('/longform/show', 'GalleryController@show');
+  Route::name('longform.preview')->post('/longform/preview', 'GalleryController@preview');
 });

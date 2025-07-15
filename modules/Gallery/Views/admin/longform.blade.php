@@ -77,8 +77,11 @@
             $('#data .modal-body').html('');
 
             $.ajax({
-                url: `{{ route('api.gallery.show') }}`,
+                url: `{{ route('admin.longform.show') }}`,
                 method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
                 data: {
                     editorjs_data: currentModalData,
                 },
@@ -113,8 +116,11 @@
             $(`#data .modal-body`).html('');
 
             $.ajax({
-                url: `{{ route('api.gallery.preview') }}`,
+                url: `{{ route('admin.longform.preview') }}`,
                 method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
                 data: {
                     editorjs_data: currentModalData,
                 },
