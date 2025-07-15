@@ -44,7 +44,7 @@
                                     {!! Form::textarea(
                                         'language[' . $language['locale'] . '][description]',
                                         @$gallery->language('description', $language['locale']),
-                                        ['class' => 'form-control', 'required'],
+                                        ['class' => 'form-control', 'required', 'rows' => 3],
                                     ) !!}
                                 </div>
                             </div>
@@ -55,13 +55,15 @@
         @endcomponent
 
 
+
+        <div id="form-gallery"></div>
+
         @include('seo_plugin::form', [
             'base' => @$gallery->categories->first()
                 ? @$gallery->categories->first()->language('slug', config('cnv.languages')[0]['locale'])
                 : ':slug',
             'model' => $gallery,
         ])
-        <div id="form-gallery"></div>
 
     </div>
     <div class="col-lg-4">

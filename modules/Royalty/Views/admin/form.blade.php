@@ -105,7 +105,7 @@
                         <label for="input-month">Tháng</label>
                         <select id="input-month" class="form-control non-select2" name="month">
                             @for ($i = 1; $i <= 12; $i++)
-                                <option value="{{ $i }}" {{ $i == $month ? 'selected' : '' }}>
+                                <option value="{{ $i < 10 ? '0' . $i : $i }}" {{ $i == $month ? 'selected' : '' }}>
                                     {{ $i < 10 ? '0' . $i : $i }}
                                 </option>
                             @endfor

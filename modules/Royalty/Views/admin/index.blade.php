@@ -62,8 +62,8 @@
                                 <label>Tháng</label>
                                 <select id="input-month" class="form-control non-select2">
                                     @for ($i = 1; $i <= 12; $i++)
-                                        <option value="{{ $i }}" {{ $i == $month ? 'selected' : '' }}>
-                                            {{ $i }}
+                                        <option value="{{ $i < 10 ? '0' . $i : $i }}" {{ $i == $month ? 'selected' : '' }}>
+                                            {{ $i < 10 ? '0' . $i : $i }}
                                         </option>
                                     @endfor
                                 </select>
@@ -133,6 +133,9 @@
             var route = $(this).data('route');
             // change the action of #filters form to the export route then submit
             $('#filters').attr('action', route).submit();
+
+            // reload page
+            $('#filters').attr('action', '{{ request()->url() }}');
         });
     </script>
 @endpush

@@ -162,7 +162,7 @@ class RoyaltyController extends AdminController
       $button = [];
 
       // edit role
-      if (allow('royalty.royalty.edit') && $model->status->id < 3) {
+      if (allow('royalty.royalty.edit') && isset($model->status->id) && $model->status->id < 4) {
         $button[] = [
           'route' => admin_route('royalty.edit', $model->id),
           'name' => trans('language.edit'),
@@ -171,37 +171,6 @@ class RoyaltyController extends AdminController
             'class' => 'btn btn-xs btn-primary'
           ]
         ];
-      }
-
-      // cancel post
-      if (allow('royalty.royalty.edit') && $model->status->id < 4) {
-        $button[] = [
-          'route' => '',
-          'name' => 'Hủy',
-          'icon' => 'fa fa-ban',
-          'attributes' => [
-            'class' => 'btn btn-xs btn-danger',
-            'data-id' => $model->post->id,
-            'data-action' => 'cancel_this_post'
-          ]
-        ];
-      }
-
-      // delete
-      if (Auth::user()->roles->first()->slug == 'administrator') {
-        if (allow('royalty.royalty.destroy') && $model->status->id < 2) {
-          $button[] = [
-            'route' => 'javascript:void(0);',
-            'name' => trans('language.delete'),
-            'icon' => 'fa fa-trash-o',
-            'attributes' => [
-              'class' => 'btn btn-xs btn-danger',
-              'data-url' => admin_route('royalty.destroy', $model->id),
-              'data-action' => 'confirm_to_delete',
-              'data-message' => trans('language.confirm_to_delete')
-            ]
-          ];
-        }
       }
 
       return cnv_action_block($button);
@@ -239,7 +208,6 @@ class RoyaltyController extends AdminController
     if (! $request->ajax()) return;
 
     $data = $request->except(['_token']);
-
 
     $data['category_id'] = @$data['category_id'] ?: 0;
     // required category
@@ -292,8 +260,8 @@ class RoyaltyController extends AdminController
 
     // filter by month
     if (@$filter['month'] && @$filter['month'] !== '*') {
-      $date = Carbon::createFromFormat('m/Y', $filter['month']);
-      $model->where('month', $date->month);
+      $month = Carbon::createFromFormat('m/Y', $filter['month'])->format('Y-m');
+      $model->where('month', $month);
     }
 
     $csvData = [];
@@ -304,12 +272,12 @@ class RoyaltyController extends AdminController
     foreach ($royalties as $royalty) {
       $csvData[] = [
         $royalty->id,
-        $royalty->author->name,
+        $this->escapeCsvField($royalty->author->name),
         Number::currency($royalty->amount, 'VND', 'vi_VN'),
-        $royalty->category->name,
-        Carbon::parse($royalty->created_at)->format('m/Y'),
+        $this->escapeCsvField($royalty->category->name),
+        $royalty->month,
         $royalty->status->name,
-        $royalty->note,
+        $this->escapeCsvField($royalty->note),
         Carbon::parse($royalty->updated_at)->format('d/m/Y H:i')
       ];
     }
@@ -323,63 +291,60 @@ class RoyaltyController extends AdminController
     // Return CSV as a downloadable response
     return Response::make($csvContent, 200, [
       'Content-Type' => 'text/csv',
-      'Content-Disposition' => 'attachment; filename="royalty_table.csv"',
+      'Content-Disposition' => 'attachment; filename="danh-sach-nhuan-but.csv"',
     ]);
   }
 
-  public function edit(Request $request, Royalty $gallery)
+  /**
+   * Escape a field for CSV.
+   *
+   * @param string $field
+   * @return string
+   */
+  private function escapeCsvField($field)
+  {
+    // Wrap the field in double quotes and escape any existing double quotes
+    return '"' . str_replace('"', '""', $field) . '"';
+  }
+
+  public function edit(Request $request, Royalty $royalty)
   {
     if ($request->ajax()) {
-      return $this->getForm($request->get('type'), $gallery);
+      return $this->getForm($request->get('type'), $royalty);
     }
 
-    $this->tpl->setData('title', trans('gallery::language.gallery_edit'));
-    $this->tpl->setData('gallery', $gallery);
-    $this->tpl->setTemplate('gallery::admin.edit');
+    $this->tpl->setData('title', trans('royalty::language.royalty_edit'));
+    $this->tpl->setData('royalty', $royalty);
+    $this->tpl->setTemplate('royalty::admin.edit');
 
     // breadcrumb
-    $this->tpl->breadcrumb()->add(admin_route('gallery.index'), trans('gallery::language.manager'));
-    $this->tpl->breadcrumb()->add(admin_route('gallery.edit', $gallery->id), trans('gallery::language.gallery_edit'));
+    $this->tpl->breadcrumb()->add(admin_route('royalty.index'), trans('royalty::language.manager'));
+    $this->tpl->breadcrumb()->add(admin_route('royalty.edit', $royalty->id), trans('royalty::language.royalty_edit'));
 
     return $this->tpl->render();
   }
 
   public function update(Request $request, Royalty $royalty)
   {
-    if (! $request->ajax()) {
-      return;
-    }
+    if (! $request->ajax()) return;
 
-    $data = $request->except(['_token', 'language']);
+    $data = $request->except(['_token']);
 
-    $data['featured'] = $request->has('featured') ? true : false;
-    $data['published'] = $request->has('published') ? true : false;
-    $data['published_at'] = Carbon::createFromFormat('d-m-Y H:i', $this->getDatetimeOrCreateFromNow($request));
+    $data = $request->except(['_token']);
 
-    $data['category'] = @$data['category'] ?: [];
+    $data['category_id'] = @$data['category_id'] ?: 0;
     // required category
-    if (!$data['category']) {
-
-      Cache::flush();
+    if (!$data['category_id']) {
       return response()->json([
         'status' => 500,
-        'message' => trans('gallery::language.required_categories'),
+        'message' => trans('royalty::language.required_category'),
       ]);
     }
 
-    $languages = $request->only('language');
-
-    if (! @$languages['language']['vi']['content']) {
-      return response()->json([
-        'status' => 500,
-        'message' => 'Các trường album hoặc video bị thiếu, không thể lưu !',
-      ]);
-    }
+    // month
+    $data['month'] = $data['year'] . '-' . $data['month'];
 
     if ($royalty->update($data)) {
-      $royalty->saveLanguages($languages);
-      $royalty->categories()->sync($data['category']);
-
       Cache::flush();
       return response()->json([
         'status' => 200,

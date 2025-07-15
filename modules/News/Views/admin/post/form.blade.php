@@ -41,31 +41,6 @@
                                 </div>
 
                                 <div class="form-group">
-                                    {!! Form::label('name', trans('language.name2_post'), ['class' => 'label-control']) !!}
-                                    {!! Form::text(
-                                        'language[' . $language['locale'] . '][second_name]',
-                                        @$post->language('second_name', $language['locale']),
-                                        ['class' => 'form-control'],
-                                    ) !!}
-                                </div>
-
-                                <div class="form-group">
-                                    {!! Form::label('name', 'Tiêu đề thứ 3', ['class' => 'label-control']) !!}
-                                    {!! Form::text(
-                                        'language[' . $language['locale'] . '][third_name]',
-                                        @$post->language('third_name', $language['locale']),
-                                        ['class' => 'form-control'],
-                                    ) !!}
-                                </div>
-
-                                <div class="form-group">
-                                    {!! Form::label('name', trans('language.tags_post'), ['class' => 'label-control']) !!}
-                                    {!! Form::text('language[' . $language['locale'] . '][tags]', @$post->language('tags', $language['locale']), [
-                                        'class' => 'form-control input-tags',
-                                    ]) !!}
-                                </div>
-
-                                <div class="form-group">
                                     {!! Form::label('description', trans('language.description_post'), ['class' => 'label-control']) !!}
                                     {!! Form::textarea(
                                         'language[' . $language['locale'] . '][description]',
@@ -323,6 +298,35 @@
                         <div class="choose-thumbnail">
                             {!! Form::hidden('thumbnail', $post->thumbnail, ['id' => 'thumbnail']) !!}
                         </div>
+                    </div>
+                </div>
+            @endcomponent
+            @component('components.block')
+                @slot('title', trans('news::language.extra_info'))
+                <div class="block-body">
+                    <div class="form-group">
+                        {!! Form::label('name', trans('language.name2_post'), ['class' => 'label-control']) !!}
+                        {!! Form::text(
+                            'language[' . $language['locale'] . '][second_name]',
+                            @$post->language('second_name', $language['locale']),
+                            ['class' => 'form-control'],
+                        ) !!}
+                    </div>
+
+                    <div class="form-group">
+                        {!! Form::label('name', 'Tiêu đề thứ 3', ['class' => 'label-control']) !!}
+                        {!! Form::text(
+                            'language[' . $language['locale'] . '][third_name]',
+                            @$post->language('third_name', $language['locale']),
+                            ['class' => 'form-control'],
+                        ) !!}
+                    </div>
+
+                    <div class="form-group">
+                        {!! Form::label('name', trans('language.tags_post'), ['class' => 'label-control']) !!}
+                        {!! Form::text('language[' . $language['locale'] . '][tags]', @$post->language('tags', $language['locale']), [
+                            'class' => 'form-control input-tags',
+                        ]) !!}
                     </div>
                 </div>
             @endcomponent
