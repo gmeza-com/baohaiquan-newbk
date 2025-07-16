@@ -79,7 +79,7 @@ $moxieManagerConfig['edit.allow_override'] = '*';
 // View
 $moxieManagerConfig['view.include_file_pattern'] = '';
 $moxieManagerConfig['view.exclude_file_pattern'] = '';
-$moxieManagerConfig['view.extensions'] = 'jpg,jpeg,png,gif,html,htm,txt,pdf';
+$moxieManagerConfig['view.extensions'] = 'jpg,jpeg,png,gif,html,htm,txt,pdf,mp3';
 $moxieManagerConfig['view.allow_override'] = '*';
 
 // Download

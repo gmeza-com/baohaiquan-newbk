@@ -32,9 +32,14 @@ class UserController extends AdminController
       ['class' => 'col-md-2']
     );
     $this->tpl->datatable()->addColumn(
+      trans('user::language.name'),
+      'name',
+      ['class' => 'col-md-2']
+    );
+    $this->tpl->datatable()->addColumn(
       trans('user::language.avatar'),
       'avatar',
-      ['class' => 'col-md-2'],
+      ['class' => 'col-md-1'],
       false,
       false
     );
@@ -46,7 +51,7 @@ class UserController extends AdminController
     $this->tpl->datatable()->addColumn(
       trans('language.status'),
       'activated',
-      ['class' => 'col-md-2']
+      ['class' => 'col-md-1']
     );
     $this->tpl->datatable()->addColumn(
       trans('language.updated_at'),
