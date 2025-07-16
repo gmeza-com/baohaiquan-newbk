@@ -60,38 +60,4 @@ Route::group([
     ]);
   });
 
-
-  Route::name('api.gallery.category.get')->get('/gallery/category/{id}', function ($id) {
-    try {
-      $category = \Modules\Gallery\Models\GalleryCategory::with('languages')->find($id);
-
-      if (!$category) {
-        return response()->json([
-          'status' => 404,
-          'message' => 'Category not found',
-          'result' => null
-        ], 404);
-      }
-
-      return response()->json([
-        'status' => 200,
-        'result' => [
-          'id' => $category->id,
-          'name' => $category->language('name'),
-          'slug' => $category->language('slug'),
-          'published' => $category->published,
-          'thumbnail' => $category->thumbnail,
-          'languages' => $category->languages,
-          'created_at' => $category->created_at,
-          'updated_at' => $category->updated_at
-        ]
-      ]);
-    } catch (\Exception $e) {
-      return response()->json([
-        'status' => 500,
-        'message' => 'Internal server error',
-        'result' => null
-      ], 500);
-    }
-  });
 });

@@ -17,5 +17,14 @@ return [
     'widget_google_title' => 'Tiêu đề',
     'widget_google_description' => 'Mô tả',
     'widget_google_icon' => 'Icon',
-    'widget_google_zoom' => 'Độ phóng to'
+    'widget_google_zoom' => 'Độ phóng to',
+
+    // Link Widget
+    'widget_link_url' => 'Đường dẫn URL',
+    'widget_link_image' => 'Hình ảnh',
+    'widget_link_target' => 'Mở liên kết',
+    'widget_link_active' => 'Kích hoạt',
+    'widget_link_position' => 'Vị trí sắp xếp',
+    'add' => 'Thêm',
+    'remove' => 'Xóa',
 ];

@@ -5,6 +5,7 @@ namespace Modules\Widget\Providers;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 use Modules\Widget\Widgets\Block;
 use Modules\Widget\Widgets\GoogleMaps;
+use Modules\Widget\Widgets\LinkWidget;
 
 class ServiceProvider extends BaseServiceProvider
 {
@@ -26,6 +27,10 @@ class ServiceProvider extends BaseServiceProvider
         add_action('widgets_hook', [
             'type' => 'google_map',
             'abstract' => GoogleMaps::class
+        ]);
+        add_action('widgets_hook', [
+            'type' => 'link_widget',
+            'abstract' => LinkWidget::class
         ]);
     }
 }

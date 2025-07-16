@@ -77,7 +77,7 @@
             $('#data .modal-body').html('');
 
             $.ajax({
-                url: `{{ route('api.gallery.show') }}`,
+                url: `{{ route('api.longform.show') }}`,
                 method: 'POST',
                 data: {
                     editorjs_data: currentModalData,
@@ -113,7 +113,7 @@
             $(`#data .modal-body`).html('');
 
             $.ajax({
-                url: `{{ route('api.gallery.preview') }}`,
+                url: `{{ route('api.longform.preview') }}`,
                 method: 'POST',
                 data: {
                     editorjs_data: currentModalData,
