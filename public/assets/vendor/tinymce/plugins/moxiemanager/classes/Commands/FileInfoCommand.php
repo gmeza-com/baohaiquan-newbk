@@ -82,6 +82,9 @@ class MOXMAN_Commands_FileInfoCommand extends MOXMAN_Commands_BaseCommand
       $metaData->url_type = MOXMAN_Util_Mime::get($fileName);
       $name = substr($fileName, 0, strlen($fileName) - strlen($ext));
 
+      $remoteUrl = MOXMAN::getConfig()->get('videoscp.data_domain');
+      $metaData->url = MOXMAN_Util_PathUtils::combine($remoteUrl, $name . $ext);
+
       // Alternative video formats
       $altExt = array("mp4", "ogv", "webm");
       foreach ($altExt as $altExt) {
