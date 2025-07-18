@@ -204,8 +204,9 @@ class MOXMAN_Handlers_UploadHandler implements MOXMAN_Http_IHandler
         $videoExtensions = array('mp4', 'avi', 'mov', 'wmv', 'flv', 'webm', 'mkv', 'm4v');
 
         if (in_array($fileExtension, $videoExtensions)) {
+
           // For videos: only SCP to remote server, don't save locally
-          $scpSuccess = $this->scpVideoToRemoteServer($tempFilePath, $file->getName());
+          $scpSuccess = $this->scpVideoToRemoteServer($tempFilePath, $file->getName(), MOXMAN::getFile($file->getParent())->getPublicPath());
 
           if ($scpSuccess) {
             // Clear the video content locally since it's now on remote server
@@ -283,8 +284,9 @@ class MOXMAN_Handlers_UploadHandler implements MOXMAN_Http_IHandler
    * @param string $fileName Original file name
    * @return bool Success status
    */
-  private function scpVideoToRemoteServer($localFilePath, $fileName)
+  private function scpVideoToRemoteServer($localFilePath, $fileName, $targetDir)
   {
+
     try {
       // Configuration for remote server
       $remoteHost = MOXMAN::getConfig()->get('videoscp.remote_host', 'your-remote-server.com');
@@ -293,17 +295,42 @@ class MOXMAN_Handlers_UploadHandler implements MOXMAN_Http_IHandler
       $remotePath = MOXMAN::getConfig()->get('videoscp.remote_path', '/path/to/videos/');
       $sshKeyPath = MOXMAN::getConfig()->get('videoscp.private_key', '~/.ssh/id_rsa');
 
-      // Build SCP command
+      // Combine remote path with target directory
+      $fullRemotePath = rtrim($remotePath, '/') . '/' . trim($targetDir, '/');
+      
+      // Build SSH command to check and create directory if needed
+      $sshCheckDirCmd = sprintf(
+        'ssh -p %s -i %s %s@%s "[ -d %s ] || mkdir -p %s"',
+        escapeshellarg($remotePort),
+        escapeshellarg($sshKeyPath),
+        escapeshellarg($remoteUser),
+        escapeshellarg($remoteHost),
+        escapeshellarg($fullRemotePath),
+        escapeshellarg($fullRemotePath)
+      );
+
+      // Execute SSH command to check/create directory
+      $output = array();
+      $returnCode = 0;
+      exec($sshCheckDirCmd . ' 2>&1', $output, $returnCode);
+
+      if ($returnCode !== 0) {
+        error_log("Failed to create remote directory: " . implode("\n", $output));
+        return false;
+      }
+
+      // Build SCP command with full remote path
       $scpCommand = sprintf(
-        'scp -P %s -i %s %s %s@%s:%s%s',
+        'scp -P %s -i %s %s %s@%s:%s/%s',
         escapeshellarg($remotePort),
         escapeshellarg($sshKeyPath),
         escapeshellarg($localFilePath),
         escapeshellarg($remoteUser),
         escapeshellarg($remoteHost),
-        escapeshellarg($remotePath),
+        escapeshellarg($fullRemotePath),
         escapeshellarg($fileName)
       );
+
 
       // Execute SCP command
       $output = array();
