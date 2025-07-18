@@ -1,5 +1,4 @@
 <?php
-
 return [
 
   /*
@@ -25,7 +24,7 @@ return [
     |
     */
 
-  'env' => env('APP_ENV', 'production'), // production
+  'env' => env('APP_ENV', 'local'), // production
 
   /*
     |--------------------------------------------------------------------------
@@ -38,7 +37,7 @@ return [
     |
     */
 
-  'debug' => env('APP_DEBUG', false),
+  'debug' => env('APP_DEBUG', true),
 
   /*
     |--------------------------------------------------------------------------

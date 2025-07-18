@@ -34,11 +34,11 @@ return [
   'connections' => [
     'mysql' => [
       'driver' => 'mysql',
-      'host' => env('DB_HOST', '127.0.0.1'),
+      'host' => env('DB_HOST', '172.16.7.56'),
       'port' => env('DB_PORT', '3306'),
       'database' => env('DB_DATABASE', 'baohaiquanvietnam.vn'),
-      'username' => env('DB_USERNAME', 'baohaiquan'),
-      'password' => env('DB_PASSWORD', ')VZcsG$/%ex&Sq"hUU'),
+      'username' => env('DB_USERNAME', 'root'),
+      'password' => env('DB_PASSWORD', 'baohaiquan01'),
       'unix_socket' => env('DB_SOCKET', ''),
       'charset' => 'utf8mb4',
       'collation' => 'utf8mb4_unicode_ci',
