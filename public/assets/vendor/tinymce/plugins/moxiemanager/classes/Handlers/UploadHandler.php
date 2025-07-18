@@ -5,7 +5,6 @@
  *
  * Copyright 2003-2013, Moxiecode Systems AB, All rights reserved.
  */
-
 /**
  * Http hander that takes the passed in file blob and stores that as a file object in the file system.
  *
@@ -33,8 +32,8 @@ class MOXMAN_Handlers_UploadHandler implements MOXMAN_Http_IHandler
     $resolution = $request->get("resolution", "default");
 
 
-
     try {
+
       if ($request->getMethod() != 'POST') {
         throw new MOXMAN_Exception("Not a HTTP post request.");
       }
@@ -200,9 +199,27 @@ class MOXMAN_Handlers_UploadHandler implements MOXMAN_Http_IHandler
           }
         }
 
-        // Create thumbnail and upload then import local blob
-        MOXMAN::getPluginManager()->get("core")->createThumbnail($file, $tempFilePath);
-        $file->importFrom($tempFilePath);
+        // Handle video files differently - only SCP to remote server
+        $fileExtension = strtolower(MOXMAN_Util_PathUtils::getExtension($file->getName()));
+        $videoExtensions = array('mp4', 'avi', 'mov', 'wmv', 'flv', 'webm', 'mkv', 'm4v');
+
+        if (in_array($fileExtension, $videoExtensions)) {
+
+          // For videos: only SCP to remote server, don't save locally
+          $scpSuccess = $this->scpVideoToRemoteServer($tempFilePath, $file->getName(), MOXMAN::getFile($file->getParent())->getPublicPath());
+
+          if ($scpSuccess) {
+            // Clear the video content locally since it's now on remote server
+            $file = $this->clearVideoContent($file);
+          } else {
+            throw new MOXMAN_Exception("Failed to upload video to remote server: " . $file->getName());
+          }
+        } else {
+          // For non-video files: normal processing
+          MOXMAN::getPluginManager()->get("core")->createThumbnail($file, $tempFilePath);
+          $file->importFrom($tempFilePath);
+        }
+
         unlink($tempFilePath);
 
         $args = new MOXMAN_Vfs_FileActionEventArgs("add", $file);
@@ -257,6 +274,102 @@ class MOXMAN_Handlers_UploadHandler implements MOXMAN_Http_IHandler
         ),
         "id" => null
       ));
+    }
+  }
+
+  /**
+   * SCP video file to remote server
+   *
+   * @param string $localFilePath Local file path to upload
+   * @param string $fileName Original file name
+   * @return bool Success status
+   */
+  private function scpVideoToRemoteServer($localFilePath, $fileName, $targetDir)
+  {
+
+    try {
+      // Configuration for remote server
+      $remoteHost = MOXMAN::getConfig()->get('videoscp.remote_host', 'your-remote-server.com');
+      $remotePort = MOXMAN::getConfig()->get('videoscp.remote_port', '22');
+      $remoteUser = MOXMAN::getConfig()->get('videoscp.remote_user', 'username');
+      $remotePath = MOXMAN::getConfig()->get('videoscp.remote_path', '/path/to/videos/');
+      $sshKeyPath = MOXMAN::getConfig()->get('videoscp.private_key', '~/.ssh/id_rsa');
+
+      // Combine remote path with target directory
+      $fullRemotePath = rtrim($remotePath, '/') . '/' . trim($targetDir, '/');
+      
+      // Build SSH command to check and create directory if needed
+      $sshCheckDirCmd = sprintf(
+        'ssh -p %s -i %s %s@%s "[ -d %s ] || mkdir -p %s"',
+        escapeshellarg($remotePort),
+        escapeshellarg($sshKeyPath),
+        escapeshellarg($remoteUser),
+        escapeshellarg($remoteHost),
+        escapeshellarg($fullRemotePath),
+        escapeshellarg($fullRemotePath)
+      );
+
+      // Execute SSH command to check/create directory
+      $output = array();
+      $returnCode = 0;
+      exec($sshCheckDirCmd . ' 2>&1', $output, $returnCode);
+
+      if ($returnCode !== 0) {
+        error_log("Failed to create remote directory: " . implode("\n", $output));
+        return false;
+      }
+
+      // Build SCP command with full remote path
+      $scpCommand = sprintf(
+        'scp -P %s -i %s %s %s@%s:%s/%s',
+        escapeshellarg($remotePort),
+        escapeshellarg($sshKeyPath),
+        escapeshellarg($localFilePath),
+        escapeshellarg($remoteUser),
+        escapeshellarg($remoteHost),
+        escapeshellarg($fullRemotePath),
+        escapeshellarg($fileName)
+      );
+
+
+      // Execute SCP command
+      $output = array();
+      $returnCode = 0;
+      exec($scpCommand . ' 2>&1', $output, $returnCode);
+
+      if ($returnCode !== 0) {
+        error_log("SCP failed for file: " . $fileName . ". Output: " . implode("\n", $output));
+        return false;
+      }
+
+      error_log("Successfully SCP'd video file: " . $fileName . " to " . $remoteHost);
+      return true;
+    } catch (Exception $e) {
+      error_log("SCP error for file " . $fileName . ": " . $e->getMessage());
+
+      return false;
+    }
+  }
+
+  /**
+   * Clear video content by creating an empty metadata file
+   *
+   * @param MOXMAN_Vfs_IFile $file File object to be cleared
+   * @return MOXMAN_Vfs_IFile The file object with cleared content
+   */
+  private function clearVideoContent($file)
+  {
+    try {
+      // Create a metadata file with remote URL and info
+      $metadata = '';
+
+      // clear data content
+      file_put_contents($file->getPath(), json_encode($metadata));
+
+      return $file;
+    } catch (Exception $e) {
+      error_log("Failed to create video metadata: " . $e->getMessage());
+      throw $e;
     }
   }
 }
