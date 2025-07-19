@@ -3,7 +3,7 @@ use Collective\Html\FormFacade as Form;
 
 Route::group([
     'middleware' => ['api'],
-    'prefix' => 'iadmin-api'
+    'prefix' => 'iadmin/api'
 ], function () {
     Route::get('/provinces.json', function (\Illuminate\Http\Request $request) {
         $provinces = \Plugins\Province\Models\Province::where('activated', 1)->get();
@@ -70,10 +70,3 @@ Route::group([
         }
     });
 });
-
-function getOriginName($attribute)
-{
-    $name = request()->get($attribute);
-    $name = str_replace(['Thành Phố', 'Tỉnh', 'Quận', 'Huyện', 'Thị Xã'], '', $name);
-    return '%' . trim($name) . '%';
-}
