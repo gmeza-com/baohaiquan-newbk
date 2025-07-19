@@ -446,7 +446,7 @@ var reloadDistrictsAndProvinces = function () {
     var province_id = $("#province").find("select").val();
     $.get(
       CNV.baseUrl +
-        "/api/districts.json?form&province=" +
+        "/iadmin-api/districts.json?form&province=" +
         province_id +
         "&district=" +
         $("#district").data("name"),
@@ -459,7 +459,7 @@ var reloadDistrictsAndProvinces = function () {
   if ($("#province").length > 0) {
     $.get(
       CNV.baseUrl +
-        "/api/provinces.json?form&province=" +
+        "/iadmin-api/provinces.json?form&province=" +
         $("#province").data("name"),
       function (data) {
         $("#province").html(data);
