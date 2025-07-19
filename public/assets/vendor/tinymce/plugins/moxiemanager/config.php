@@ -21,7 +21,7 @@ $moxieManagerConfig['filesystem.extensions'] = 'jpg,jpeg,png,gif,txt,docx,doc,zi
 $moxieManagerConfig['filesystem.readable'] = true;
 $moxieManagerConfig['filesystem.writable'] = true;
 $moxieManagerConfig['filesystem.overwrite_action'] = "";
-$moxieManagerConfig['filesystem.directories'] = array("images" => array("upload.extensions" => "gif,jpg,png,webp"));
+// $moxieManagerConfig['filesystem.directories'] = array("images" => array("upload.extensions" => "gif,jpg,png,webp"));
 $moxieManagerConfig['filesystem.allow_override'] = '*';
 
 // Createdir
