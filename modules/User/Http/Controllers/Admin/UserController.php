@@ -66,7 +66,17 @@ class UserController extends AdminController
   {
     app('helper')->load('buttons');
 
-    return Datatables::eloquent(User::query())
+    $currentUser = auth()->user();
+    $query = User::query();
+
+    // Nếu user hiện tại là super_admin, chỉ hiển thị user có role super_admin
+    if (!$currentUser->is_super_admin) {
+      $query->whereHas('roles', function ($q) {
+        $q->where('slug', '!=', 'super_admin');
+      });
+    }
+
+    return Datatables::eloquent($query)
       ->editColumn('avatar', function ($model) {
         return sprintf('<div class="%s"><img src="%s" width="40" class="img-circle"></div>', 'text-center', $model->avatar);
       })
@@ -243,6 +253,11 @@ class UserController extends AdminController
 
   protected function getRoles()
   {
-    return Role::orderBy('slug')->with('languages')->get();
+    $currentUser = auth()->user();
+    $query = Role::orderBy('slug')->with('languages');
+    if (!$currentUser->is_super_admin) {
+      $query->where('slug', '!=', 'super_admin');
+    }
+    return $query->get();
   }
 }

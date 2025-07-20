@@ -10,7 +10,8 @@ class Permission extends Model
 
     protected $fillable = [
         'slug',
-        'module'
+        'module',
+        'only_for_super_admin'
     ];
     public $timestamps = false;
 
