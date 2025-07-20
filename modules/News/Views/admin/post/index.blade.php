@@ -46,9 +46,11 @@
                     style="min-width: 120px; max-width:320px">
                     <option value="*">{{ trans('news::language.include_categories') }}</option>
                     @foreach (get_all_categories() as $category)
-                        <option value="{{ $category->id }}" {{ $category->id == request()->get('category') ? 'selected' : '' }}>
-                            {{ $category->language('name') }}
-                        </option>
+                        @if(trim($category->language('name')) !== '')
+                            <option value="{{ $category->id }}" {{ $category->id == request()->get('category') ? 'selected' : '' }}>
+                                {{ $category->language('name') }}
+                            </option>
+                        @endif
                     @endforeach
                 </select>
             </form>
