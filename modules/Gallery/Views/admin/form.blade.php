@@ -267,6 +267,8 @@
 
                     $(document).ready(function() {
                         var defaultWidget = $('select[name=type]').val();
+                        // Disable AJAX form submission for gallery form
+                        $('#save').off('submit.ajaxForm');
 
                         if ($('select[name=type]').length > 0) {
                             loadFormWidget(defaultWidget);
@@ -323,7 +325,24 @@
 
                         // EditorJS validation handling moved to longform.blade.php
 
+                        var isSubmitting = false;
+
                         var handleSubmit = function() {
+                            if (isSubmitting) {
+                                return;
+                            }
+
+                            isSubmitting = true;
+
+                            // Disable the save button to prevent multiple submissions
+                            $('#save-gallery-btn').prop('disabled', true).text('Đang lưu...');
+
+                            // Disable validation temporarily for form submission
+                            var form = $('#save');
+                            if (form.length > 0) {
+                                form.off('submit.validate');
+                            }
+
                             if (currentWidget === 'longform') {
                                 // Use the longform submit handler from longform.blade.php
                                 if (typeof window.handleLongformSubmit === 'function') {
@@ -332,11 +351,49 @@
                                     $('#save').submit();
                                 }
                             } else {
-                                $('#save').submit();
+                                // Force form submission for non-longform widgets
+                                var formElement = $('#save')[0];
+                                if (formElement) {
+                                    formElement.submit();
+                                } else {
+                                    console.error('Form #save not found');
+                                    isSubmitting = false;
+                                    $('#save-gallery-btn').prop('disabled', false).html(
+                                        '<i class="fa fa-save"></i> {{ trans('language.save') }}');
+                                }
                             }
                         }
 
                         window.handleSubmit = handleSubmit;
+
+                        // Add event listener for save button (works for both create and edit)
+                        $(document).on('click', '#save-gallery-btn', function(e) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleSubmit();
+                        });
+
+                        // Reset submission state on form submit
+                        $('#save').on('submit', function() {
+                            setTimeout(function() {
+                                isSubmitting = false;
+                                $('#save-gallery-btn').prop('disabled', false).html(
+                                    '<i class="fa fa-save"></i> {{ trans('language.save') }}');
+                            }, 2000);
+                        });
+
+                        // Handle AJAX errors if any
+                        $(document).ajaxError(function(event, xhr, settings) {
+                            console.log('AJAX error occurred, resetting state');
+                            isSubmitting = false;
+                            $('#save-gallery-btn').prop('disabled', false).html(
+                                '<i class="fa fa-save"></i> {{ trans('language.save') }}');
+                        });
+
+                        // Reset state on page unload to prevent stuck state
+                        $(window).on('beforeunload', function() {
+                            isSubmitting = false;
+                        });
 
                         // expandEditor function moved to longform.blade.php
                     });
