@@ -1,4 +1,5 @@
 <?php
+
 namespace Modules\Acl\Traits;
 
 use Modules\Acl\Models\Role;
@@ -21,7 +22,7 @@ trait HasRoleAndPermission
      */
     public function getIsSuperAdminAttribute($value)
     {
-        return false;
+        return $this->roles()->where('slug', 'super_admin')->exists();
     }
 
     /**
@@ -30,7 +31,7 @@ trait HasRoleAndPermission
      */
     public function getIdAttribute($id)
     {
-        if(! $id) {
+        if (! $id) {
             return 0;
         }
 
@@ -45,7 +46,7 @@ trait HasRoleAndPermission
     public function hasRole($role)
     {
         // if super admin, passed all
-        if($this->is_super_admin) {
+        if ($this->is_super_admin) {
             return true;
         }
         // if $role is string

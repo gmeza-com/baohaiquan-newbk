@@ -61,8 +61,6 @@
         @endcomponent
     </div>
 
-
-
     <div class="col-lg-6">
         @component('components.block')
             @slot('title', trans('acl::language.role_permissions'))
@@ -71,7 +69,7 @@
                     <div class="form-group">
                         @foreach ($permissions as $module => $perms)
                             <h4>
-                                <strong>{{ ucwords($module) }}</strong>
+                                <strong>{{ ucwords(trans('acl::language.' . $module)) }}</strong>
                             </h4>
                             <hr>
                             @foreach ($perms as $perm)

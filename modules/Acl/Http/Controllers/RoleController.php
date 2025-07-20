@@ -50,7 +50,14 @@ class RoleController extends AdminController
   {
     app('helper')->load('buttons');
 
-    return Datatables::eloquent(Role::query())
+    $currentUser = auth()->user();
+    $query = Role::query();
+
+    if (!$currentUser->is_super_admin) {
+      $query->where('slug', '!=', 'super_admin');
+    }
+
+    return Datatables::eloquent($query)
       ->addColumn('name', function ($model) {
         $preffy = '';
         $preffy .= "<h4><strong>{$model->language('name')}</strong></h4>";
@@ -189,7 +196,13 @@ class RoleController extends AdminController
 
   protected function getAllPermissions()
   {
-    $permissions = Permission::all();
+    $currentUser = auth()->user();
+    $permissions = Permission::where('only_for_super_admin', false)->get();
+
+    if ($currentUser->is_super_admin) {
+      $permissions = Permission::all();
+    }
+
     return $permissions->groupBy('module');
   }
 }
