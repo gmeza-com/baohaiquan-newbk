@@ -20,7 +20,7 @@ $moxieManagerConfig['filesystem.exclude_file_pattern'] = '';
 $moxieManagerConfig['filesystem.extensions'] = 'jpg,jpeg,png,gif,txt,docx,doc,zip,pdf,mp3,m4a,wav,aac,mp4,webm,avi,flv,mov,ogg,ogv,webp';
 $moxieManagerConfig['filesystem.readable'] = true;
 $moxieManagerConfig['filesystem.writable'] = true;
-$moxieManagerConfig['filesystem.overwrite_action'] = "";
+$moxieManagerConfig['filesystem.overwrite_action'] = "rename";
 // $moxieManagerConfig['filesystem.directories'] = array("images" => array("upload.extensions" => "gif,jpg,png,webp"));
 $moxieManagerConfig['filesystem.allow_override'] = '*';
 
