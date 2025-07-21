@@ -499,7 +499,7 @@ var number_format = function (money) {
 };
 
 $(document).ready(function () {
-  reloadDistrictsAndProvinces();
+  // reloadDistrictsAndProvinces();
 });
 
 var toggleThisElement = function (element) {

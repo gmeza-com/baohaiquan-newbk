@@ -20,6 +20,8 @@ return [
     'general_site_email' => 'Email liên hệ',
     'general_site_fax' => 'Fax',
     'general_site_address' => 'Địa chỉ',
+    'general_province' => 'Tỉnh/Thành phố',
+    'general_ward' => 'Phường/Xã',
     'general_codescript' => 'Code Scripts',
     'general_codescript_des' => 'Chứa các đoạn mã Javascript hoặc CSS mà bạn muốn tùy biến website.',
     'general_mail' => 'Cấu hình hệ thống E-mail',
