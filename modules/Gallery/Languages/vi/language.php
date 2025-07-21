@@ -18,4 +18,5 @@ return [
   'category_edit' => 'Sửa danh mục',
   'required_categories' => 'Bạn chưa chọn danh mục',
   'choose_category' => 'Chọn danh mục',
+  'choose_podcast_category' => 'Chọn danh mục podcast',
 ];

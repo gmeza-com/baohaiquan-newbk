@@ -148,6 +148,22 @@
                 </div>
             @endcomponent
 
+            <div id="podcast-category-block" style="display: none;">
+                @component('components.block')
+                    @slot('title', trans('gallery::language.choose_podcast_category'))
+                    <div class="block-body">
+                        <div class="form_group">
+                            {!! Form::select(
+                                'podcast_category',
+                                (new \Modules\Gallery\Models\PodcastCategory())->getForSelection(),
+                                @$gallery->podcast_categories->first()->id,
+                                ['class' => 'form-control', 'multiple' => false, 'required'],
+                            ) !!}
+                        </div>
+                    </div>
+                @endcomponent
+            </div>
+
             @component('components.block')
                 @slot('title', trans('language.thumbnail'))
                 <div class="block-body">
@@ -274,6 +290,12 @@
                             loadFormWidget(defaultWidget);
                             var currentWidget = defaultWidget;
 
+                            // Check initial type for podcast category visibility
+                            if (defaultWidget === 'audio') {
+                                $('#podcast-category-block').show();
+                                $('select[name="podcast_category"]').prop('required', true);
+                            }
+
                         } else {
                             defaultWidget = $('meta[name="gallery-type"]');
 
@@ -281,6 +303,12 @@
                             if (defaultWidget.length > 0) {
                                 loadFormWidget(defaultWidget.attr('content'));
                                 currentWidget = defaultWidget.attr('content');
+
+                                // Check initial type for podcast category visibility
+                                if (defaultWidget.attr('content') === 'audio') {
+                                    $('#podcast-category-block').show();
+                                    $('select[name="podcast_category"]').prop('required', true);
+                                }
                             }
                         }
 
@@ -290,6 +318,15 @@
                             if (_nextWidget !== currentWidget) {
                                 loadFormWidget(_nextWidget);
                                 currentWidget = _nextWidget;
+                            }
+
+                            // Show/hide podcast category block based on type selection
+                            if (_nextWidget === 'audio') {
+                                $('#podcast-category-block').show();
+                                $('select[name="podcast_category"]').prop('required', true);
+                            } else {
+                                $('#podcast-category-block').hide();
+                                $('select[name="podcast_category"]').prop('required', false);
                             }
                         });
 
