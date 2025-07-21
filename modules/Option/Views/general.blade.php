@@ -161,10 +161,22 @@
                         </div>
 
                         <div class="col-md-6">
-                            <div class="form_group" id="province" data-name="{{ get_option('province') ?: 0 }}"></div>
+                            <div class="form_group">
+                                {!! Form::label('province', trans('option::language.general_province'), ['class' => 'control-label']) !!}
+                                {!! Form::text('province', get_option('province'), [
+                                    'class' => 'form-control',
+                                    'placeholder' => trans('option::language.general_province'),
+                                ]) !!}
+                            </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="form_group" id="district" data-name="{{ get_option('district') ?: 0 }}"></div>
+                            <div class="form_group">
+                                {!! Form::label('ward', trans('option::language.general_ward'), ['class' => 'control-label']) !!}
+                                {!! Form::text('ward', get_option('ward'), [
+                                    'class' => 'form-control',
+                                    'placeholder' => trans('option::language.general_ward'),
+                                ]) !!}
+                            </div>
                         </div>
 
                         <div class="col-md-12">
