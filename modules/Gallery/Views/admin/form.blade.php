@@ -47,6 +47,13 @@
                                         ['class' => 'form-control', 'required', 'rows' => 3],
                                     ) !!}
                                 </div>
+
+                                <div class="form-group">
+                                    {!! Form::label('name', trans('language.tags_post'), ['class' => 'label-control']) !!}
+                                    {!! Form::text('language[' . $language['locale'] . '][tags]', @$gallery->language('tags', $language['locale']), [
+                                        'class' => 'form-control input-tags',
+                                    ]) !!}
+                                </div>
                             </div>
                         @endforeach
                     </div>
@@ -132,15 +139,15 @@
             </div>
         @endcomponent
 
-        @component('components.block')
+                @component('components.block')
             @slot('title', trans('gallery::language.choose_category'))
             @slot('action', link_to_route('admin.gallery.category.index', trans('gallery::language.category_create'), null,
                 ['class' => 'btn btn-xs btn-primary', 'target' => '_blank', 'required']))
-                <div class="block-body">
+            <div class="block-body">
                     <div class="form_group">
                         {!! Form::select(
                             'category[]',
-                            (new \Modules\Gallery\Models\GalleryCategory())->getForSelection(),
+                            app(\Modules\Gallery\Models\GalleryCategory::class)->getForSelection(),
                             @$gallery->categories->map->id->toArray(),
                             ['class' => 'form-control', 'multiple' => true],
                         ) !!}
@@ -155,7 +162,7 @@
                         <div class="form_group">
                             {!! Form::select(
                                 'podcast_category',
-                                (new \Modules\Gallery\Models\PodcastCategory())->getForSelection(),
+                                app(\Modules\Gallery\Models\PodcastCategory::class)->getForSelection(),
                                 @$gallery->podcast_categories->first()->id,
                                 ['class' => 'form-control', 'multiple' => false, 'required'],
                             ) !!}
