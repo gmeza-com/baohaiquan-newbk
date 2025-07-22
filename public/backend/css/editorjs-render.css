@@ -357,6 +357,14 @@
   width: 100%;
 }
 
+.editor-content p.dropcap::first-letter {
+  font-size: 3em; /* làm chữ lớn hơn */
+  font-weight: bold;
+  float: left; /* để nó nằm gọn bên trái */
+  line-height: 1;
+  margin-right: 8px;
+}
+
 /* General container for editor content */
 .editor-content {
   max-width: 100%;
