@@ -42,7 +42,7 @@
                 class: ImageTool,
                 config: {
                     moxman: moxman,
-                    captionPlaceholder: "Nhập mô tả hình ảnh",
+                    captionPlaceholder: "Nhập mô tả hình ảnh (Tùy chọn)",
                     buttonContent: "Chọn hình ảnh",
                     features: {
                         background: false,

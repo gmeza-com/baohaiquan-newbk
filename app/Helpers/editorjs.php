@@ -112,8 +112,8 @@ function render_image_block($data, $index)
 {
     $url = $data['file']['url'] ?? '';
     $caption = $data['caption'] ?? '';
+    $link = $data['link'] ?? '';
 
-    // dd($data);
 
     // Lấy size thay vì stretched
     $size = $data['size'] ?? 'normal';
@@ -143,9 +143,10 @@ function render_image_block($data, $index)
 
     $html = '<figure class="' . implode(' ', $classes) . '">';
     
-    // Thêm style cho size small
-    if ($size === 'small') {
+    if (!empty($link)) {
+        $html .= '<a href="' . htmlspecialchars($link) . '" target="_blank" rel="noopener noreferrer">';
         $html .= '<img src="' . htmlspecialchars($url) . '" alt="' . htmlspecialchars($caption) . '">';
+        $html .= '</a>';
     } else {
         $html .= '<img src="' . htmlspecialchars($url) . '" alt="' . htmlspecialchars($caption) . '">';
     }
