@@ -80,7 +80,7 @@
                 url: `{{ route('api.longform.show') }}`,
                 method: 'POST',
                 data: {
-                    editorjs_data: currentModalData,
+                    editorjs_data: JSON.stringify(currentModalData),
                 },
                 success: function(data) {
                     $('#data').modal('show');
@@ -116,7 +116,7 @@
                 url: `{{ route('api.longform.preview') }}`,
                 method: 'POST',
                 data: {
-                    editorjs_data: currentModalData,
+                    editorjs_data: JSON.stringify(currentModalData),
                 },
                 success: function(data) {
                     $('#data .modal-body').html(data);

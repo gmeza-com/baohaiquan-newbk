@@ -88,8 +88,9 @@ function render_paragraph_block($data)
 {
     $text = $data['text'] ?? '';
     $alignment = $data['alignment'] ?? 'left';
+    $dropcap = $data['dropcap'] ?? false;
 
-    return '<p style="text-align: ' . htmlspecialchars($alignment) . '">' . $text . '</p>';
+    return '<p class="paragraph-with-alignment' . ($dropcap ? ' dropcap' : '') . '" style="text-align: ' . htmlspecialchars($alignment) . '">' . $text . '</p>';
 }
 
 /**
