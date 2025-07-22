@@ -235,6 +235,26 @@
             <hr>
             <div class="row">
                 <div class="col-lg-4">
+                    <h2>{{ trans('option::language.general_layout') }}</h2>
+                    <p>{{ trans('option::language.general_layout_des') }}</p>
+                </div>
+                <div class="col-lg-8">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form_group">
+                                {!! Form::label('home_layout', trans('option::language.general_home_layout'), ['class' => 'control-label']) !!}
+                                {!! Form::text('home_layout', get_option('home_layout'), [
+                                    'class' => 'form-control',
+                                    'placeholder' => trans('option::language.general_home_layout_placeholder'),
+                                ]) !!}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr>
+            <div class="row">
+                <div class="col-lg-4">
                     <h2>{{ trans('option::language.general_codescript') }}</h2>
                     <p>{{ trans('option::language.general_codescript_des') }}</p>
                 </div>

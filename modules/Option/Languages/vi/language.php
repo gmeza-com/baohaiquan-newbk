@@ -46,7 +46,10 @@ return [
     'general_zalo_placeholder' => 'Nhập địa chỉ liên hết zalo',
     'general_facebook_placeholder' => 'Nhập địa chỉ liên hết facebook',
     'general_youtube_placeholder' => 'Nhập địa chỉ liên hết youtube',
-
+    'general_home_layout' => 'Bố cục trang chủ',
+    'general_home_layout_placeholder' => 'Nhập danh sách id danh mục muốn hiển thị theo thứ tự',
+    'general_layout' => 'Bố cục',
+    'general_layout_des' => 'Cấu hình bố cục của website',
 
     //update
     'update' => 'Cập nhật hệ thống',
