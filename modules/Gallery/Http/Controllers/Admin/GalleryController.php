@@ -80,7 +80,14 @@ class GalleryController extends AdminController
   {
     $filter = decrypt($request->get('filter'));
     $language = @$filter['language'] ?: config('cnv.language_default');
-    $model = GalleryLanguage::with('gallery')->where('locale', $language);
+    $model = GalleryLanguage::with([
+      'gallery',
+      'gallery.categories.languages' => function ($query) use ($language) {
+        $query->where('locale', $language);
+      }
+    ])->where('locale', $language);
+
+
     if (@$filter['category'] && @$filter['category'] !== '*') {
       $model->whereHas('gallery', function ($query) use ($filter) {
         $query->whereHas('categories', function ($query) use ($filter) {
@@ -111,7 +118,7 @@ class GalleryController extends AdminController
         $button = [];
 
         $button[] = [
-          'route' => $model->gallery->type == 'video' ? route('gallery.show', $model->slug) : url('/bao-in-hai-quan?id=' . $model->gallery->id . '&year=' . Carbon::parse($model->gallery->published_at)->format('Y')),
+          'route' => $model->gallery->categories->first()->languages->first()->slug . ($model->gallery->type == 'album' ? '?newspaper=' . $model->gallery->languages->first()->slug : '/' .  $model->gallery->languages->first()->slug),
           'name' => trans('language.show'),
           'icon' => 'fa fa-eye',
           'attributes' => [
