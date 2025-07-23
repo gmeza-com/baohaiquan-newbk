@@ -13,7 +13,8 @@ class GalleryLanguage extends Model
         'slug',
         'description',
         'content',
-        'gallery_id'
+        'gallery_id',
+        'tags'
     ];
 
     public $timestamps = false;

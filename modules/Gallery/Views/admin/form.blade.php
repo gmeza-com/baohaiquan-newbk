@@ -47,6 +47,13 @@
                                         ['class' => 'form-control', 'required', 'rows' => 3],
                                     ) !!}
                                 </div>
+
+                                <div class="form-group">
+                                    {!! Form::label('name', trans('language.tags_post'), ['class' => 'label-control']) !!}
+                                    {!! Form::text('language[' . $language['locale'] . '][tags]', @$gallery->language('tags', $language['locale']), [
+                                        'class' => 'form-control input-tags',
+                                    ]) !!}
+                                </div>
                             </div>
                         @endforeach
                     </div>
@@ -132,21 +139,37 @@
             </div>
         @endcomponent
 
-        @component('components.block')
+                @component('components.block')
             @slot('title', trans('gallery::language.choose_category'))
             @slot('action', link_to_route('admin.gallery.category.index', trans('gallery::language.category_create'), null,
                 ['class' => 'btn btn-xs btn-primary', 'target' => '_blank', 'required']))
-                <div class="block-body">
+            <div class="block-body">
                     <div class="form_group">
                         {!! Form::select(
                             'category[]',
-                            (new \Modules\Gallery\Models\GalleryCategory())->getForSelection(),
+                            app(\Modules\Gallery\Models\GalleryCategory::class)->getForSelection(),
                             @$gallery->categories->map->id->toArray(),
                             ['class' => 'form-control', 'multiple' => true],
                         ) !!}
                     </div>
                 </div>
             @endcomponent
+
+            <div id="podcast-category-block" style="display: none;">
+                @component('components.block')
+                    @slot('title', trans('gallery::language.choose_podcast_category'))
+                    <div class="block-body">
+                        <div class="form_group">
+                            {!! Form::select(
+                                'podcast_category',
+                                app(\Modules\Gallery\Models\PodcastCategory::class)->getForSelection(),
+                                @$gallery->podcast_categories->first()->id,
+                                ['class' => 'form-control', 'multiple' => false, 'required'],
+                            ) !!}
+                        </div>
+                    </div>
+                @endcomponent
+            </div>
 
             @component('components.block')
                 @slot('title', trans('language.thumbnail'))
@@ -267,10 +290,18 @@
 
                     $(document).ready(function() {
                         var defaultWidget = $('select[name=type]').val();
+                        // Disable AJAX form submission for gallery form
+                        $('#save').off('submit.ajaxForm');
 
                         if ($('select[name=type]').length > 0) {
                             loadFormWidget(defaultWidget);
                             var currentWidget = defaultWidget;
+
+                            // Check initial type for podcast category visibility
+                            if (defaultWidget === 'audio') {
+                                $('#podcast-category-block').show();
+                                $('select[name="podcast_category"]').prop('required', true);
+                            }
 
                         } else {
                             defaultWidget = $('meta[name="gallery-type"]');
@@ -279,6 +310,12 @@
                             if (defaultWidget.length > 0) {
                                 loadFormWidget(defaultWidget.attr('content'));
                                 currentWidget = defaultWidget.attr('content');
+
+                                // Check initial type for podcast category visibility
+                                if (defaultWidget.attr('content') === 'audio') {
+                                    $('#podcast-category-block').show();
+                                    $('select[name="podcast_category"]').prop('required', true);
+                                }
                             }
                         }
 
@@ -288,6 +325,15 @@
                             if (_nextWidget !== currentWidget) {
                                 loadFormWidget(_nextWidget);
                                 currentWidget = _nextWidget;
+                            }
+
+                            // Show/hide podcast category block based on type selection
+                            if (_nextWidget === 'audio') {
+                                $('#podcast-category-block').show();
+                                $('select[name="podcast_category"]').prop('required', true);
+                            } else {
+                                $('#podcast-category-block').hide();
+                                $('select[name="podcast_category"]').prop('required', false);
                             }
                         });
 
@@ -323,7 +369,24 @@
 
                         // EditorJS validation handling moved to longform.blade.php
 
+                        var isSubmitting = false;
+
                         var handleSubmit = function() {
+                            if (isSubmitting) {
+                                return;
+                            }
+
+                            isSubmitting = true;
+
+                            // Disable the save button to prevent multiple submissions
+                            $('#save-gallery-btn').prop('disabled', true).text('Đang lưu...');
+
+                            // Disable validation temporarily for form submission
+                            var form = $('#save');
+                            if (form.length > 0) {
+                                form.off('submit.validate');
+                            }
+
                             if (currentWidget === 'longform') {
                                 // Use the longform submit handler from longform.blade.php
                                 if (typeof window.handleLongformSubmit === 'function') {
@@ -332,11 +395,49 @@
                                     $('#save').submit();
                                 }
                             } else {
-                                $('#save').submit();
+                                // Force form submission for non-longform widgets
+                                var formElement = $('#save')[0];
+                                if (formElement) {
+                                    formElement.submit();
+                                } else {
+                                    console.error('Form #save not found');
+                                    isSubmitting = false;
+                                    $('#save-gallery-btn').prop('disabled', false).html(
+                                        '<i class="fa fa-save"></i> {{ trans('language.save') }}');
+                                }
                             }
                         }
 
                         window.handleSubmit = handleSubmit;
+
+                        // Add event listener for save button (works for both create and edit)
+                        $(document).on('click', '#save-gallery-btn', function(e) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleSubmit();
+                        });
+
+                        // Reset submission state on form submit
+                        $('#save').on('submit', function() {
+                            setTimeout(function() {
+                                isSubmitting = false;
+                                $('#save-gallery-btn').prop('disabled', false).html(
+                                    '<i class="fa fa-save"></i> {{ trans('language.save') }}');
+                            }, 2000);
+                        });
+
+                        // Handle AJAX errors if any
+                        $(document).ajaxError(function(event, xhr, settings) {
+                            console.log('AJAX error occurred, resetting state');
+                            isSubmitting = false;
+                            $('#save-gallery-btn').prop('disabled', false).html(
+                                '<i class="fa fa-save"></i> {{ trans('language.save') }}');
+                        });
+
+                        // Reset state on page unload to prevent stuck state
+                        $(window).on('beforeunload', function() {
+                            isSubmitting = false;
+                        });
 
                         // expandEditor function moved to longform.blade.php
                     });

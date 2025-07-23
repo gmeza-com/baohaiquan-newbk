@@ -64,6 +64,11 @@ class Gallery extends Model
     return $this->belongsToMany(GalleryCategory::class, 'gallery_category');
   }
 
+  public function podcast_categories()
+  {
+    return $this->belongsToMany(PodcastCategory::class, 'gallery_podcast_category');
+  }
+
   public function royalties()
   {
     return $this->hasMany(\Modules\Royalty\Models\Royalty::class, 'gallery_id');
@@ -93,6 +98,13 @@ class Gallery extends Model
   {
     return $this->categories->map(function ($category) {
       return link_to_route('gallery.category.show', $category->language('name'), $category->language('slug'));
+    })->toArray();
+  }
+
+  public function getListPodcastCategoriesAttribute($value)
+  {
+    return $this->podcast_categories->map(function ($category) {
+      return link_to_route('gallery.podcast-category.show', $category->language('name'), $category->language('slug'));
     })->toArray();
   }
 }

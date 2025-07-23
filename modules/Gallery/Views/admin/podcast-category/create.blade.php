@@ -3,10 +3,10 @@
 @section('page_header')
 
     <div class="pull-right">
-        <a href="{{ admin_route('gallery.index') }}" class="btn btn-default">
+        <a href="{{ admin_route('gallery.category.index') }}" class="btn btn-default">
             <i class="fa fa-arrow-circle-left"></i> {{ trans('language.back') }}
         </a>
-        <button type="button" class="btn btn-primary" id="save-gallery-btn">
+        <button type="button" class="btn btn-primary" onclick="submitForm('#save');">
             <i class="fa fa-save"></i> {{ trans('language.save') }}
         </button>
     </div>
@@ -18,12 +18,12 @@
 
 @section('content')
     {!! Form::open([
-        'url' => admin_route('gallery.store'),
+        'url' => admin_route('gallery.podcast-category.store'),
         'method' => 'POST',
         'class' => 'form-validate',
         'id' => 'save',
         'data-callback' => 'redirect_to',
     ]) !!}
-    @include('gallery::admin.form')
+    @include('gallery::admin.podcast-category.form')
     {!! Form::close() !!}
 @stop

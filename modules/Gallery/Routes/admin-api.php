@@ -44,13 +44,19 @@ Route::group([
     Route::name('api.longform.show')->post('/iadmin/longform/show', function () {
         $data = request()->input('editorjs_data');
 
+        // Decode JSON string back to array/object
+        if (is_string($data)) {
+            $data = json_decode($data, true);
+        }
+
         return view('gallery::admin.show', compact('data'));
     });
 
     Route::name('api.longform.preview')->post('/iadmin/longform/preview', function () {
         $data = request()->input('editorjs_data');
 
-        $data = is_array($data) ? json_encode($data) : (string) $data;
+        // Chỉ encode JSON nếu là array, giữ nguyên kiểu dữ liệu khác
+        $data = is_array($data) ? json_encode($data) : $data;
 
         return view('gallery::admin.preview', compact('data'));
     });

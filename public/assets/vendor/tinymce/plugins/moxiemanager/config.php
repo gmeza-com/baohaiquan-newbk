@@ -20,8 +20,8 @@ $moxieManagerConfig['filesystem.exclude_file_pattern'] = '';
 $moxieManagerConfig['filesystem.extensions'] = 'jpg,jpeg,png,gif,txt,docx,doc,zip,pdf,mp3,m4a,wav,aac,mp4,webm,avi,flv,mov,ogg,ogv,webp';
 $moxieManagerConfig['filesystem.readable'] = true;
 $moxieManagerConfig['filesystem.writable'] = true;
-$moxieManagerConfig['filesystem.overwrite_action'] = "";
-$moxieManagerConfig['filesystem.directories'] = array("images" => array("upload.extensions" => "gif,jpg,png,webp"));
+$moxieManagerConfig['filesystem.overwrite_action'] = "rename";
+// $moxieManagerConfig['filesystem.directories'] = array("images" => array("upload.extensions" => "gif,jpg,png,webp"));
 $moxieManagerConfig['filesystem.allow_override'] = '*';
 
 // Createdir
@@ -42,7 +42,7 @@ $moxieManagerConfig['createdoc.allow_override'] = '*';
 $moxieManagerConfig['upload.include_file_pattern'] = '';
 $moxieManagerConfig['upload.exclude_file_pattern'] = '';
 $moxieManagerConfig['upload.extensions'] = '*';
-$moxieManagerConfig['upload.maxsize'] = '10MB';
+$moxieManagerConfig['upload.maxsize'] = '500MB';
 $moxieManagerConfig['upload.overwrite'] = false;
 $moxieManagerConfig['upload.autoresize'] = true;
 $moxieManagerConfig['upload.autoresize_jpeg_quality'] = 80;
@@ -177,3 +177,12 @@ $moxieManagerConfig['favorites.max'] = 20;
 
 // History
 $moxieManagerConfig['history.max'] = 20;
+
+
+// VideoSCP
+$moxieManagerConfig['videoscp.remote_host'] = 'localhost';
+$moxieManagerConfig['videoscp.remote_port'] = '2222';
+$moxieManagerConfig['videoscp.remote_user'] = 'hoantruong6814';
+$moxieManagerConfig['videoscp.remote_path'] = '/home/hoantruong6814/storage/';
+$moxieManagerConfig['videoscp.private_key'] = '/Users/truongduchoan/.ssh/id_rsa_local';
+$moxieManagerConfig['videoscp.data_domain'] = 'http://data.baohaiquan.local/storage/';

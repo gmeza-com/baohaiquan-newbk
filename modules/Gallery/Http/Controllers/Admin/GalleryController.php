@@ -185,9 +185,8 @@ class GalleryController extends AdminController
 
   public function store(Request $request)
   {
-    if (! $request->ajax()) {
-      return;
-    }
+    // Check if this is an AJAX request or regular form submission
+    $isAjax = $request->ajax();
 
     $data = $request->except(['_token', 'language']);
 
@@ -198,40 +197,83 @@ class GalleryController extends AdminController
     $data['category'] = @$data['category'] ?: [];
     // required category
     if (!$data['category']) {
-      return response()->json([
-        'status' => 500,
-        'message' => trans('gallery::language.required_categories'),
-      ]);
+      if ($isAjax) {
+        return response()->json([
+          'status' => 500,
+          'message' => trans('gallery::language.required_categories'),
+        ]);
+      } else {
+        return redirect()->back()->withErrors([trans('gallery::language.required_categories')]);
+      }
+    }
+
+    // Validate podcast_category when type is audio
+    if ($data['type'] === 'audio' && empty($data['podcast_category'])) {
+      if ($isAjax) {
+        return response()->json([
+          'status' => 500,
+          'message' => 'Podcast category is required when type is audio.',
+        ]);
+      } else {
+        return redirect()->back()->withErrors(['Podcast category is required when type is audio.']);
+      }
     }
 
     $languages = $request->only('language');
 
     if (! @$languages['language']['vi']['content']) {
-      return response()->json([
-        'status' => 500,
-        'message' => 'Các trường album hoặc video bị thiếu, không thể lưu !',
-      ]);
+      if ($isAjax) {
+        return response()->json([
+          'status' => 500,
+          'message' => 'Các trường album hoặc video bị thiếu, không thể lưu !',
+        ]);
+      } else {
+        return redirect()->back()->withErrors(['Các trường album hoặc video bị thiếu, không thể lưu !']);
+      }
     }
 
-    if ($gallery = Gallery::create($data)) {
-      // save royalty
-      $this->updateRoyalty($request, $gallery);
+    try {
+      if ($gallery = Gallery::create($data)) {
 
-      $gallery->saveLanguages($languages);
+        // save royalty
+        $this->updateRoyalty($request, $gallery);
 
-      $gallery->categories()->sync($data['category']);
+        $gallery->saveLanguages($languages);
 
-      Cache::flush();
-      return response()->json([
-        'status' => 200,
-        'message' => trans('language.create_success'),
-        'redirect_url' => admin_route('gallery.edit', $gallery->id)
-      ]);
-    } else {
-      return response()->json([
-        'status' => 500,
-        'message' => trans('language.update_fail'),
-      ]);
+        $gallery->categories()->sync($data['category']);
+
+        $gallery->podcast_categories()->sync($data['podcast_category']);
+
+        Cache::flush();
+
+        if ($isAjax) {
+          return response()->json([
+            'status' => 200,
+            'message' => trans('language.create_success'),
+            'redirect_url' => admin_route('gallery.edit', $gallery->id)
+          ]);
+        } else {
+          return redirect()->route('admin.gallery.edit', $gallery->id)->with('success', trans('language.create_success'));
+        }
+      } else {
+        if ($isAjax) {
+          return response()->json([
+            'status' => 500,
+            'message' => trans('language.update_fail'),
+          ]);
+        } else {
+          return redirect()->back()->withErrors([trans('language.update_fail')]);
+        }
+      }
+    } catch (\Exception $e) {
+      if ($isAjax) {
+        return response()->json([
+          'status' => 500,
+          'message' => 'Đã xảy ra lỗi khi lưu gallery: ' . $e->getMessage(),
+        ]);
+      } else {
+        return redirect()->back()->withErrors(['Đã xảy ra lỗi khi lưu gallery: ' . $e->getMessage()]);
+      }
     }
   }
 
@@ -254,9 +296,9 @@ class GalleryController extends AdminController
 
   public function update(Request $request, Gallery $gallery)
   {
-    if (! $request->ajax()) {
-      return;
-    }
+    // Check if this is an AJAX request or regular form submission
+    $isAjax = $request->ajax();
+    error_log("[GalleryController@update] Is AJAX request: " . ($isAjax ? 'true' : 'false'));
 
     $data = $request->except(['_token', 'language']);
 
@@ -267,21 +309,41 @@ class GalleryController extends AdminController
     $data['category'] = @$data['category'] ?: [];
     // required category
     if (!$data['category']) {
-
-      Cache::flush();
-      return response()->json([
-        'status' => 500,
-        'message' => trans('gallery::language.required_categories'),
-      ]);
+      if ($isAjax) {
+        return response()->json([
+          'status' => 500,
+          'message' => trans('gallery::language.required_categories'),
+        ]);
+      } else {
+        return redirect()->back()->withErrors([trans('gallery::language.required_categories')]);
+      }
     }
+
+    error_log("test" . json_encode($data));
+
+    // Validate podcast_category when type is audio
+    // if ($data['type'] === 'audio' && empty($data['podcast_category'])) {
+    //   if ($isAjax) {
+    //     return response()->json([
+    //       'status' => 500,
+    //       'message' => 'Podcast category is required when type is audio.',
+    //     ]);
+    //   } else {
+    //     return redirect()->back()->withErrors(['Podcast category is required when type is audio.']);
+    //   }
+    // }
 
     $languages = $request->only('language');
 
     if (! @$languages['language']['vi']['content']) {
-      return response()->json([
-        'status' => 500,
-        'message' => 'Các trường album hoặc video bị thiếu, không thể lưu !',
-      ]);
+      if ($isAjax) {
+        return response()->json([
+          'status' => 500,
+          'message' => 'Các trường album hoặc video bị thiếu, không thể lưu !',
+        ]);
+      } else {
+        return redirect()->back()->withErrors(['Các trường album hoặc video bị thiếu, không thể lưu !']);
+      }
     }
 
     if ($gallery->update($data)) {
@@ -289,18 +351,27 @@ class GalleryController extends AdminController
 
       $gallery->saveLanguages($languages);
       $gallery->categories()->sync($data['category']);
+      $gallery->podcast_categories()->sync($data['podcast_category']);
 
       Cache::flush();
-      return response()->json([
-        'status' => 200,
-        'message' => trans('language.update_success'),
-        'redirect_url' => admin_route('gallery.edit', $gallery->id)
-      ]);
+      if ($isAjax) {
+        return response()->json([
+          'status' => 200,
+          'message' => trans('language.update_success'),
+          'redirect_url' => admin_route('gallery.edit', $gallery->id)
+        ]);
+      } else {
+        return redirect()->route('admin.gallery.edit', $gallery->id)->with('success', trans('language.update_success'));
+      }
     } else {
-      return response()->json([
-        'status' => 500,
-        'message' => trans('language.update_fail'),
-      ]);
+      if ($isAjax) {
+        return response()->json([
+          'status' => 500,
+          'message' => trans('language.update_fail'),
+        ]);
+      } else {
+        return redirect()->back()->withErrors([trans('language.update_fail')]);
+      }
     }
   }
 
