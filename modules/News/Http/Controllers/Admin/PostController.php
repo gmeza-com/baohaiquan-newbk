@@ -107,9 +107,12 @@ class PostController extends AdminController
       });
     }
 
-    $user_id = Auth::user()->id;
 
-    if (allow('news.post.only_show_my_post')) {
+
+    $currentUser = Auth::user();
+    $user_id = $currentUser->id;
+
+    if (allow('news.post.only_show_my_post') && !$currentUser->is_super_admin) {
       $model = $model->whereHas('post', function ($query) use ($user_id) {
         $query->where('user_id', $user_id);
       });
