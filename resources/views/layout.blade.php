@@ -9,7 +9,7 @@
 
     @include('partial.cms_head')
     <!-- Stylesheets -->
-    <link rel="stylesheet" href="/backend/css/main.css?v=<?php echo microtime(); ?>">
+    <link rel="stylesheet" href="/backend/css/main.css?v=1753247432827">
     <link rel="stylesheet" href="/backend/css/themes.css">
     <!-- END Stylesheets -->
 
