@@ -2920,6 +2920,16 @@ li.dropdown-header {
   padding: 0 5px !important;
 }
 
+.modal-body table {
+  max-width: 100%;
+  table-layout: fixed;
+}
+
+.modal-body table img {
+  max-width: 100% !important;
+  height: auto !important;
+}
+
 .modal-footer {
   margin-top: 0;
   padding: 14px 15px 15px;

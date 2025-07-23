@@ -22,7 +22,7 @@
             'url' => admin_route('menu.update', $menu->id),
             'method' => 'PUT',
             'class' => 'form-horizontal form-bordered form-validate',
-            'data-callback' => 'redirect_to'
+            'data-callback' => 'redirect_to',
         ]) !!}
 
         @include('menu::form')
