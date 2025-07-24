@@ -19,10 +19,10 @@
                         <div class="tab-pane active" id="{{ @$postHistory->locale }}">
 
                             <div class="form-group">
-                                {!! Form::label('origin_content', 'Phiên bản gốc ( ' . $postHistory->created_at->format('d/m/Y H:i:s') . ')', [
+                                {!! Form::label('origin_content', 'Phiên bản trước ( ' . $postHistory->created_at->format('d/m/Y H:i:s') . ')', [
                                     'class' => 'label-control',
                                 ]) !!}
-                                {!! @$postHistory->origin_content !!}
+                                <div class="content_news">{!! @$postHistory->origin_content !!}</div>
                             </div>
                         </div>
                     </div>
@@ -55,7 +55,7 @@
                                         'Phiên bản hiện tại ( ' . $postHistory->post->updated_at->format('d/m/Y H:i:s') . ')',
                                         ['class' => 'label-control'],
                                     ) !!}
-                                    {!! @$postHistory->post->language('content', $language['locale']) !!}
+                                    <div class="content_news">{!! @$postHistory->post->language('content', $language['locale']) !!}</div>
                                 </div>
                             </div>
                         @endforeach

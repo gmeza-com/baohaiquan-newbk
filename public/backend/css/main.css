@@ -4568,3 +4568,9 @@ Nestable
   padding-left: 10px;
   padding-right: 10px;
 }
+
+
+.content_news img{
+max-width:100% !important;
+height:auto !important;
+}
