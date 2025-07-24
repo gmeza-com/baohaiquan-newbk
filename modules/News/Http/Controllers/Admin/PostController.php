@@ -411,21 +411,25 @@ class PostController extends AdminController
         // $post->saveLanguages(['language' => $languages]);
 
 
+        // Lưu content cũ vào history trước khi update
+        foreach ($post->languages as $oldLanguage) {
+          PostHistory::create([
+            'locale' => $oldLanguage->locale,
+            'name' => $oldLanguage->name,
+            'post_id' => $post->id,
+            'user_id' => auth()->user()->id,
+            'origin_content' => $oldLanguage->content
+          ]);
+        }
+
         $post->saveLanguages($request->only('language'));
 
         $this->updateRoyalty($request, $post);
 
-        foreach ($languages as $locale => $dataLanguage) {
-          PostHistory::create([
-            'locale' => $locale,
-            'name' => $languages[$locale]['name'],
-            'post_id' => $post->id,
-            'user_id' => auth()->user()->id,
-            'origin_content' => $languages[$locale]['content']
-          ]);
-        }
-
         $post->categories()->sync($data['category']);
+        
+        // Force update updated_at khi có bất kỳ thay đổi nào
+        $post->touch();
       }
       Cache::flush();
       return response()->json([
