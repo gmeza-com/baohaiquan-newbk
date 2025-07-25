@@ -284,7 +284,7 @@
                     <div class="form_group">
                         {!! Form::select(
                             'category[]',
-                            (new \Modules\News\Models\PostCategory())->getParentForSelection(null, false, false),
+                            app(\Modules\News\Models\PostCategory::class)->getParentForSelection(null, false, false),
                             @$post->categories->map->id->toArray(),
                             ['class' => 'form-control', 'multiple' => true],
                         ) !!}
@@ -292,12 +292,24 @@
                 </div>
             @endcomponent
             @component('components.block')
-                @slot('title', trans('language.thumbnail'))
+                @slot('title', trans('news::language.horizon_thumbnail'))
                 <div class="block-body">
                     <div class="form_group">
                         <div class="choose-thumbnail">
                             {!! Form::hidden('thumbnail', $post->thumbnail, ['id' => 'thumbnail']) !!}
                         </div>
+                    </div>
+                </div>
+            @endcomponent
+            @component('components.block')
+                @slot('title', trans('news::language.vertical_thumbnail') . ' (' . trans('news::language.optional') . ')')
+                <div class="block-body">
+                    <div class="form_group">
+                        <div class="choose-thumbnail vertical">
+                            {!! Form::hidden('thumbnail_vertical', $post->thumbnail_vertical, ['id' => 'thumbnail_vertical']) !!}
+                        </div>
+
+                        <p class="describe">Tỉ lệ (9 / 16)</p>
                     </div>
                 </div>
             @endcomponent
