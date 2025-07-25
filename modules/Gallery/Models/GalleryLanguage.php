@@ -14,6 +14,7 @@ class GalleryLanguage extends Model
         'description',
         'content',
         'gallery_id',
+        'post_content',
         'tags'
     ];
 

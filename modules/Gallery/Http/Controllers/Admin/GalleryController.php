@@ -228,7 +228,7 @@ class GalleryController extends AdminController
 
     $languages = $request->only('language');
 
-    if (! @$languages['language']['vi']['content']) {
+    if (! @$languages['language']['vi']['content'] && $data['type'] != 'content') {
       if ($isAjax) {
         return response()->json([
           'status' => 500,
@@ -236,6 +236,17 @@ class GalleryController extends AdminController
         ]);
       } else {
         return redirect()->back()->withErrors(['Các trường album hoặc video bị thiếu, không thể lưu !']);
+      }
+    }
+
+    if (! @$languages['language']['vi']['post_content'] && $data['type'] == 'content') {
+      if ($isAjax) {
+        return response()->json([
+          'status' => 500,
+          'message' => 'Trường nội dung bị thiếu, không thể lưu !',
+        ]);
+      } else {
+        return redirect()->back()->withErrors(['Trường nội dung bị thiếu, không thể lưu !']);
       }
     }
 
@@ -326,7 +337,6 @@ class GalleryController extends AdminController
       }
     }
 
-    error_log("test" . json_encode($data));
 
     // Validate podcast_category when type is audio
     // if ($data['type'] === 'audio' && empty($data['podcast_category'])) {
@@ -342,7 +352,7 @@ class GalleryController extends AdminController
 
     $languages = $request->only('language');
 
-    if (! @$languages['language']['vi']['content']) {
+    if (! @$languages['language']['vi']['content'] && $data['type'] != 'content') {
       if ($isAjax) {
         return response()->json([
           'status' => 500,
@@ -350,6 +360,17 @@ class GalleryController extends AdminController
         ]);
       } else {
         return redirect()->back()->withErrors(['Các trường album hoặc video bị thiếu, không thể lưu !']);
+      }
+    }
+
+    if (! @$languages['language']['vi']['post_content'] && $data['type'] == 'content') {
+      if ($isAjax) {
+        return response()->json([
+          'status' => 500,
+          'message' => 'Trường nội dung bị thiếu, không thể lưu !',
+        ]);
+      } else {
+        return redirect()->back()->withErrors(['Trường nội dung bị thiếu, không thể lưu !']);
       }
     }
 
@@ -455,6 +476,10 @@ class GalleryController extends AdminController
 
     if ($type == 'longform') {
       return view('gallery::admin.longform', compact('gallery'));
+    }
+
+    if ($type == 'content') {
+      return view('gallery::admin.content', compact('gallery'));
     }
 
     return view('gallery::admin.album', compact('gallery'));

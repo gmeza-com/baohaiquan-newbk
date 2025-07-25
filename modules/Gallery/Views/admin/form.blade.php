@@ -84,7 +84,7 @@
                             <div class="col-md-8">
                                 {!! Form::select(
                                     'type',
-                                    ['album' => 'Album', 'video' => 'Video', 'audio' => 'Audio', 'longform' => 'Longform'],
+                                    ['album' => 'Album', 'video' => 'Video', 'audio' => 'Audio', 'longform' => 'Longform', 'content' => 'Bài viết'],
                                     null,
                                     [
                                         'class' => 'form-control',
@@ -139,11 +139,11 @@
             </div>
         @endcomponent
 
-                @component('components.block')
+        @component('components.block')
             @slot('title', trans('gallery::language.choose_category'))
             @slot('action', link_to_route('admin.gallery.category.index', trans('gallery::language.category_create'), null,
                 ['class' => 'btn btn-xs btn-primary', 'target' => '_blank', 'required']))
-            <div class="block-body">
+                <div class="block-body">
                     <div class="form_group">
                         {!! Form::select(
                             'category[]',
@@ -326,6 +326,9 @@
                                 loadFormWidget(_nextWidget);
                                 currentWidget = _nextWidget;
                             }
+
+
+
 
                             // Show/hide podcast category block based on type selection
                             if (_nextWidget === 'audio') {
