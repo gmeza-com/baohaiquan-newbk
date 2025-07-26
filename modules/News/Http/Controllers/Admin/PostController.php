@@ -140,8 +140,6 @@ class PostController extends AdminController
       });
     }
 
-
-
     $currentUser = Auth::user();
     $user_id = $currentUser->id;
 

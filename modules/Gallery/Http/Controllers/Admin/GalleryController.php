@@ -10,6 +10,8 @@ use Modules\Gallery\Models\Gallery;
 use Modules\Gallery\Models\GalleryLanguage;
 use Yajra\DataTables\Facades\DataTables;
 use Modules\Royalty\Models\RoyaltyCategory;
+use Illuminate\Support\Facades\Auth;
+
 
 class GalleryController extends AdminController
 {
@@ -86,6 +88,16 @@ class GalleryController extends AdminController
         $query->where('locale', $language);
       }
     ])->where('locale', $language);
+
+
+    $currentUser = Auth::user();
+    $user_id = $currentUser->id;
+
+    if (allow('gallery.gallery.only_show_my_post') && !$currentUser->is_super_admin) {
+      $model = $model->whereHas('gallery', function ($query) use ($user_id) {
+        $query->where('user_id', $user_id);
+      });
+    }
 
 
     if (@$filter['category'] && @$filter['category'] !== '*') {
@@ -297,6 +309,10 @@ class GalleryController extends AdminController
 
   public function edit(Request $request, Gallery $gallery)
   {
+    if ((allow('gallery.gallery.only_show_my_post') && !Auth::user()->is_super_admin && $gallery->user_id !== Auth::user()->id)) {
+      abort(403);
+    }
+
     if ($request->ajax()) {
       return $this->getForm($request->get('type'), $gallery);
     }
@@ -314,6 +330,10 @@ class GalleryController extends AdminController
 
   public function update(Request $request, Gallery $gallery)
   {
+    if ((allow('gallery.gallery.only_show_my_post') && !Auth::user()->is_super_admin && $gallery->user_id !== Auth::user()->id)) {
+      abort(403);
+    }
+
     // Check if this is an AJAX request or regular form submission
     $isAjax = $request->ajax();
     error_log("[GalleryController@update] Is AJAX request: " . ($isAjax ? 'true' : 'false'));
@@ -452,6 +472,11 @@ class GalleryController extends AdminController
     if (! $request->ajax()) {
       return;
     }
+
+    if ((allow('gallery.gallery.only_show_my_post') && !Auth::user()->is_super_admin && $gallery->user_id !== Auth::user()->id)) {
+      abort(403);
+    }
+
     if ($gallery->delete()) {
 
       Cache::flush();
