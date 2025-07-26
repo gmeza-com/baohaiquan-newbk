@@ -78,21 +78,21 @@
             @slot('title', trans('language.setting_field'))
             <div class="block-body">
                 <div class="form-horizontal form-bordered">
-                    @if (!$gallery->type)
-                        <div class="form-group">
+                    
+                        <div class="form-group" style="{{ !empty($gallery->type) ? 'display:none;' : '' }}">
                             {!! Form::label('type', trans('gallery::language.type'), ['class' => 'control-label col-md-4']) !!}
                             <div class="col-md-8">
                                 {!! Form::select(
                                     'type',
                                     ['album' => 'Album', 'video' => 'Video', 'audio' => 'Audio', 'longform' => 'Longform', 'content' => 'Bài viết'],
-                                    null,
+                                    $gallery->type ?: null,
                                     [
                                         'class' => 'form-control',
                                     ],
                                 ) !!}
                             </div>
                         </div>
-                    @endif
+                
 
                     <div class="form-group">
                         {!! Form::label('featured', trans('gallery::language.featured'), ['class' => 'control-label col-md-4']) !!}
