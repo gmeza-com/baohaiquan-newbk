@@ -28,16 +28,49 @@ class PostController extends AdminController
       return $this->data($request);
     }
 
-    $this->tpl->setData('title', trans('news::language.manager_post'));
     $this->tpl->setTemplate('news::admin.post.index');
 
-    // breadcrumb
-    $this->tpl->breadcrumb()->add('admin.post.index', trans('news::language.manager_post'));
+
 
     // datatable
-    $filter = encrypt($request->only(['language', 'category', 'published']));
+    $filter = $request->only(['language', 'category', 'published']);
+    $this->tpl->setData('is_waiting_approve_post', false);
+
+    if ($request->route()->getName() == 'admin.post.waiting_approve_post') {
+      // Kiểm tra permission và thiết lập filter cho waiting approve post
+      $allowedPublishedValues = [];
+
+      if (allow('news.post.approved_level_3')) {
+        $allowedPublishedValues[] = 2;
+      }
+      if (allow('news.post.approved_level_2')) {
+        $allowedPublishedValues[] = 1;
+      }
+      if (allow('news.post.approved_level_1')) {
+        $allowedPublishedValues[] = 0;
+      }
+
+      // Nếu user không có permission nào thì return 403
+      if (empty($allowedPublishedValues)) {
+        abort(403, 'Bạn không có quyền truy cập chức năng này');
+      }
+
+      // Thiết lập filter published để chỉ lấy các bài post tương ứng với level được phép
+      $filter['published_levels'] = $allowedPublishedValues;
+
+      // breadcrumb
+      $this->tpl->setData('title', trans('news::language.waiting_approve_post'));
+      $this->tpl->setData('is_waiting_approve_post', true);
+      $this->tpl->breadcrumb()->add('admin.post.index', trans('news::language.waiting_approve_post'));
+    } else {
+      // breadcrumb
+      $this->tpl->setData('title', trans('news::language.manager_post'));
+      $this->tpl->breadcrumb()->add('admin.post.index', trans('news::language.manager_post'));
+    }
+
+
     $url = admin_route('post.index');
-    $url = $url . '?filter=' . $filter;
+    $url = $url . '?filter=' . encrypt($filter);
     $this->tpl->datatable()->setSource($url);
 
     $this->tpl->datatable()->addColumn(
@@ -122,6 +155,13 @@ class PostController extends AdminController
       $published = intval($filter['published']);
       $model = $model->whereHas('post', function ($query) use ($published) {
         $query->where('published', $published ?: 0);
+      });
+    }
+
+    // Xử lý filter published_levels cho waiting approve post
+    if (isset($filter['published_levels']) && is_array($filter['published_levels'])) {
+      $model = $model->whereHas('post', function ($query) use ($filter) {
+        $query->whereIn('published', $filter['published_levels']);
       });
     }
 
