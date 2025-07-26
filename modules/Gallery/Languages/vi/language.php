@@ -20,4 +20,5 @@ return [
   'choose_category' => 'Chọn danh mục',
   'choose_podcast_category' => 'Chọn danh mục podcast',
   'content' => 'Nội dung',
+  'post' => 'Bài viết',
 ];
