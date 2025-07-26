@@ -385,12 +385,14 @@ class PostController extends AdminController
 
   public function edit(Post $post)
   {
-    if ((allow('news.post.only_show_my_post') && $post->user_id !== Auth::user()->id)) {
+    if ((allow('news.post.only_show_my_post') && !Auth::user()->is_super_admin && $post->user_id !== Auth::user()->id)) {
       abort(403);
     }
 
     $this->tpl->setData('title', trans('news::language.post_edit'));
     $this->tpl->setData('post', $post);
+    $this->tpl->setData('read_only', !$this->allowToEditByApproval($post));
+
     $this->tpl->setTemplate('news::admin.post.edit');
 
     // breadcrumb
@@ -409,7 +411,7 @@ class PostController extends AdminController
       $post->update(['published' => -1, 'cancel_message' => $request->input('message')]);
     }
 
-    if ((allow('news.post.only_show_my_post') && $post->user_id !== Auth::user()->id)) {
+    if ((allow('news.post.only_show_my_post') && !Auth::user()->is_super_admin && $post->user_id !== Auth::user()->id) || !$this->allowToEditByApproval($post)) {
       abort(403);
     }
     $data = $request->except(['_token', 'language']);
@@ -467,7 +469,7 @@ class PostController extends AdminController
         $this->updateRoyalty($request, $post);
 
         $post->categories()->sync($data['category']);
-        
+
         // Force update updated_at khi có bất kỳ thay đổi nào
         $post->touch();
       }
@@ -533,7 +535,7 @@ class PostController extends AdminController
       return;
     }
 
-    if ((allow('news.post.only_show_my_post') && $post->user_id !== Auth::user()->id) || !$this->allowToDo($post->published)) {
+    if ((allow('news.post.only_show_my_post') && !Auth::user()->is_super_admin && $post->user_id !== Auth::user()->id) || !$this->allowToDo($post->published)) {
       abort(403);
     }
     DB::table('post_histories')->where('post_id', $post->id)->delete();
@@ -631,5 +633,28 @@ class PostController extends AdminController
   public function updateSlug(Request $request)
   {
     dd('123123');
+  }
+
+  private function allowToEditByApproval($post)
+  {
+    $maxLevel = 0;
+
+    if (allow('news.post.approved_level_1')) {
+      $maxLevel = 1;
+    }
+
+    if (allow('news.post.approved_level_2')) {
+      $maxLevel = 2;
+    }
+
+    if (allow('news.post.approved_level_3')) {
+      $maxLevel = 3;
+    }
+
+    if ($post->published > $maxLevel) {
+      return false;
+    }
+
+    return true;
   }
 }
