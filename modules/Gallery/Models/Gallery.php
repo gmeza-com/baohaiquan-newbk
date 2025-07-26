@@ -21,7 +21,8 @@ class Gallery extends Model
     'published_at',
     'thumbnail',
     'user_id',
-    'type'
+    'type',
+    'prefix'
   ];
 
   protected $with = [
@@ -31,7 +32,9 @@ class Gallery extends Model
   protected $dates = [
     'created_at',
     'updated_at',
-    'published_at'
+    'published_at',
+    'date_featured_started_at',
+    'date_featured_ended_at'
   ];
 
   protected $casts = [

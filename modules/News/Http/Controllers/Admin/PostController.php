@@ -28,16 +28,49 @@ class PostController extends AdminController
       return $this->data($request);
     }
 
-    $this->tpl->setData('title', trans('news::language.manager_post'));
     $this->tpl->setTemplate('news::admin.post.index');
 
-    // breadcrumb
-    $this->tpl->breadcrumb()->add('admin.post.index', trans('news::language.manager_post'));
+
 
     // datatable
-    $filter = encrypt($request->only(['language', 'category', 'published']));
+    $filter = $request->only(['language', 'category', 'published']);
+    $this->tpl->setData('is_waiting_approve_post', false);
+
+    if ($request->route()->getName() == 'admin.post.waiting_approve_post') {
+      // Kiểm tra permission và thiết lập filter cho waiting approve post
+      $allowedPublishedValues = [];
+
+      if (allow('news.post.approved_level_3')) {
+        $allowedPublishedValues[] = 2;
+      }
+      if (allow('news.post.approved_level_2')) {
+        $allowedPublishedValues[] = 1;
+      }
+      if (allow('news.post.approved_level_1')) {
+        $allowedPublishedValues[] = 0;
+      }
+
+      // Nếu user không có permission nào thì return 403
+      if (empty($allowedPublishedValues)) {
+        abort(403, 'Bạn không có quyền truy cập chức năng này');
+      }
+
+      // Thiết lập filter published để chỉ lấy các bài post tương ứng với level được phép
+      $filter['published_levels'] = $allowedPublishedValues;
+
+      // breadcrumb
+      $this->tpl->setData('title', trans('news::language.waiting_approve_post'));
+      $this->tpl->setData('is_waiting_approve_post', true);
+      $this->tpl->breadcrumb()->add('admin.post.index', trans('news::language.waiting_approve_post'));
+    } else {
+      // breadcrumb
+      $this->tpl->setData('title', trans('news::language.manager_post'));
+      $this->tpl->breadcrumb()->add('admin.post.index', trans('news::language.manager_post'));
+    }
+
+
     $url = admin_route('post.index');
-    $url = $url . '?filter=' . $filter;
+    $url = $url . '?filter=' . encrypt($filter);
     $this->tpl->datatable()->setSource($url);
 
     $this->tpl->datatable()->addColumn(
@@ -107,8 +140,6 @@ class PostController extends AdminController
       });
     }
 
-
-
     $currentUser = Auth::user();
     $user_id = $currentUser->id;
 
@@ -122,6 +153,13 @@ class PostController extends AdminController
       $published = intval($filter['published']);
       $model = $model->whereHas('post', function ($query) use ($published) {
         $query->where('published', $published ?: 0);
+      });
+    }
+
+    // Xử lý filter published_levels cho waiting approve post
+    if (isset($filter['published_levels']) && is_array($filter['published_levels'])) {
+      $model = $model->whereHas('post', function ($query) use ($filter) {
+        $query->whereIn('published', $filter['published_levels']);
       });
     }
 
@@ -345,12 +383,14 @@ class PostController extends AdminController
 
   public function edit(Post $post)
   {
-    if ((allow('news.post.only_show_my_post') && $post->user_id !== Auth::user()->id)) {
+    if ((allow('news.post.only_show_my_post') && !Auth::user()->is_super_admin && $post->user_id !== Auth::user()->id)) {
       abort(403);
     }
 
     $this->tpl->setData('title', trans('news::language.post_edit'));
     $this->tpl->setData('post', $post);
+    $this->tpl->setData('read_only', !$this->allowToEditByApproval($post));
+
     $this->tpl->setTemplate('news::admin.post.edit');
 
     // breadcrumb
@@ -369,7 +409,7 @@ class PostController extends AdminController
       $post->update(['published' => -1, 'cancel_message' => $request->input('message')]);
     }
 
-    if ((allow('news.post.only_show_my_post') && $post->user_id !== Auth::user()->id)) {
+    if ((allow('news.post.only_show_my_post') && !Auth::user()->is_super_admin && $post->user_id !== Auth::user()->id) || !$this->allowToEditByApproval($post)) {
       abort(403);
     }
     $data = $request->except(['_token', 'language']);
@@ -427,7 +467,7 @@ class PostController extends AdminController
         $this->updateRoyalty($request, $post);
 
         $post->categories()->sync($data['category']);
-        
+
         // Force update updated_at khi có bất kỳ thay đổi nào
         $post->touch();
       }
@@ -493,7 +533,7 @@ class PostController extends AdminController
       return;
     }
 
-    if ((allow('news.post.only_show_my_post') && $post->user_id !== Auth::user()->id) || !$this->allowToDo($post->published)) {
+    if ((allow('news.post.only_show_my_post') && !Auth::user()->is_super_admin && $post->user_id !== Auth::user()->id) || !$this->allowToDo($post->published)) {
       abort(403);
     }
     DB::table('post_histories')->where('post_id', $post->id)->delete();
@@ -591,5 +631,28 @@ class PostController extends AdminController
   public function updateSlug(Request $request)
   {
     dd('123123');
+  }
+
+  private function allowToEditByApproval($post)
+  {
+    $maxLevel = 0;
+
+    if (allow('news.post.approved_level_1')) {
+      $maxLevel = 1;
+    }
+
+    if (allow('news.post.approved_level_2')) {
+      $maxLevel = 2;
+    }
+
+    if (allow('news.post.approved_level_3')) {
+      $maxLevel = 3;
+    }
+
+    if ($post->published > $maxLevel) {
+      return false;
+    }
+
+    return true;
   }
 }

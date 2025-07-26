@@ -3,11 +3,13 @@
 @section('page_header')
 
     @can('news.post.create')
-        <div class="pull-right">
-            <a href="{{ admin_route('post.create') }}" class="btn btn-primary">
-                <i class="fa fa-plus"></i> {{ trans('language.create') }}
-            </a>
-        </div>
+        @if (!$is_waiting_approve_post)
+            <div class="pull-right">
+                <a href="{{ admin_route('post.create') }}" class="btn btn-primary">
+                    <i class="fa fa-plus"></i> {{ trans('language.create') }}
+                </a>
+            </div>
+        @endif
     @endcan
 
     <h1>{{ $title }}</h1>
@@ -21,33 +23,36 @@
 
         @slot('action')
             <form action="{{ request()->url() }}" id="filter" method="GET" style="display:flex">
-                <select name="published" id="filter_by_status" class="form-control non-select2"
-                    style="min-width: 60px; max-width:160px; margin-right: 5px">
-                    <option value="*" {{ request()->has('published') && request('published') == '*' ? 'selected' : '' }}>
-                        Tất cả trạng thái
-                    </option>
-                    <option value="3" {{ request()->has('published') && request('published') == 3 ? 'selected' : '' }}>
-                        {{ trans('news::language.approved_by_level_3') }}
-                    </option>
-                    <option value="0" {{ request()->has('published') && request('published') == 0 ? 'selected' : '' }}>
-                        {{ trans('news::language.waiting_level_1') }}
-                    </option>
-                    <option value="1" {{ request()->has('published') && request('published') == 1 ? 'selected' : '' }}>
-                        {{ trans('news::language.waiting_level_2') }}
-                    </option>
-                    <option value="2" {{ request()->has('published') && request('published') == 2 ? 'selected' : '' }}>
-                        {{ trans('news::language.waiting_level_3') }}
-                    </option>
-                    <option value="-1" {{ request()->has('published') && request('published') == -1 ? 'selected' : '' }}>
-                        Đã hủy
-                    </option>
-                </select>
+                @if (!$is_waiting_approve_post)
+                    <select name="published" id="filter_by_status" class="form-control non-select2"
+                        style="min-width: 60px; max-width:160px; margin-right: 5px">
+                        <option value="*" {{ request()->has('published') && request('published') == '*' ? 'selected' : '' }}>
+                            Tất cả trạng thái
+                        </option>
+                        <option value="3" {{ request()->has('published') && request('published') == 3 ? 'selected' : '' }}>
+                            {{ trans('news::language.approved_by_level_3') }}
+                        </option>
+                        <option value="0" {{ request()->has('published') && request('published') == 0 ? 'selected' : '' }}>
+                            {{ trans('news::language.waiting_level_1') }}
+                        </option>
+                        <option value="1" {{ request()->has('published') && request('published') == 1 ? 'selected' : '' }}>
+                            {{ trans('news::language.waiting_level_2') }}
+                        </option>
+                        <option value="2" {{ request()->has('published') && request('published') == 2 ? 'selected' : '' }}>
+                            {{ trans('news::language.waiting_level_3') }}
+                        </option>
+                        <option value="-1" {{ request()->has('published') && request('published') == -1 ? 'selected' : '' }}>
+                            Đã hủy
+                        </option>
+                    </select>
+                @endif
                 <select name="category" id="flter_by_category" class="form-control non-select2"
                     style="min-width: 120px; max-width:320px">
                     <option value="*">{{ trans('news::language.include_categories') }}</option>
                     @foreach (get_all_categories() as $category)
-                        @if(trim($category->language('name')) !== '')
-                            <option value="{{ $category->id }}" {{ $category->id == request()->get('category') ? 'selected' : '' }}>
+                        @if (trim($category->language('name')) !== '')
+                            <option value="{{ $category->id }}"
+                                {{ $category->id == request()->get('category') ? 'selected' : '' }}>
                                 {{ $category->language('name') }}
                             </option>
                         @endif

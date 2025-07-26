@@ -4574,3 +4574,7 @@ Nestable
 max-width:100% !important;
 height:auto !important;
 }
+
+.post-edit-read-only {
+  margin-top: 1rem;
+}
