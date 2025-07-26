@@ -181,8 +181,8 @@
                             </label>
                         </div>
                     </div>
-
-                    @if (allow('news.post.approved_level_1') && $post->published >= 3)
+                    {{-- Nếu là tổng biến tập thì show lên, còn nếu là BTV thì đợi tổng biên tập duyệt mới được chỉnh thời gian đăng --}}
+                    @if ((allow('news.post.approved_level_1') && $post->published >= 3) || allow('news.post.approved_level_3'))
                         <div class="form-group show_publish_datetime">
                             <div class="col-md-12 help-block">
                                 <span>Ngày bắt đầu hiển thị</span>
