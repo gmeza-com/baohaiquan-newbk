@@ -39,7 +39,11 @@
                     @endphp
                     @if (
                         $item->attributes['permission'] === '*' ||
-                            ($item->attributes['permission'] !== '*' && allow($item->attributes['permission'])))
+                            ($item->attributes['permission'] !== '*' && allow($item->attributes['permission'])) ||
+                            ($child->attributes['permission'] == 'news.post.approved_level_*' &&
+                                (allow('news.post.approved_level_1') ||
+                                    allow('news.post.approved_level_2') ||
+                                    allow('news.post.approved_level_3'))))
                         <li>
                             <a href="{{ @$item->attributes['url'] == '#' ? 'javascript:void(0);' : @$item->attributes['url'] }}"
                                 class="{!! $class !!}">
@@ -62,7 +66,11 @@
                                         @endphp
                                         @if (
                                             $child->attributes['permission'] === '*' ||
-                                                ($child->attributes['permission'] !== '*' && allow($child->attributes['permission'])))
+                                                ($child->attributes['permission'] !== '*' && allow($child->attributes['permission'])) ||
+                                                ($child->attributes['permission'] == 'news.post.approved_level_*' &&
+                                                    (allow('news.post.approved_level_1') ||
+                                                        allow('news.post.approved_level_2') ||
+                                                        allow('news.post.approved_level_3'))))
                                             <li>
                                                 <a href="{{ @$child->attributes['url'] }}" class="{{ $active }}">
                                                     {{ @$child->language('name') }}

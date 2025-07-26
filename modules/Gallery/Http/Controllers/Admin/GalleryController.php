@@ -10,6 +10,8 @@ use Modules\Gallery\Models\Gallery;
 use Modules\Gallery\Models\GalleryLanguage;
 use Yajra\DataTables\Facades\DataTables;
 use Modules\Royalty\Models\RoyaltyCategory;
+use Illuminate\Support\Facades\Auth;
+
 
 class GalleryController extends AdminController
 {
@@ -86,6 +88,16 @@ class GalleryController extends AdminController
         $query->where('locale', $language);
       }
     ])->where('locale', $language);
+
+
+    $currentUser = Auth::user();
+    $user_id = $currentUser->id;
+
+    if (allow('gallery.gallery.only_show_my_post') && !$currentUser->is_super_admin) {
+      $model = $model->whereHas('gallery', function ($query) use ($user_id) {
+        $query->where('user_id', $user_id);
+      });
+    }
 
 
     if (@$filter['category'] && @$filter['category'] !== '*') {
@@ -228,7 +240,7 @@ class GalleryController extends AdminController
 
     $languages = $request->only('language');
 
-    if (! @$languages['language']['vi']['content']) {
+    if (! @$languages['language']['vi']['content'] && $data['type'] != 'content') {
       if ($isAjax) {
         return response()->json([
           'status' => 500,
@@ -236,6 +248,17 @@ class GalleryController extends AdminController
         ]);
       } else {
         return redirect()->back()->withErrors(['Các trường album hoặc video bị thiếu, không thể lưu !']);
+      }
+    }
+
+    if (! @$languages['language']['vi']['post_content'] && $data['type'] == 'content') {
+      if ($isAjax) {
+        return response()->json([
+          'status' => 500,
+          'message' => 'Trường nội dung bị thiếu, không thể lưu !',
+        ]);
+      } else {
+        return redirect()->back()->withErrors(['Trường nội dung bị thiếu, không thể lưu !']);
       }
     }
 
@@ -286,6 +309,10 @@ class GalleryController extends AdminController
 
   public function edit(Request $request, Gallery $gallery)
   {
+    if ((allow('gallery.gallery.only_show_my_post') && !Auth::user()->is_super_admin && $gallery->user_id !== Auth::user()->id)) {
+      abort(403);
+    }
+
     if ($request->ajax()) {
       return $this->getForm($request->get('type'), $gallery);
     }
@@ -303,6 +330,10 @@ class GalleryController extends AdminController
 
   public function update(Request $request, Gallery $gallery)
   {
+    if ((allow('gallery.gallery.only_show_my_post') && !Auth::user()->is_super_admin && $gallery->user_id !== Auth::user()->id)) {
+      abort(403);
+    }
+
     // Check if this is an AJAX request or regular form submission
     $isAjax = $request->ajax();
     error_log("[GalleryController@update] Is AJAX request: " . ($isAjax ? 'true' : 'false'));
@@ -326,7 +357,6 @@ class GalleryController extends AdminController
       }
     }
 
-    error_log("test" . json_encode($data));
 
     // Validate podcast_category when type is audio
     // if ($data['type'] === 'audio' && empty($data['podcast_category'])) {
@@ -342,7 +372,7 @@ class GalleryController extends AdminController
 
     $languages = $request->only('language');
 
-    if (! @$languages['language']['vi']['content']) {
+    if (! @$languages['language']['vi']['content'] && $data['type'] != 'content') {
       if ($isAjax) {
         return response()->json([
           'status' => 500,
@@ -350,6 +380,17 @@ class GalleryController extends AdminController
         ]);
       } else {
         return redirect()->back()->withErrors(['Các trường album hoặc video bị thiếu, không thể lưu !']);
+      }
+    }
+
+    if (! @$languages['language']['vi']['post_content'] && $data['type'] == 'content') {
+      if ($isAjax) {
+        return response()->json([
+          'status' => 500,
+          'message' => 'Trường nội dung bị thiếu, không thể lưu !',
+        ]);
+      } else {
+        return redirect()->back()->withErrors(['Trường nội dung bị thiếu, không thể lưu !']);
       }
     }
 
@@ -431,6 +472,11 @@ class GalleryController extends AdminController
     if (! $request->ajax()) {
       return;
     }
+
+    if ((allow('gallery.gallery.only_show_my_post') && !Auth::user()->is_super_admin && $gallery->user_id !== Auth::user()->id)) {
+      abort(403);
+    }
+
     if ($gallery->delete()) {
 
       Cache::flush();
@@ -455,6 +501,10 @@ class GalleryController extends AdminController
 
     if ($type == 'longform') {
       return view('gallery::admin.longform', compact('gallery'));
+    }
+
+    if ($type == 'content') {
+      return view('gallery::admin.content', compact('gallery'));
     }
 
     return view('gallery::admin.album', compact('gallery'));

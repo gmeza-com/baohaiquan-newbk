@@ -181,8 +181,8 @@
                             </label>
                         </div>
                     </div>
-
-                    @if (allow('news.post.approved_level_1') && $post->published >= 3)
+                    {{-- Nếu là tổng biến tập thì show lên, còn nếu là BTV thì đợi tổng biên tập duyệt mới được chỉnh thời gian đăng --}}
+                    @if ((allow('news.post.approved_level_1') && $post->published >= 3) || allow('news.post.approved_level_3'))
                         <div class="form-group show_publish_datetime">
                             <div class="col-md-12 help-block">
                                 <span>Ngày bắt đầu hiển thị</span>
@@ -284,7 +284,7 @@
                     <div class="form_group">
                         {!! Form::select(
                             'category[]',
-                            (new \Modules\News\Models\PostCategory())->getParentForSelection(null, false, false),
+                            app(\Modules\News\Models\PostCategory::class)->getParentForSelection(null, false, false),
                             @$post->categories->map->id->toArray(),
                             ['class' => 'form-control', 'multiple' => true],
                         ) !!}
@@ -292,12 +292,24 @@
                 </div>
             @endcomponent
             @component('components.block')
-                @slot('title', trans('language.thumbnail'))
+                @slot('title', trans('news::language.horizon_thumbnail'))
                 <div class="block-body">
                     <div class="form_group">
                         <div class="choose-thumbnail">
                             {!! Form::hidden('thumbnail', $post->thumbnail, ['id' => 'thumbnail']) !!}
                         </div>
+                    </div>
+                </div>
+            @endcomponent
+            @component('components.block')
+                @slot('title', trans('news::language.vertical_thumbnail') . ' (' . trans('news::language.optional') . ')')
+                <div class="block-body">
+                    <div class="form_group">
+                        <div class="choose-thumbnail vertical">
+                            {!! Form::hidden('thumbnail_vertical', $post->thumbnail_vertical, ['id' => 'thumbnail_vertical']) !!}
+                        </div>
+
+                        <p class="describe">Tỉ lệ (9 / 16)</p>
                     </div>
                 </div>
             @endcomponent

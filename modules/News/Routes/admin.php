@@ -22,7 +22,9 @@ Route::group([
   Route::name('post.revision.edit')->get('/post/revision/{postHistory}/edit', 'RevisionController@edit');
   Route::name('post.revision.update')->put('/post/revision/{postHistory}', 'RevisionController@update');
 
+
   // Post
   Route::resource('post', 'PostController');
   Route::name('post.slug')->get('/post/slug', 'PostController@slug');
+  Route::name('post.waiting_approve_post')->get('/waiting-approve-post', 'PostController@index');
 });

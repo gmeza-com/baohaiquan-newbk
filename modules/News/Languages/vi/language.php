@@ -35,4 +35,8 @@ return [
   'waiting_level_3' => 'Chờ tổng biên tập duyệt',
   'include_categories' => 'Tất cả danh mục',
   'extra_info' => 'Thông tin bổ sung',
+  'vertical_thumbnail' => 'Ảnh đại diện dọc',
+  'horizon_thumbnail' => 'Ảnh đại diện ngang',
+  'optional' => "Tùy chọn",
+  'waiting_approve_post' => 'Bài chờ duyệt'
 ];

@@ -14,7 +14,10 @@ class GalleryLanguage extends Model
         'description',
         'content',
         'gallery_id',
-        'tags'
+        'post_content',
+        'tags',
+        'quote',
+        'note'
     ];
 
     public $timestamps = false;

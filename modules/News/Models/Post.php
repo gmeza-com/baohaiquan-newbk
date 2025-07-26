@@ -20,6 +20,7 @@ class Post extends Model
     'status',
     'published_at',
     'thumbnail',
+    'thumbnail_vertical',
     'user_id',
     'featured_started_at',
     'featured_ended_at',
