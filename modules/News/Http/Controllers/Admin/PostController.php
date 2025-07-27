@@ -332,8 +332,16 @@ class PostController extends AdminController
     }
 
     $languages = $request->input('language');
+
+    // Xử lý cắt description nếu vượt quá 160 ký tự
     foreach ($languages as $locale => $dataLanguage) {
       $languages[$locale]['slug'] = isset($dataLanguage['slug']) ? $dataLanguage['slug'] : Str::slug($dataLanguage['name']);
+
+      // Cắt description nếu vượt quá 160 ký tự
+      if (isset($dataLanguage['description']) && strlen($dataLanguage['description']) > 157) {
+        $languages[$locale]['description'] = Str::limit($dataLanguage['description'], 157, '...');
+      }
+
       if ($languagePost = PostLanguage::query()->whereLocale($locale)->whereSlug(@$dataLanguage['slug'])->first()) {
         return response()->json([
           'status' => 500,
@@ -341,6 +349,7 @@ class PostController extends AdminController
         ]);
       }
     }
+
     if ($post = Post::create($data)) {
       /*$languages = $request->input('language');
             foreach ($languages as $locale => $dataLanguage) {
@@ -355,7 +364,8 @@ class PostController extends AdminController
       // save royalty
       $this->updateRoyalty($request, $post);
 
-      $post->saveLanguages($request->only('language'));
+      // Lưu languages với dữ liệu đã được xử lý
+      $post->saveLanguages(['language' => $languages]);
 
       foreach ($languages as $locale => $dataLanguage) {
         PostHistory::create([
@@ -427,8 +437,16 @@ class PostController extends AdminController
     }
 
     $languages = $request->input('language');
+
+    // Xử lý cắt description nếu vượt quá 160 ký tự
     foreach ($languages as $locale => $dataLanguage) {
       $languages[$locale]['slug'] = isset($dataLanguage['slug']) ? $dataLanguage['slug'] : Str::slug($dataLanguage['name']);
+
+      // Cắt description nếu vượt quá 160 ký tự
+      if (isset($dataLanguage['description']) && strlen($dataLanguage['description']) > 157) {
+        $languages[$locale]['description'] = Str::limit($dataLanguage['description'], 157, '...');
+      }
+
       if ($languagePost = PostLanguage::query()->whereLocale($locale)->whereSlug(@$dataLanguage['slug'])->first()) {
         if ($languagePost->post_id != $post->id) {
           return response()->json([
@@ -462,7 +480,8 @@ class PostController extends AdminController
           ]);
         }
 
-        $post->saveLanguages($request->only('language'));
+        // Lưu languages với dữ liệu đã được xử lý
+        $post->saveLanguages(['language' => $languages]);
 
         $this->updateRoyalty($request, $post);
 
