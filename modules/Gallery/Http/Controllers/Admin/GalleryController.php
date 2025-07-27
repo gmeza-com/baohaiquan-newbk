@@ -11,6 +11,7 @@ use Modules\Gallery\Models\GalleryLanguage;
 use Yajra\DataTables\Facades\DataTables;
 use Modules\Royalty\Models\RoyaltyCategory;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 
 class GalleryController extends AdminController
@@ -240,6 +241,9 @@ class GalleryController extends AdminController
 
     $languages = $request->only('language');
 
+    // Xử lý tạo unique slug cho tất cả languages
+    $languages = $this->processLanguagesWithUniqueSlug($languages);
+
     if (! @$languages['language']['vi']['content'] && $data['type'] != 'content') {
       if ($isAjax) {
         return response()->json([
@@ -371,6 +375,9 @@ class GalleryController extends AdminController
     // }
 
     $languages = $request->only('language');
+
+    // Xử lý tạo unique slug cho tất cả languages (exclude current gallery)
+    $languages = $this->processLanguagesWithUniqueSlug($languages, $gallery->id);
 
     if (! @$languages['language']['vi']['content'] && $data['type'] != 'content') {
       if ($isAjax) {
@@ -516,5 +523,48 @@ class GalleryController extends AdminController
     $time = $request->has('time_published') ? $request->input('time_published') : '00:00';
 
     return $date . ' ' . $time;
+  }
+
+  /**
+   * Generate unique slug for a given locale and base slug
+   */
+  private function generateUniqueSlug($locale, $baseSlug, $excludeGalleryId = null)
+  {
+    $slug = $baseSlug;
+    $counter = 1;
+    
+    while (true) {
+      $query = GalleryLanguage::query()
+        ->whereLocale($locale)
+        ->whereSlug($slug);
+      
+      if ($excludeGalleryId) {
+        $query->whereHas('gallery', function($q) use ($excludeGalleryId) {
+          $q->where('id', '!=', $excludeGalleryId);
+        });
+      }
+      
+      if (!$query->exists()) {
+        return $slug;
+      }
+      
+      $slug = $baseSlug . '-' . $counter;
+      $counter++;
+    }
+  }
+
+  /**
+   * Process languages data to generate unique slugs
+   */
+  private function processLanguagesWithUniqueSlug($languages, $excludeGalleryId = null)
+  {
+    foreach ($languages['language'] as $locale => $dataLanguage) {
+      $baseSlug = isset($dataLanguage['slug']) ? $dataLanguage['slug'] : Str::slug($dataLanguage['name']);
+      
+      // Tự động tạo unique slug
+      $languages['language'][$locale]['slug'] = $this->generateUniqueSlug($locale, $baseSlug, $excludeGalleryId);
+    }
+    
+    return $languages;
   }
 }
