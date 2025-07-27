@@ -312,6 +312,34 @@ class PostController extends AdminController
     ]);
   }
 
+  /**
+   * Generate unique slug for a given locale and base slug
+   */
+  private function generateUniqueSlug($locale, $baseSlug, $excludePostId = null)
+  {
+    $slug = $baseSlug;
+    $counter = 1;
+    
+    while (true) {
+      $query = PostLanguage::query()
+        ->whereLocale($locale)
+        ->whereSlug($slug);
+      
+      if ($excludePostId) {
+        $query->whereHas('post', function($q) use ($excludePostId) {
+          $q->where('id', '!=', $excludePostId);
+        });
+      }
+      
+      if (!$query->exists()) {
+        return $slug;
+      }
+      
+      $slug = $baseSlug . '-' . $counter;
+      $counter++;
+    }
+  }
+
   public function store(Request $request, Post $post)
   {
     if (!$request->ajax()) return;
@@ -333,20 +361,16 @@ class PostController extends AdminController
 
     $languages = $request->input('language');
 
-    // Xử lý cắt description nếu vượt quá 160 ký tự
+    // Xử lý cắt description nếu vượt quá 160 ký tự và tạo unique slug
     foreach ($languages as $locale => $dataLanguage) {
-      $languages[$locale]['slug'] = isset($dataLanguage['slug']) ? $dataLanguage['slug'] : Str::slug($dataLanguage['name']);
+      $baseSlug = isset($dataLanguage['slug']) ? $dataLanguage['slug'] : Str::slug($dataLanguage['name']);
+      
+      // Tự động tạo unique slug
+      $languages[$locale]['slug'] = $this->generateUniqueSlug($locale, $baseSlug);
 
       // Cắt description nếu vượt quá 160 ký tự
       if (isset($dataLanguage['description']) && strlen($dataLanguage['description']) > 157) {
         $languages[$locale]['description'] = Str::limit($dataLanguage['description'], 157, '...');
-      }
-
-      if ($languagePost = PostLanguage::query()->whereLocale($locale)->whereSlug(@$dataLanguage['slug'])->first()) {
-        return response()->json([
-          'status' => 500,
-          'message' => 'Tên bài viết đã tồn tại . Yêu cầu nhập tên khác'
-        ]);
       }
     }
 
@@ -438,22 +462,16 @@ class PostController extends AdminController
 
     $languages = $request->input('language');
 
-    // Xử lý cắt description nếu vượt quá 160 ký tự
+    // Xử lý cắt description nếu vượt quá 160 ký tự và tạo unique slug
     foreach ($languages as $locale => $dataLanguage) {
-      $languages[$locale]['slug'] = isset($dataLanguage['slug']) ? $dataLanguage['slug'] : Str::slug($dataLanguage['name']);
+      $baseSlug = isset($dataLanguage['slug']) ? $dataLanguage['slug'] : Str::slug($dataLanguage['name']);
+      
+      // Tự động tạo unique slug (exclude current post)
+      $languages[$locale]['slug'] = $this->generateUniqueSlug($locale, $baseSlug, $post->id);
 
       // Cắt description nếu vượt quá 160 ký tự
       if (isset($dataLanguage['description']) && strlen($dataLanguage['description']) > 157) {
         $languages[$locale]['description'] = Str::limit($dataLanguage['description'], 157, '...');
-      }
-
-      if ($languagePost = PostLanguage::query()->whereLocale($locale)->whereSlug(@$dataLanguage['slug'])->first()) {
-        if ($languagePost->post_id != $post->id) {
-          return response()->json([
-            'status' => 500,
-            'message' => 'Tên bài viết đã tồn tại . Yêu cầu nhập tên khác'
-          ]);
-        }
       }
     }
 
