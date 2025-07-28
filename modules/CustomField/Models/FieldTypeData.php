@@ -7,22 +7,24 @@ use Illuminate\Database\Eloquent\Model;
 
 class FieldTypeData extends Model
 {
-    use ModelLanguages;
+  use ModelLanguages;
 
-    protected $fillable = [
-        'position',
-        'field_id'
-    ];
+  protected $fillable = [
+    'position',
+    'field_id'
+  ];
 
-    public $timestamps = false;
+  public $timestamps = false;
 
-    public function languages()
-    {
-        return $this->hasMany(FieldTypeDataLanguage::class, 'field_type_data_id');
-    }
+  protected $table = 'field_type_datas';
 
-    public function field()
-    {
-        return $this->belongsTo(Field::class);
-    }
+  public function languages()
+  {
+    return $this->hasMany(FieldTypeDataLanguage::class, 'field_type_data_id');
+  }
+
+  public function field()
+  {
+    return $this->belongsTo(Field::class);
+  }
 }

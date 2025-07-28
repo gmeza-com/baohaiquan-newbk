@@ -69,6 +69,8 @@ class TypeController extends AdminController
   {
     $model = $field->typeDatas()->with('languages');
 
+
+
     return Datatables::of($model)
       ->addColumn('slug', function ($model) {
         return $model->language('slug');
@@ -81,37 +83,37 @@ class TypeController extends AdminController
         $button = [];
 
         // edit role
-        if (allow('customfield.field.edit')) {
-          $button[] = [
-            'route' => admin_route('custom-field.type.edit', [
-              'custom-field' => $field->id,
-              'type' => $model->id
-            ]),
-            'name' => trans('language.edit'),
-            'icon' => 'fa fa-pencil-square-o',
-            'attributes' => [
-              'class' => 'btn btn-xs btn-primary'
-            ]
-          ];
-        }
+        // if (allow('customfield.field.edit')) {
+        //   $button[] = [
+        //     'route' => admin_route('custom-field.type.edit', [
+        //       'custom-field' => $field->id,
+        //       'type' => $model->id
+        //     ]),
+        //     'name' => trans('language.edit'),
+        //     'icon' => 'fa fa-pencil-square-o',
+        //     'attributes' => [
+        //       'class' => 'btn btn-xs btn-primary'
+        //     ]
+        //   ];
+        // }
 
         // delete
-        if (allow('customfield.field.destroy')) {
-          $button[] = [
-            'route' => 'javascript:void(0);',
-            'name' => trans('language.delete'),
-            'icon' => 'fa fa-trash-o',
-            'attributes' => [
-              'class' => 'btn btn-xs btn-danger',
-              'data-url' => admin_route('custom-field.type.destroy', [
-                'custom-field' => $field->id,
-                'type' => $model->id
-              ]),
-              'data-action' => 'confirm_to_delete',
-              'data-message' => trans('language.confirm_to_delete')
-            ]
-          ];
-        }
+        // if (allow('customfield.field.destroy')) {
+        //   $button[] = [
+        //     'route' => 'javascript:void(0);',
+        //     'name' => trans('language.delete'),
+        //     'icon' => 'fa fa-trash-o',
+        //     'attributes' => [
+        //       'class' => 'btn btn-xs btn-danger',
+        //       'data-url' => admin_route('custom-field.type.destroy', [
+        //         'custom-field' => $field->id,
+        //         'type' => $model->id
+        //       ]),
+        //       'data-action' => 'confirm_to_delete',
+        //       'data-message' => trans('language.confirm_to_delete')
+        //     ]
+        //   ];
+        // }
 
         return cnv_action_block($button);
       })
