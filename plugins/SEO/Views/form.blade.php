@@ -156,7 +156,7 @@
                     $('[name="language[{{ $language['locale'] }}][description]"]').keyup(function() {
                         $('[data="description_{{ $language['locale'] }}"]').html($(this).val().substr(0, 169));
                         $('[name="seo[language][{{ $language['locale'] }}][description]"]').val($(this).val()
-                            .substr(0, 169));
+                            .substr(0, 160));
                     });
                     $('[name="language[{{ $language['locale'] }}][slug]"]').keyup(function() {
                         $('[data="url_{{ $language['locale'] }}"]').html(slugify($(this).val()));
