@@ -39,6 +39,45 @@
                 <div class="dropdown">
                     <button class="form-control" type="button" style="margin-right: 5px; width: 130px;" id="dropdownMenu1"
                         data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                        @if (request()->get('quater') != '')
+                            {{ request()->get('quater') }}
+                        @else
+                            Theo quý
+                        @endif
+                        <i class="fa fa-calendar" style="margin-left: 5px"></i>
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenu1" style="padding: 6px">
+                        <div class="row" style="margin-bottom: 5px; min-width: 240px">
+                            <div class="col-lg-6" style="margin-bottom: 10px">
+                                <label>Năm</label>
+                                <select id="input-year" class="form-control non-select2">
+                                    @for ($i = date('Y'); $i >= 2024; $i--)
+                                        <option value="{{ $i }}" {{ $i == $year ? 'selected' : '' }}>
+                                            {{ $i }}
+                                        </option>
+                                    @endfor
+                                </select>
+                            </div>
+                            <div class="col-lg-6" style="margin-bottom: 10px">
+                                <label>Quý</label>
+                                <select id="input-quater" class="form-control non-select2">
+                                    @for ($i = 1; $i <= 4; $i++)
+                                        <option value="{{ $i < 10 ? '0' . $i : $i }}" {{ $i == $month ? 'selected' : '' }}>
+                                            {{ $i < 10 ? '0' . $i : $i }}
+                                        </option>
+                                    @endfor
+                                </select>
+                            </div>
+                        </div>
+                        <button type="button" id="filter-quater" class="btn btn-default btn-sm btn-block">Xem</button>
+                        <button type="button" id="cancel-filter-quater" class="btn btn-default btn-sm btn-block">Hủy lọc
+                            quý</button>
+                    </div>
+                </div>
+
+                <div class="dropdown">
+                    <button class="form-control" type="button" style="margin-right: 5px; width: 130px;" id="dropdownMenu1"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                         @if (request()->get('month') != '')
                             {{ request()->get('month') }}
                         @else
