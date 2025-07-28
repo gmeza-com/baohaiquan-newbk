@@ -433,7 +433,15 @@ var redirect_to = function (form, data) {
 };
 
 var submitForm = function (element) {
-  $(element).submit();
+  // Đảm bảo TinyMCE sync content vào textarea trước khi submit
+  if (typeof tinymce !== "undefined") {
+    tinymce.triggerSave();
+  }
+
+  // Delay nhỏ để đảm bảo quá trình save hoàn tất
+  setTimeout(function () {
+    $(element).submit();
+  }, 100);
 };
 
 var submitFormAndCreate = function (element) {
