@@ -46,8 +46,8 @@ $moxieManagerConfig['upload.maxsize'] = '500MB';
 $moxieManagerConfig['upload.overwrite'] = false;
 $moxieManagerConfig['upload.autoresize'] = true;
 $moxieManagerConfig['upload.autoresize_jpeg_quality'] = 80;
-$moxieManagerConfig['upload.max_width'] = 1600;
-$moxieManagerConfig['upload.max_height'] = 1600;
+$moxieManagerConfig['upload.max_width'] = 1920;
+$moxieManagerConfig['upload.max_height'] = 5200;
 $moxieManagerConfig['upload.chunk_size'] = '10mb';
 $moxieManagerConfig['upload.allow_override'] = '*';
 
