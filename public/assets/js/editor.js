@@ -91,7 +91,11 @@ var editor = function () {
             // click choose images
             $(this).off();
             $(this).on('click', function () {
-                return moxman.browse({fields: input.attr('id'), view: 'thumbs'});
+                return moxman.browse({
+                  fields: input.attr("id"),
+                  view: "thumbs",
+                  no_host: true,
+                });
             });
 
             // change picture
@@ -111,7 +115,7 @@ var editor = function () {
         if (btn.length > 0) {
             btn.on('click', function(e) {
                 e.preventDefault();
-                return moxman.browse({fields: btn.data('target'), view: 'thumbs'});
+                return moxman.browse({fields: btn.data('target'), view: 'thumbs', no_host : true});
             });
         }
     };

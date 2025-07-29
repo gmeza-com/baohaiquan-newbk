@@ -3,7 +3,7 @@
     <script type="text/javascript" src="/assets/js/editorjs/header.js"></script>
     <script type="text/javascript" src="/assets/js/editorjs/quote.umd.js"></script>
     <script type="text/javascript" src="/assets/js/editorjs/embed.umd.js"></script>
-    <script type="text/javascript" src="/assets/js/editorjs/image.umd.js"></script>
+    <script type="text/javascript" src="/assets/js/editorjs/image.umd.js?v=290720251704"></script>
     {{-- <script type="text/javascript" src="/extra/image/dist/image.umd.js"></script> --}}
 
     <script type="text/javascript" src="/assets/js/editorjs/paragraph-with-alignment.js"></script>

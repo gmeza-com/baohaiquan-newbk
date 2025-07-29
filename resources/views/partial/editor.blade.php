@@ -5,5 +5,5 @@
 @push('footer')
 <script src="/assets/vendor/tinymce/plugins/moxiemanager/js/moxman.loader.min.js"></script>
 <script src="/assets/vendor/tinymce/tinymce.min.js"></script>
-<script src="/assets/js/editor.js"></script>
+<script src="/assets/js/editor.js?v=290720251704"></script>
 @endpush
