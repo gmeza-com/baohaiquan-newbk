@@ -331,6 +331,9 @@ class MOXMAN_Handlers_UploadHandler implements MOXMAN_Http_IHandler
       );
 
 
+      error_log("scpCommand " . $scpCommand);
+
+
       // Execute SCP command
       $output = array();
       $returnCode = 0;
