@@ -278,15 +278,15 @@ class MOXMAN_Handlers_UploadHandler implements MOXMAN_Http_IHandler
   }
 
   /**
-   * SCP video file to remote server using proc_open
+   * SCP video file to remote server
    *
    * @param string $localFilePath Local file path to upload
    * @param string $fileName Original file name
-   * @param string $targetDir Remote subdirectory to upload into
    * @return bool Success status
    */
   private function scpVideoToRemoteServer($localFilePath, $fileName, $targetDir)
   {
+
     try {
       // Configuration for remote server
       $remoteHost = MOXMAN::getConfig()->get('videoscp.remote_host', 'your-remote-server.com');
@@ -298,8 +298,8 @@ class MOXMAN_Handlers_UploadHandler implements MOXMAN_Http_IHandler
       // Combine remote path with target directory
       $fullRemotePath = rtrim($remotePath, '/') . '/' . trim($targetDir, '/');
 
-      // Check/create directory on remote server via ssh
-      $checkDirCmd = sprintf(
+      // Build SSH command to check and create directory if needed
+      $sshCheckDirCmd = sprintf(
         'ssh -p %s -i %s %s@%s "[ -d %s ] || mkdir -p %s"',
         escapeshellarg($remotePort),
         escapeshellarg($sshKeyPath),
@@ -309,56 +309,46 @@ class MOXMAN_Handlers_UploadHandler implements MOXMAN_Http_IHandler
         escapeshellarg($fullRemotePath)
       );
 
-      exec($checkDirCmd . ' 2>&1', $output, $returnCode);
+      // Execute SSH command to check/create directory
+      $output = array();
+      $returnCode = 0;
+      exec($sshCheckDirCmd . ' 2>&1', $output, $returnCode);
+
       if ($returnCode !== 0) {
         error_log("Failed to create remote directory: " . implode("\n", $output));
         return false;
       }
 
-      // Full remote file path
-      $fullRemoteFilePath = rtrim($fullRemotePath, '/') . '/' . $fileName;
-      $remoteTarget = $remoteUser . '@' . $remoteHost . ':' . $fullRemoteFilePath;
-
-      // Build process
-      $process = proc_open(
-        [
-          'scp',
-          '-P',
-          $remotePort,
-          '-i',
-          $sshKeyPath,
-          $localFilePath,
-          $remoteTarget
-        ],
-        [
-          1 => ['pipe', 'w'], // stdout
-          2 => ['pipe', 'w']  // stderr
-        ],
-        $pipes
+      // Build SCP command with full remote path
+      // Fix for "scp: ambiguous target" error by properly escaping the complete remote target
+      $remoteTarget = $remoteUser . '@' . $remoteHost . ':' . $fullRemotePath . '/' . $fileName;
+      $scpCommand = sprintf(
+        'scp -P %s -i %s %s %s',
+        escapeshellarg($remotePort),
+        escapeshellarg($sshKeyPath),
+        escapeshellarg($localFilePath),
+        escapeshellarg($remoteTarget)
       );
 
-      if (!is_resource($process)) {
-        error_log("Failed to start SCP process.");
+
+      error_log("scpCommand " . $scpCommand);
+
+
+      // Execute SCP command
+      $output = array();
+      $returnCode = 0;
+      exec($scpCommand . ' 2>&1', $output, $returnCode);
+
+      if ($returnCode !== 0) {
+        error_log("SCP failed for file: " . $fileName . ". Output: " . implode("\n", $output));
         return false;
       }
 
-      $stdout = stream_get_contents($pipes[1]);
-      $stderr = stream_get_contents($pipes[2]);
-
-      fclose($pipes[1]);
-      fclose($pipes[2]);
-
-      $scpReturnCode = proc_close($process);
-
-      if ($scpReturnCode !== 0) {
-        error_log("SCP failed for file: $fileName. Output: $stderr");
-        return false;
-      }
-
-      error_log("Successfully SCP'd video file: $fileName to $remoteHost");
+      error_log("Successfully SCP'd video file: " . $fileName . " to " . $remoteHost);
       return true;
     } catch (Exception $e) {
-      error_log("SCP error for file $fileName: " . $e->getMessage());
+      error_log("SCP error for file " . $fileName . ": " . $e->getMessage());
+
       return false;
     }
   }
