@@ -319,18 +319,17 @@ class MOXMAN_Handlers_UploadHandler implements MOXMAN_Http_IHandler
         return false;
       }
 
-      $scpTarget = escapeshellarg(
-        $remoteUser . '@' . $remoteHost . ':' . $fullRemotePath . '/' . $fileName
-      );
-
+      // Build SCP command with full remote path
+      $fullRemoteFilePath = rtrim($fullRemotePath, '/') . '/' . $fileName;
       $scpCommand = sprintf(
-        'scp -P %s -i %s %s %s',
+        'scp -P %s -i %s %s %s@%s:%s',
         escapeshellarg($remotePort),
         escapeshellarg($sshKeyPath),
         escapeshellarg($localFilePath),
-        $scpTarget
+        escapeshellarg($remoteUser),
+        escapeshellarg($remoteHost),
+        escapeshellarg($fullRemoteFilePath)
       );
-
 
       // Execute SCP command
       $output = array();
