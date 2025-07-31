@@ -319,9 +319,15 @@ class MOXMAN_Handlers_UploadHandler implements MOXMAN_Http_IHandler
         return false;
       }
 
-      // Build SCP command with full remote path
-      // Fix for "scp: ambiguous target" error by properly escaping the complete remote target
-      $remoteTarget = $remoteUser . '@' . $remoteHost . ':' . $fullRemotePath . '/' . $fileName;
+            // Build SCP command using temp directory approach to avoid any path/filename space issues
+      // Upload to temp directory first, then move to final location
+      $tempFileName = 'temp_' . uniqid() . '.' . pathinfo($fileName, PATHINFO_EXTENSION);
+      $tempRemoteDir = '/tmp'; // Upload to /tmp first (no spaces)
+      $tempRemotePath = $tempRemoteDir . '/' . $tempFileName;
+      $finalRemotePath = $fullRemotePath . '/' . $fileName;
+      
+      // SCP to temp directory (guaranteed no spaces in path)
+      $remoteTarget = $remoteUser . '@' . $remoteHost . ':' . $tempRemotePath;
       $scpCommand = sprintf(
         'scp -P %s -i %s %s %s',
         escapeshellarg($remotePort),
@@ -330,25 +336,51 @@ class MOXMAN_Handlers_UploadHandler implements MOXMAN_Http_IHandler
         escapeshellarg($remoteTarget)
       );
 
-
-      error_log("scpCommand " . $scpCommand);
-
-
-      // Execute SCP command
+      // Execute SCP command with temp filename
       $output = array();
       $returnCode = 0;
       exec($scpCommand . ' 2>&1', $output, $returnCode);
 
       if ($returnCode !== 0) {
-        error_log("SCP failed for file: " . $fileName . ". Output: " . implode("\n", $output));
+        error_log("SCP failed for temp file: " . $tempFileName . ". Output: " . implode("\n", $output));
         return false;
       }
 
-      error_log("Successfully SCP'd video file: " . $fileName . " to " . $remoteHost);
+      // Now move the file from temp directory to final location with original filename
+      // First ensure the target directory exists, then move the file
+      $moveCommand = sprintf(
+        'ssh -p %s -i %s %s@%s "mkdir -p %s && mv %s %s"',
+        escapeshellarg($remotePort),
+        escapeshellarg($sshKeyPath),
+        escapeshellarg($remoteUser),
+        escapeshellarg($remoteHost),
+        escapeshellarg($fullRemotePath),
+        escapeshellarg($tempRemotePath),
+        escapeshellarg($finalRemotePath)
+      );
+
+      $output = array();
+      $returnCode = 0;
+      exec($moveCommand . ' 2>&1', $output, $returnCode);
+
+      if ($returnCode !== 0) {
+        error_log("Failed to move file on remote server. Output: " . implode("\n", $output));
+        // Try to cleanup temp file
+        $cleanupCommand = sprintf(
+          'ssh -p %s -i %s %s@%s "rm -f %s"',
+          escapeshellarg($remotePort),
+          escapeshellarg($sshKeyPath),
+          escapeshellarg($remoteUser),
+          escapeshellarg($remoteHost),
+          escapeshellarg($tempRemotePath)
+        );
+        exec($cleanupCommand . ' 2>&1');
+        return false;
+      }
+
       return true;
     } catch (Exception $e) {
       error_log("SCP error for file " . $fileName . ": " . $e->getMessage());
-
       return false;
     }
   }
