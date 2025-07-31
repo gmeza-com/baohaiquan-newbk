@@ -297,7 +297,7 @@ class MOXMAN_Handlers_UploadHandler implements MOXMAN_Http_IHandler
 
       // Combine remote path with target directory
       $fullRemotePath = rtrim($remotePath, '/') . '/' . trim($targetDir, '/');
-      
+
       // Build SSH command to check and create directory if needed
       $sshCheckDirCmd = sprintf(
         'ssh -p %s -i %s %s@%s "[ -d %s ] || mkdir -p %s"',
@@ -319,16 +319,16 @@ class MOXMAN_Handlers_UploadHandler implements MOXMAN_Http_IHandler
         return false;
       }
 
-      // Build SCP command with full remote path
+      $scpTarget = escapeshellarg(
+        $remoteUser . '@' . $remoteHost . ':' . $fullRemotePath . '/' . $fileName
+      );
+
       $scpCommand = sprintf(
-        'scp -P %s -i %s %s %s@%s:%s/%s',
+        'scp -P %s -i %s %s %s',
         escapeshellarg($remotePort),
         escapeshellarg($sshKeyPath),
         escapeshellarg($localFilePath),
-        escapeshellarg($remoteUser),
-        escapeshellarg($remoteHost),
-        escapeshellarg($fullRemotePath),
-        escapeshellarg($fileName)
+        $scpTarget
       );
 
 
