@@ -321,15 +321,22 @@ class MOXMAN_Handlers_UploadHandler implements MOXMAN_Http_IHandler
 
       // Build SCP command with full remote path
       $fullRemoteFilePath = rtrim($fullRemotePath, '/') . '/' . $fileName;
+      $remoteUserHostPath = sprintf(
+        '%s@%s:%s',
+        $remoteUser,
+        $remoteHost,
+        $fullRemoteFilePath
+      );
+
       $scpCommand = sprintf(
-        'scp -P %s -i %s %s %s@%s:%s',
+        'scp -P %s -i %s %s %s',
         escapeshellarg($remotePort),
         escapeshellarg($sshKeyPath),
         escapeshellarg($localFilePath),
-        escapeshellarg($remoteUser),
-        escapeshellarg($remoteHost),
-        escapeshellarg($fullRemoteFilePath)
+        escapeshellarg($remoteUserHostPath) // escape toàn bộ chuỗi
       );
+
+      error_log("Test 2 " . $scpCommand);
 
       // Execute SCP command
       $output = array();
