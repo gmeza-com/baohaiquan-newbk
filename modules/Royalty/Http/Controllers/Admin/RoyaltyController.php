@@ -26,7 +26,7 @@ class RoyaltyController extends AdminController
     $this->tpl->breadcrumb()->add('admin.royalty.index', trans('royalty::language.manager'));
 
     // datatable
-    $filter = encrypt($request->only(['category', 'author', 'status', 'note', 'month', 'user_id']));
+    $filter = encrypt($request->only(['category', 'author', 'status', 'note', 'month', 'user_id', 'quater']));
     $url = admin_route('royalty.index');
     $url = $url . '?filter=' . $filter;
     $this->tpl->datatable()->setSource($url);
@@ -121,6 +121,32 @@ class RoyaltyController extends AdminController
     if (@$filter['month'] && @$filter['month'] !== '*') {
       $month = Carbon::createFromFormat('m/Y', $filter['month'])->format('Y-m');
       $model->where('month', $month);
+    }
+
+    // filter by quater
+    if (@$filter['quater'] && @$filter['quater'] !== '*') {
+      // Parse quater format Q4/2025
+      preg_match('/Q(\d+)\/(\d+)/', $filter['quater'], $matches);
+      if (count($matches) === 3) {
+        $quater = (int)$matches[1];
+        $year = (int)$matches[2];
+
+        // Define months for each quater
+        $quaterMonths = [
+          1 => [1, 2, 3],    // Q1: Jan, Feb, Mar
+          2 => [4, 5, 6],    // Q2: Apr, May, Jun
+          3 => [7, 8, 9],    // Q3: Jul, Aug, Sep
+          4 => [10, 11, 12]  // Q4: Oct, Nov, Dec
+        ];
+
+        if (isset($quaterMonths[$quater])) {
+          $months = [];
+          foreach ($quaterMonths[$quater] as $month) {
+            $months[] = $year . '-' . str_pad($month, 2, '0', STR_PAD_LEFT);
+          }
+          $model->whereIn('month', $months);
+        }
+      }
     }
 
     $classes = ['', 'default', 'info', 'success', 'danger'];
@@ -272,6 +298,37 @@ class RoyaltyController extends AdminController
     if (@$filter['month'] && @$filter['month'] !== '*') {
       $month = Carbon::createFromFormat('m/Y', $filter['month'])->format('Y-m');
       $model->where('month', $month);
+    }
+
+    // filter by quater
+    if (@$filter['quater'] && @$filter['quater'] !== '*') {
+      // Parse quater format Q4/2025
+      preg_match('/Q(\d+)\/(\d+)/', $filter['quater'], $matches);
+      if (count($matches) === 3) {
+        $quater = (int)$matches[1];
+        $year = (int)$matches[2];
+
+        // Define months for each quater
+        $quaterMonths = [
+          1 => [1, 2, 3],    // Q1: Jan, Feb, Mar
+          2 => [4, 5, 6],    // Q2: Apr, May, Jun
+          3 => [7, 8, 9],    // Q3: Jul, Aug, Sep
+          4 => [10, 11, 12]  // Q4: Oct, Nov, Dec
+        ];
+
+        if (isset($quaterMonths[$quater])) {
+          $months = [];
+          foreach ($quaterMonths[$quater] as $month) {
+            $months[] = $year . '-' . str_pad($month, 2, '0', STR_PAD_LEFT);
+          }
+          $model->whereIn('month', $months);
+        }
+      }
+    }
+
+    // filter by user
+    if (@$filter['user_id'] && @$filter['user_id'] !== '*') {
+      $model->where('user_id', @$filter['user_id']);
     }
 
     $csvData = [];
