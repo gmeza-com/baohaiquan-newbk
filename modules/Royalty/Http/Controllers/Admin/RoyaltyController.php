@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Auth;
 use Modules\Royalty\Models\Royalty;
+use Modules\Royalty\Models\RoyaltyStatus;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Response;
 
@@ -25,7 +26,7 @@ class RoyaltyController extends AdminController
     $this->tpl->breadcrumb()->add('admin.royalty.index', trans('royalty::language.manager'));
 
     // datatable
-    $filter = encrypt($request->only(['category', 'author', 'status', 'note', 'month']));
+    $filter = encrypt($request->only(['category', 'author', 'status', 'note', 'month', 'user_id']));
     $url = admin_route('royalty.index');
     $url = $url . '?filter=' . $filter;
     $this->tpl->datatable()->setSource($url);
@@ -105,6 +106,15 @@ class RoyaltyController extends AdminController
       $model->whereHas('status', function ($query) use ($filter) {
         $query->where('id', @$filter['status']);
       });
+    } else {
+      $model->whereHas('status', function ($query) {
+        $query->where('id', '!=', RoyaltyStatus::CANCELED);
+      });
+    }
+
+    // filter by user
+    if (@$filter['user_id'] && @$filter['user_id'] !== '*') {
+      $model->where('user_id', @$filter['user_id']);
     }
 
     // filter by month

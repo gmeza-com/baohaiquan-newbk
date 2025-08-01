@@ -35,7 +35,7 @@
         @slot('title', trans('royalty::language.royalty_list'))
 
         @slot('action')
-            <div style="display:flex;">
+            <div style="display:flex;flex-wrap:wrap;justify-content:flex-end;">
                 <div class="dropdown">
                     <button class="form-control" type="button" style="margin-right: 5px; width: 130px;" id="dropdownMenu1"
                         data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
@@ -134,6 +134,22 @@
                             </option>
                         @endforeach
                     </select>
+
+                    <div class="form_group" style="margin-left: 4px;">
+                        {!! Form::select(
+                            'user_id',
+                            ['' => 'Tất cả người nhận'] + get_list_authors_for_choose(),
+                            request()->get('user_id') ? request()->get('user_id') : '*',
+                            [
+                                'class' => 'form-control',
+                                'multiple' => false,
+                                'style' => 'min-width: 220px; max-width:320px',
+                                'id' => 'filter_by_user_id',
+                            ],
+                        ) !!}
+                    </div>
+
+
                 </form>
             </div>
             <div class="clearfix"></div>
@@ -146,7 +162,7 @@
 
 @push('footer')
     <script>
-        $('#flter_by_category, #flter_by_status').change(function(e) {
+        $('#flter_by_category, #flter_by_status, #filter_by_user_id').change(function(e) {
             $('#filters').trigger('submit');
         });
 
