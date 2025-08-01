@@ -22,7 +22,19 @@
         @slot('title', trans('gallery::language.gallery_list'))
 
         @slot('action')
-            <form action="{{ request()->url() }}" id="filter" method="GET">
+            <form action="{{ request()->url() }}" id="filter" method="GET" style="display:flex">
+                <select name="has_royalty" id="filter_by_has_royalty" class="form-control non-select2"
+                    style="min-width: 60px; max-width:260px; margin-right: 5px">
+                    <option value="*" {{ request()->has('has_royalty') && request('has_royalty') == '*' ? 'selected' : '' }}>
+                        Tất cả trạng thái nhuận bút
+                    </option>
+                    <option value="1" {{ request()->has('has_royalty') && request('has_royalty') == 1 ? 'selected' : '' }}>
+                        Có nhuận bút
+                    </option>
+                    <option value="0" {{ request()->has('has_royalty') && request('has_royalty') == 0 ? 'selected' : '' }}>
+                        Không nhuận bút
+                    </option>
+                </select>
                 <select name="category" id="flter_by_category" class="form-control non-select2"
                     style="min-width: 120px; max-width:320px">
                     <option value="*">{{ trans('news::language.include_categories') }}</option>
@@ -43,7 +55,7 @@
 
 @push('footer')
     <script>
-        $('#flter_by_category').change(function(e) {
+        $('#flter_by_category,#filter_by_has_royalty').change(function(e) {
             $('#filter').trigger('submit');
         });
     </script>

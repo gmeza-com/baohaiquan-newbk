@@ -29,7 +29,7 @@ class GalleryController extends AdminController
     $this->tpl->breadcrumb()->add('admin.gallery.index', trans('gallery::language.manager'));
 
     // datatable
-    $filter = encrypt($request->only(['language', 'category', 'published']));
+    $filter = encrypt($request->only(['language', 'category', 'published', 'has_royalty']));
     $url = admin_route('gallery.index');
     $url = $url . '?filter=' . $filter;
     $this->tpl->datatable()->setSource($url);
@@ -53,13 +53,18 @@ class GalleryController extends AdminController
     $this->tpl->datatable()->addColumn(
       trans('language.status'),
       'gallery.published',
-      ['class' => 'col-md-2'],
+      ['class' => 'col-md-1'],
       false,
       true
     );
     $this->tpl->datatable()->addColumn(
       trans('language.updated_at'),
       'gallery.updated_at'
+    );
+
+    $this->tpl->datatable()->addColumn(
+      trans('news::language.royalty'),
+      'gallery.has_royalty'
     );
 
     return $this->tpl->render();
@@ -109,6 +114,14 @@ class GalleryController extends AdminController
       });
     }
 
+
+    if (isset($filter['has_royalty']) && @$filter['has_royalty'] !== '*') {
+
+      $model->whereHas('gallery', function ($query) use ($filter) {
+        $query->where('has_royalty', $filter['has_royalty']);
+      });
+    }
+
     return Datatables::of($model)
       ->editColumn('thumbnail', function ($model) {
         return sprintf('<div class="%s"><img src="%s" width="120" class="img-rounded"></div>', 'text-center', $model->thumbnail);
@@ -126,6 +139,16 @@ class GalleryController extends AdminController
 
         return $html;
       })
+
+
+      ->editColumn('gallery.has_royalty', function ($model) {
+        return sprintf(
+          '<span class="label label-%s">%s</span> ',
+          $model->gallery->has_royalty ? 'success' : 'default',
+          $model->gallery->has_royalty ? 'Có' : 'Không'
+        );
+      })
+
       ->addColumn('action', function ($model) {
         app('helper')->load('buttons');
         $button = [];
@@ -179,7 +202,7 @@ class GalleryController extends AdminController
       ->editColumn('gallery.updated_at', function ($model) {
         return Carbon::parse($model->gallery->updated_at)->format('d/m/Y H:i');
       })
-      ->rawColumns(['name', 'action', 'gallery.published', 'thumbnail'])
+      ->rawColumns(['name', 'action', 'gallery.published', 'thumbnail', 'gallery.has_royalty'])
       ->make(true);
   }
 
@@ -213,6 +236,8 @@ class GalleryController extends AdminController
     $data['featured'] = $request->has('featured') ? true : false;
     $data['published'] = $request->has('published') ? true : false;
     $data['published_at'] = Carbon::createFromFormat('d-m-Y H:i', $this->getDatetimeOrCreateFromNow($request));
+    $data['has_royalty'] = $request->has('add-royalty') ? true : false;
+
 
     $data['category'] = @$data['category'] ?: [];
     // required category
@@ -346,6 +371,8 @@ class GalleryController extends AdminController
 
     $data['featured'] = $request->has('featured') ? true : false;
     $data['published'] = $request->has('published') ? true : false;
+    $data['has_royalty'] = $request->has('add-royalty') ? true : false;
+
     $data['published_at'] = Carbon::createFromFormat('d-m-Y H:i', $this->getDatetimeOrCreateFromNow($request));
 
     $data['category'] = @$data['category'] ?: [];
@@ -532,22 +559,22 @@ class GalleryController extends AdminController
   {
     $slug = $baseSlug;
     $counter = 1;
-    
+
     while (true) {
       $query = GalleryLanguage::query()
         ->whereLocale($locale)
         ->whereSlug($slug);
-      
+
       if ($excludeGalleryId) {
-        $query->whereHas('gallery', function($q) use ($excludeGalleryId) {
+        $query->whereHas('gallery', function ($q) use ($excludeGalleryId) {
           $q->where('id', '!=', $excludeGalleryId);
         });
       }
-      
+
       if (!$query->exists()) {
         return $slug;
       }
-      
+
       $slug = $baseSlug . '-' . $counter;
       $counter++;
     }
@@ -560,11 +587,11 @@ class GalleryController extends AdminController
   {
     foreach ($languages['language'] as $locale => $dataLanguage) {
       $baseSlug = isset($dataLanguage['slug']) ? $dataLanguage['slug'] : Str::slug($dataLanguage['name']);
-      
+
       // Tự động tạo unique slug
       $languages['language'][$locale]['slug'] = $this->generateUniqueSlug($locale, $baseSlug, $excludeGalleryId);
     }
-    
+
     return $languages;
   }
 }

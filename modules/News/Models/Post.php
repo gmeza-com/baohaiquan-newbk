@@ -26,7 +26,8 @@ class Post extends Model
     'featured_ended_at',
     'prefix',
     'hide',
-    'cancel_message'
+    'cancel_message',
+    'has_royalty'
   ];
 
   protected $dates = [
@@ -40,7 +41,8 @@ class Post extends Model
   protected $casts = [
     'featured' => 'boolean',
     'status' => 'boolean',
-    'hide' => 'boolean'
+    'hide' => 'boolean',
+    'has_royalty' => 'boolean'
   ];
 
   protected $with = [

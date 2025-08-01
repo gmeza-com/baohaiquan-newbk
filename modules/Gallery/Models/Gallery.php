@@ -22,7 +22,8 @@ class Gallery extends Model
     'thumbnail',
     'user_id',
     'type',
-    'prefix'
+    'prefix',
+    'has_royalty'
   ];
 
   protected $with = [
@@ -39,7 +40,8 @@ class Gallery extends Model
 
   protected $casts = [
     'featured' => 'boolean',
-    'published' => 'boolean'
+    'published' => 'boolean',
+    'has_royalty' => 'boolean'
   ];
 
   public static function boot()

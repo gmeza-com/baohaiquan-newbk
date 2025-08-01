@@ -33,7 +33,7 @@ class PostController extends AdminController
 
 
     // datatable
-    $filter = $request->only(['language', 'category', 'published']);
+    $filter = $request->only(['language', 'category', 'published', 'has_royalty']);
     $this->tpl->setData('is_waiting_approve_post', false);
 
     if ($request->route()->getName() == 'admin.post.waiting_approve_post') {
@@ -86,13 +86,13 @@ class PostController extends AdminController
       ['class' => 'col-md-4']
     );
 
-    $this->tpl->datatable()->addColumn(
-      'Lịch sử',
-      'revision_history',
-      ['class' => 'col-md-1'],
-      false,
-      true
-    );
+    // $this->tpl->datatable()->addColumn(
+    //   'Lịch sử',
+    //   'revision_history',
+    //   ['class' => 'col-md-1'],
+    //   false,
+    //   true
+    // );
 
 
     $this->tpl->datatable()->addColumn(
@@ -111,17 +111,24 @@ class PostController extends AdminController
       true
     );
 
-    $this->tpl->datatable()->addColumn(
-      'Ẩn tạm thời',
-      'post.status',
-      ['class' => 'col-md-1'],
-      false,
-      false
-    );
+    // $this->tpl->datatable()->addColumn(
+    //   'Ẩn tạm thời',
+    //   'post.status',
+    //   ['class' => 'col-md-1'],
+    //   false,
+    //   false
+    // );
 
     $this->tpl->datatable()->addColumn(
       trans('language.updated_at'),
       'post.updated_at',
+      [],
+      false
+    );
+
+    $this->tpl->datatable()->addColumn(
+      trans('news::language.royalty'),
+      'post.has_royalty',
       [],
       false
     );
@@ -132,6 +139,7 @@ class PostController extends AdminController
   public function data(Request $request)
   {
     $filter = decrypt($request->get('filter'));
+
     $language = @$filter['language'] ?: config('cnv.language_default');
     $model = PostLanguage::with('post')->where('locale', $language);
     if (! isset($filter['published'])) {
@@ -180,6 +188,13 @@ class PostController extends AdminController
       });
     }
 
+    if (isset($filter['has_royalty']) && @$filter['has_royalty'] !== '*') {
+
+      $model->whereHas('post', function ($query) use ($filter) {
+        $query->where('has_royalty', $filter['has_royalty']);
+      });
+    }
+
     return Datatables::of($model)
       ->editColumn('name', function ($model) {
         $html = '<h4>';
@@ -189,6 +204,17 @@ class PostController extends AdminController
 
         return $html;
       })
+      ->editColumn('post.has_royalty', function ($model) {
+        return sprintf(
+          '<span class="label label-%s">%s</span> ',
+          $model->post->has_royalty ? 'success' : 'default',
+          $model->post->has_royalty ? 'Có' : 'Không'
+        );
+      })
+
+
+
+
       ->addColumn('action', function ($model) {
         app('helper')->load('buttons');
         $button = [];
@@ -279,7 +305,7 @@ class PostController extends AdminController
       })
 
 
-      ->rawColumns(['name', 'action', 'post.published', 'post.featured', 'post.status', 'revision_history'])
+      ->rawColumns(['name', 'action', 'post.published', 'post.featured', 'post.status', 'revision_history', 'post.has_royalty'])
       ->make(true);
   }
 
@@ -319,22 +345,22 @@ class PostController extends AdminController
   {
     $slug = $baseSlug;
     $counter = 1;
-    
+
     while (true) {
       $query = PostLanguage::query()
         ->whereLocale($locale)
         ->whereSlug($slug);
-      
+
       if ($excludePostId) {
-        $query->whereHas('post', function($q) use ($excludePostId) {
+        $query->whereHas('post', function ($q) use ($excludePostId) {
           $q->where('id', '!=', $excludePostId);
         });
       }
-      
+
       if (!$query->exists()) {
         return $slug;
       }
-      
+
       $slug = $baseSlug . '-' . $counter;
       $counter++;
     }
@@ -347,6 +373,7 @@ class PostController extends AdminController
     $data = $request->except(['_token', 'language']);
     $data = $this->readyData($request, $data);
     $data['status'] = $request->has('status') ? true : false;
+    $data['has_royalty'] = $request->has('add-royalty') ? true : false;
     if (!$this->allowToPublished($post)) {
       $data['published_at'] = null;
     }
@@ -364,7 +391,7 @@ class PostController extends AdminController
     // Xử lý cắt description nếu vượt quá 160 ký tự và tạo unique slug
     foreach ($languages as $locale => $dataLanguage) {
       $baseSlug = isset($dataLanguage['slug']) ? $dataLanguage['slug'] : Str::slug($dataLanguage['name']);
-      
+
       // Tự động tạo unique slug
       $languages[$locale]['slug'] = $this->generateUniqueSlug($locale, $baseSlug);
 
@@ -448,10 +475,12 @@ class PostController extends AdminController
     }
     $data = $request->except(['_token', 'language']);
     $data['status'] = $request->has('status') ? true : false;
+    $data['has_royalty'] = $request->has('add-royalty') ? true : false;
     $data = $this->readyData($request, $data);
     if ($post->published == 3) {
       unset($data['published']);
     }
+
 
     if (!@$data['category']) {
       return response()->json([
@@ -465,7 +494,7 @@ class PostController extends AdminController
     // Xử lý cắt description nếu vượt quá 160 ký tự và tạo unique slug
     foreach ($languages as $locale => $dataLanguage) {
       $baseSlug = isset($dataLanguage['slug']) ? $dataLanguage['slug'] : Str::slug($dataLanguage['name']);
-      
+
       // Tự động tạo unique slug (exclude current post)
       $languages[$locale]['slug'] = $this->generateUniqueSlug($locale, $baseSlug, $post->id);
 
