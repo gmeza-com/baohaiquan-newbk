@@ -78,21 +78,21 @@
             @slot('title', trans('language.setting_field'))
             <div class="block-body">
                 <div class="form-horizontal form-bordered">
-                    
-                        <div class="form-group" style="{{ !empty($gallery->type) ? 'display:none;' : '' }}">
-                            {!! Form::label('type', trans('gallery::language.type'), ['class' => 'control-label col-md-4']) !!}
-                            <div class="col-md-8">
-                                {!! Form::select(
-                                    'type',
-                                    ['album' => 'Album', 'video' => 'Video', 'audio' => 'Audio', 'longform' => 'Longform', 'content' => 'Bài viết'],
-                                    $gallery->type ?: null,
-                                    [
-                                        'class' => 'form-control',
-                                    ],
-                                ) !!}
-                            </div>
+
+                    <div class="form-group" style="{{ !empty($gallery->type) ? 'display:none;' : '' }}">
+                        {!! Form::label('type', trans('gallery::language.type'), ['class' => 'control-label col-md-4']) !!}
+                        <div class="col-md-8">
+                            {!! Form::select(
+                                'type',
+                                ['album' => 'Album', 'video' => 'Video', 'audio' => 'Audio', 'longform' => 'Longform', 'content' => 'Bài viết'],
+                                $gallery->type ?: null,
+                                [
+                                    'class' => 'form-control',
+                                ],
+                            ) !!}
                         </div>
-                
+                    </div>
+
 
                     <div class="form-group">
                         {!! Form::label('featured', trans('gallery::language.featured'), ['class' => 'control-label col-md-4']) !!}
@@ -105,16 +105,31 @@
                         </div>
                     </div>
 
+
+                    @if ($gallery->could_be_approved_post)
+                        <div class="form-group">
+                            {!! Form::label('approve_level', trans('news::language.publish'), ['class' => 'control-label col-md-4']) !!}
+                            <div class="col-md-8">
+                                <label class="switch switch-primary">
+                                    <input type="checkbox" name="approve_level" value="1"
+                                        {{ @$gallery->approved ? 'checked' : '' }}>
+                                    <span></span>
+                                </label>
+                            </div>
+                        </div>
+                    @endif
+
                     <div class="form-group">
-                        {!! Form::label('published', trans('language.published'), ['class' => 'control-label col-md-4']) !!}
+                        {!! Form::label('hide', 'Ẩn bản tin', ['class' => 'control-label col-md-4']) !!}
                         <div class="col-md-8">
-                            <label class="switch switch-primary">
-                                <input type="checkbox" name="published" value="1"
-                                    {{ @$gallery->published ? 'checked' : '' }}>
+                            <label class="switch switch-success">
+                                <input type="checkbox" name="hide" value="1" {{ @$gallery->hide ? 'checked' : '' }}>
                                 <span></span>
                             </label>
                         </div>
                     </div>
+
+
 
                     <div class="form-group">
                         <a href="javascript:void(0);"

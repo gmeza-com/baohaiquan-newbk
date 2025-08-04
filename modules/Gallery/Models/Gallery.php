@@ -23,7 +23,9 @@ class Gallery extends Model
     'user_id',
     'type',
     'prefix',
-    'has_royalty'
+    'has_royalty',
+    'approve_level',
+    'hide'
   ];
 
   protected $with = [
@@ -41,7 +43,8 @@ class Gallery extends Model
   protected $casts = [
     'featured' => 'boolean',
     'published' => 'boolean',
-    'has_royalty' => 'boolean'
+    'has_royalty' => 'boolean',
+    'hide' => 'boolean'
   ];
 
   public static function boot()
@@ -111,5 +114,66 @@ class Gallery extends Model
     return $this->podcast_categories->map(function ($category) {
       return link_to_route('gallery.podcast-category.show', $category->language('name'), $category->language('slug'));
     })->toArray();
+  }
+
+  public function getShowPublishedStatusAttribute($value)
+  {
+    $class = 'warning';
+    $text = trans('news::language.waiting_level_1');
+
+    switch ($this->approve_level) {
+      case -1:
+        $class = 'danger';
+        $text = 'Đã hủy';
+        break;
+      case 1:
+        if (allow('news.post.approved_level_1')) {
+          $text = trans('news::language.waiting_level_2');
+        } else {
+          $class = 'info';
+          $text = trans('news::language.approved_by_level_1');
+        }
+        break;
+      case 2:
+        if (allow('news.post.approved_level_2')) {
+          $text = trans('news::language.waiting_level_3');
+        } else {
+          $class = 'info';
+          $text = trans('news::language.approved_by_level_2');
+        }
+        break;
+      case 3:
+        $class = 'success';
+        $text = $this->getOriginal('published_at') ? trans('news::language.approved_by_level_3') : 'Đã duyệt chờ đăng';
+        break;
+    }
+    return sprintf('<span class="label label-%s">%s</span>', $class, $text);
+  }
+
+
+  public function getCouldBeApprovedPostAttribute($value)
+  {
+    if ($this->approve_level <= 3 && allow('gallery.gallery.approved_level_3')) {
+      return true;
+    } elseif ($this->approve_level <= 2 && allow('gallery.gallery.approved_level_2')) {
+      return true;
+    } elseif ($this->approve_level <= 1 && allow('gallery.gallery.approved_level_1')) {
+      return true;
+    }
+
+    return false;
+  }
+
+  public function getApprovedAttribute($value)
+  {
+    if ($this->approve_level == 3 && allow('gallery.gallery.approved_level_3')) {
+      return true;
+    } elseif ($this->approve_level == 2 && allow('gallery.gallery.approved_level_2')) {
+      return true;
+    } elseif ($this->approve_level == 1 && allow('gallery.gallery.approved_level_1')) {
+      return true;
+    }
+
+    return false;
   }
 }
