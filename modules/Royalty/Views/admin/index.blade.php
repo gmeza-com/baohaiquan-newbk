@@ -35,7 +35,7 @@
         @slot('title', trans('royalty::language.royalty_list'))
 
         @slot('action')
-            <div style="display:flex;">
+            <div style="display:flex;flex-wrap:wrap;justify-content:flex-end;">
                 <div class="dropdown">
                     <button class="form-control" type="button" style="margin-right: 5px; width: 130px;" id="dropdownMenu1"
                         data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
@@ -62,8 +62,8 @@
                                 <label>Quý</label>
                                 <select id="input-quater" class="form-control non-select2">
                                     @for ($i = 1; $i <= 4; $i++)
-                                        <option value="{{ $i < 10 ? '0' . $i : $i }}" {{ $i == $month ? 'selected' : '' }}>
-                                            {{ $i < 10 ? '0' . $i : $i }}
+                                        <option value="{{ $i }}" {{ $i == $month ? 'selected' : '' }}>
+                                            {{ $i }}
                                         </option>
                                     @endfor
                                 </select>
@@ -114,6 +114,7 @@
                     </div>
                 </div>
                 <form action="{{ request()->url() }}" method="GET" id="filters" style="display:flex;">
+                    <input type="hidden" id="quater" name="quater" value="{{ request()->get('quater') }}" />
                     <input type="hidden" id="month" name="month" value="{{ request()->get('month') }}">
                     <select name="category" id="flter_by_category" class="form-control non-select2"
                         style="min-width: 120px; max-width:320px; margin-right: 5px">
@@ -134,6 +135,22 @@
                             </option>
                         @endforeach
                     </select>
+
+                    <div class="form_group" style="margin-left: 4px;">
+                        {!! Form::select(
+                            'user_id',
+                            ['' => 'Tất cả người nhận'] + get_list_authors_for_choose(),
+                            request()->get('user_id') ? request()->get('user_id') : '*',
+                            [
+                                'class' => 'form-control',
+                                'multiple' => false,
+                                'style' => 'min-width: 220px; max-width:320px',
+                                'id' => 'filter_by_user_id',
+                            ],
+                        ) !!}
+                    </div>
+
+
                 </form>
             </div>
             <div class="clearfix"></div>
@@ -146,35 +163,64 @@
 
 @push('footer')
     <script>
-        $('#flter_by_category, #flter_by_status').change(function(e) {
-            $('#filters').trigger('submit');
-        });
-
-        $(document).on('click', '.dropdown-menu', function(event) {
-            event.stopPropagation(); // Prevent the dropdown from closing
-        });
-
-        $('#filter-month').click(function() {
-            var month = $('#input-month').val();
-            var year = $('#input-year').val();
-            if (month && year) {
-                $('#month').val(month + '/' + year);
+        $(document).ready(function() {
+            $('#flter_by_category, #flter_by_status, #filter_by_user_id').change(function(e) {
                 $('#filters').trigger('submit');
+            });
+
+            function resetQuater() {
+                $('#input-quater').val('');
             }
-        });
 
-        $('#cancel-filter-month').click(function() {
-            $('#month').val('');
-            $('#filters').trigger('submit');
-        });
+            function resetMonth() {
+                $('#input-month').val('');
+            }
 
-        $('#btn-export-royalty').click(function() {
-            var route = $(this).data('route');
-            // change the action of #filters form to the export route then submit
-            $('#filters').attr('action', route).submit();
 
-            // reload page
-            $('#filters').attr('action', '{{ request()->url() }}');
+            $(document).on('click', '.dropdown-menu', function(event) {
+                event.stopPropagation(); // Prevent the dropdown from closing
+            });
+
+            $('#filter-month').click(function() {
+                var month = $('#input-month').val();
+                var year = $('#input-year').val();
+                if (month && year) {
+                    $('#month').val(month + '/' + year);
+                    $('#quater').val('')
+                    resetQuater();
+                    $('#filters').trigger('submit');
+                }
+            });
+
+            $('#filter-quater').click(function() {
+                var quater = $('#input-quater').val();
+                var year = $('#input-year').val();
+                if (quater && year) {
+                    $('#quater').val('Q' + quater + '/' + year);
+                    $('#month').val('')
+                    resetMonth();
+                    $('#filters').trigger('submit');
+                }
+            });
+
+            $('#cancel-filter-month').click(function() {
+                $('#month').val('');
+                $('#filters').trigger('submit');
+            });
+
+            $('#cancel-filter-quater').click(function() {
+                $('#quater').val('');
+                $('#filters').trigger('submit');
+            });
+
+            $('#btn-export-royalty').click(function() {
+                var route = $(this).data('route');
+                // change the action of #filters form to the export route then submit
+                $('#filters').attr('action', route).submit();
+
+                // reload page
+                $('#filters').attr('action', '{{ request()->url() }}');
+            });
         });
     </script>
 @endpush

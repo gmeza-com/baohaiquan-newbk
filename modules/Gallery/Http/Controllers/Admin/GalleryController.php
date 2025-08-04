@@ -22,14 +22,46 @@ class GalleryController extends AdminController
       return $this->data($request);
     }
 
-    $this->tpl->setData('title', trans('gallery::language.manager'));
     $this->tpl->setTemplate('gallery::admin.index');
 
-    // breadcrumb
-    $this->tpl->breadcrumb()->add('admin.gallery.index', trans('gallery::language.manager'));
+    $filter = $request->only(['language', 'category', 'published', 'has_royalty', 'approve_level']);
+
+    if ($request->route()->getName() == 'admin.gallery.waiting_approve_gallery') {
+      // Kiểm tra permission và thiết lập filter cho waiting approve post
+      $allowedPublishedValues = [];
+
+      if (allow('gallery.gallery.approved_level_3')) {
+        $allowedPublishedValues[] = 2;
+      }
+      if (allow('gallery.gallery.approved_level_2')) {
+        $allowedPublishedValues[] = 1;
+      }
+      if (allow('gallery.gallery.approved_level_1')) {
+        $allowedPublishedValues[] = 0;
+      }
+
+      // Nếu user không có permission nào thì return 403
+      if (empty($allowedPublishedValues)) {
+        abort(403, 'Bạn không có quyền truy cập chức năng này');
+      }
+
+
+      // breadcrumb
+      $this->tpl->setData('title', trans('news::language.waiting_approve_post'));
+      $this->tpl->setData('is_waiting_approve_post', true);
+      $this->tpl->breadcrumb()->add('admin.gallery.index', trans('news::language.waiting_approve_post'));
+      // Thiết lập filter published để chỉ lấy các bài post tương ứng với level được phép
+      $filter['published_levels'] = $allowedPublishedValues;
+    } else {
+      $this->tpl->setData('title', trans('gallery::language.manager'));
+      // breadcrumb
+      $this->tpl->breadcrumb()->add('admin.gallery.index', trans('gallery::language.manager'));
+      $this->tpl->setData('is_waiting_approve_post', false);
+    }
+
 
     // datatable
-    $filter = encrypt($request->only(['language', 'category', 'published']));
+    $filter = encrypt($filter);
     $url = admin_route('gallery.index');
     $url = $url . '?filter=' . $filter;
     $this->tpl->datatable()->setSource($url);
@@ -52,14 +84,19 @@ class GalleryController extends AdminController
     );
     $this->tpl->datatable()->addColumn(
       trans('language.status'),
-      'gallery.published',
-      ['class' => 'col-md-2'],
+      'gallery.approve_level',
+      ['class' => 'col-md-1'],
       false,
       true
     );
     $this->tpl->datatable()->addColumn(
       trans('language.updated_at'),
       'gallery.updated_at'
+    );
+
+    $this->tpl->datatable()->addColumn(
+      trans('news::language.royalty'),
+      'gallery.has_royalty'
     );
 
     return $this->tpl->render();
@@ -109,6 +146,29 @@ class GalleryController extends AdminController
       });
     }
 
+    // Xử lý filter published_levels cho waiting approve post
+    if (isset($filter['published_levels']) && is_array($filter['published_levels'])) {
+      $model = $model->whereHas('gallery', function ($query) use ($filter) {
+        $query->whereIn('approve_level', $filter['published_levels']);
+      });
+    }
+
+
+
+    if (isset($filter['has_royalty']) && @$filter['has_royalty'] !== '*') {
+
+      $model->whereHas('gallery', function ($query) use ($filter) {
+        $query->where('has_royalty', $filter['has_royalty']);
+      });
+    }
+
+    if (isset($filter['approve_level']) && @$filter['approve_level'] !== '*') {
+
+      $model->whereHas('gallery', function ($query) use ($filter) {
+        $query->where('approve_level', $filter['approve_level']);
+      });
+    }
+
     return Datatables::of($model)
       ->editColumn('thumbnail', function ($model) {
         return sprintf('<div class="%s"><img src="%s" width="120" class="img-rounded"></div>', 'text-center', $model->thumbnail);
@@ -126,6 +186,16 @@ class GalleryController extends AdminController
 
         return $html;
       })
+
+
+      ->editColumn('gallery.has_royalty', function ($model) {
+        return sprintf(
+          '<span class="label label-%s">%s</span> ',
+          $model->gallery->has_royalty ? 'success' : 'default',
+          $model->gallery->has_royalty ? 'Có' : 'Không'
+        );
+      })
+
       ->addColumn('action', function ($model) {
         app('helper')->load('buttons');
         $button = [];
@@ -169,17 +239,13 @@ class GalleryController extends AdminController
 
         return cnv_action_block($button);
       })
-      ->editColumn('gallery.published', function ($model) {
-        return sprintf(
-          '<span class="label label-%s">%s</span>',
-          $model->gallery->published ? 'success' : 'warning',
-          $model->gallery->published ? trans('language.published') : trans('language.trashed')
-        );
+      ->editColumn('gallery.approve_level', function ($model) {
+        return $model->gallery->show_published_status;
       })
       ->editColumn('gallery.updated_at', function ($model) {
         return Carbon::parse($model->gallery->updated_at)->format('d/m/Y H:i');
       })
-      ->rawColumns(['name', 'action', 'gallery.published', 'thumbnail'])
+      ->rawColumns(['name', 'action', 'thumbnail', 'gallery.has_royalty', 'gallery.approve_level'])
       ->make(true);
   }
 
@@ -212,7 +278,20 @@ class GalleryController extends AdminController
 
     $data['featured'] = $request->has('featured') ? true : false;
     $data['published'] = $request->has('published') ? true : false;
-    $data['published_at'] = Carbon::createFromFormat('d-m-Y H:i', $this->getDatetimeOrCreateFromNow($request));
+    $data['has_royalty'] = $request->has('add-royalty') ? true : false;
+    $data['hide'] = $request->has('hide') ? true : false;
+    $data['approve_level'] = $this->convertApproveLevel($request->has('approve_level'));
+
+    //* just keep old data, published is not use anymore
+    if ($data['approve_level'] == 3) {
+      $data['published'] = true;
+    } else {
+      $data['published'] = false;
+    }
+
+    // * Nếu duyệt level_3 mà không chuyền published_at lên thì phải lấy thời điểm hiện tại
+    $data['published_at'] = $this->getDatetime($request, $data['approve_level']);
+
 
     $data['category'] = @$data['category'] ?: [];
     // required category
@@ -324,6 +403,7 @@ class GalleryController extends AdminController
     $this->tpl->setData('title', trans('gallery::language.gallery_edit'));
     $this->tpl->setData('gallery', $gallery);
     $this->tpl->setTemplate('gallery::admin.edit');
+    $this->tpl->setData('read_only', !$this->allowToEditByApproval($gallery));
 
     // breadcrumb
     $this->tpl->breadcrumb()->add(admin_route('gallery.index'), trans('gallery::language.manager'));
@@ -334,19 +414,31 @@ class GalleryController extends AdminController
 
   public function update(Request $request, Gallery $gallery)
   {
-    if ((allow('gallery.gallery.only_show_my_post') && !Auth::user()->is_super_admin && $gallery->user_id !== Auth::user()->id)) {
+    if ((allow('gallery.gallery.only_show_my_post') && !Auth::user()->is_super_admin && $gallery->user_id !== Auth::user()->id) || !$this->allowToEditByApproval($gallery)) {
       abort(403);
     }
 
     // Check if this is an AJAX request or regular form submission
     $isAjax = $request->ajax();
-    error_log("[GalleryController@update] Is AJAX request: " . ($isAjax ? 'true' : 'false'));
 
     $data = $request->except(['_token', 'language']);
 
     $data['featured'] = $request->has('featured') ? true : false;
-    $data['published'] = $request->has('published') ? true : false;
-    $data['published_at'] = Carbon::createFromFormat('d-m-Y H:i', $this->getDatetimeOrCreateFromNow($request));
+    $data['has_royalty'] = $request->has('add-royalty') ? true : false;
+    $data['hide'] = $request->has('hide') ? true : false;
+
+    $nextApproveLevel = $this->convertApproveLevel($request->has('approve_level'));
+
+    //* Không được hạ cấp duyệt level
+    if ($nextApproveLevel >= $gallery->approve_level) {
+      $data['approve_level'] = $nextApproveLevel;
+    } else {
+      $data['approve_level'] = $gallery->approve_level;
+    }
+
+    $data['published_at'] = $this->getDatetime($request, $data['approve_level'], $gallery->published_at);
+
+    $data['published'] = $data['approve_level'] >= 3 ? true : false;
 
     $data['category'] = @$data['category'] ?: [];
     // required category
@@ -525,6 +617,28 @@ class GalleryController extends AdminController
     return $date . ' ' . $time;
   }
 
+  protected function getDatetime(Request $request, $approve_level = 0, $published_at = null)
+  {
+    $date = $request->has('date_published') ? $request->input('date_published') : null;
+    $time = $request->has('time_published') ? $request->input('time_published') : null;
+
+    //* Nếu đã có thời gian publish truyền lên thì giữ nguyên
+    //* Nếu duyệt level_3 mà không chuyền published_at lên thì phải lấy thời điểm hiện tại
+    if ($date && $time) {
+      return  Carbon::createFromFormat('d-m-Y H:i', $date . ' ' . $time);
+    }
+
+    if ($published_at) {
+      return $published_at;
+    }
+
+    if ($approve_level == 3) {
+      return Carbon::now();
+    }
+
+    return null;
+  }
+
   /**
    * Generate unique slug for a given locale and base slug
    */
@@ -532,22 +646,22 @@ class GalleryController extends AdminController
   {
     $slug = $baseSlug;
     $counter = 1;
-    
+
     while (true) {
       $query = GalleryLanguage::query()
         ->whereLocale($locale)
         ->whereSlug($slug);
-      
+
       if ($excludeGalleryId) {
-        $query->whereHas('gallery', function($q) use ($excludeGalleryId) {
+        $query->whereHas('gallery', function ($q) use ($excludeGalleryId) {
           $q->where('id', '!=', $excludeGalleryId);
         });
       }
-      
+
       if (!$query->exists()) {
         return $slug;
       }
-      
+
       $slug = $baseSlug . '-' . $counter;
       $counter++;
     }
@@ -560,11 +674,48 @@ class GalleryController extends AdminController
   {
     foreach ($languages['language'] as $locale => $dataLanguage) {
       $baseSlug = isset($dataLanguage['slug']) ? $dataLanguage['slug'] : Str::slug($dataLanguage['name']);
-      
+
       // Tự động tạo unique slug
       $languages['language'][$locale]['slug'] = $this->generateUniqueSlug($locale, $baseSlug, $excludeGalleryId);
     }
-    
+
     return $languages;
+  }
+
+
+  protected function convertApproveLevel($approved = false)
+  {
+    if (allow('gallery.gallery.approved_level_3')) {
+      return $approved ? 3 : 2;
+    } elseif (allow('gallery.gallery.approved_level_2')) {
+      return $approved ? 2 : 1;
+    } elseif (allow('gallery.gallery.approved_level_1')) {
+      return $approved ? 1 : 0;
+    } else {
+      return 0;
+    }
+  }
+
+  private function allowToEditByApproval($gallery)
+  {
+    $maxLevel = 0;
+
+    if (allow('gallery.gallery.approved_level_1')) {
+      $maxLevel = 1;
+    }
+
+    if (allow('gallery.gallery.approved_level_2')) {
+      $maxLevel = 2;
+    }
+
+    if (allow('gallery.gallery.approved_level_3')) {
+      $maxLevel = 3;
+    }
+
+    if ($gallery->approve_level > $maxLevel) {
+      return false;
+    }
+
+    return true;
   }
 }

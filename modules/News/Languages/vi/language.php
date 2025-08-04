@@ -38,5 +38,6 @@ return [
   'vertical_thumbnail' => 'Ảnh đại diện dọc',
   'horizon_thumbnail' => 'Ảnh đại diện ngang',
   'optional' => "Tùy chọn",
-  'waiting_approve_post' => 'Bài chờ duyệt'
+  'waiting_approve_post' => 'Bài chờ duyệt',
+  'royalty' => 'Nhuận bút'
 ];

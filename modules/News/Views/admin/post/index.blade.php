@@ -23,6 +23,20 @@
 
         @slot('action')
             <form action="{{ request()->url() }}" id="filter" method="GET" style="display:flex">
+
+                <select name="has_royalty" id="filter_by_has_royalty" class="form-control non-select2"
+                    style="min-width: 60px; max-width:260px; margin-right: 5px">
+                    <option value="*" {{ request()->has('has_royalty') && request('has_royalty') == '*' ? 'selected' : '' }}>
+                        Tất cả trạng thái nhuận bút
+                    </option>
+                    <option value="1" {{ request()->has('has_royalty') && request('has_royalty') == 1 ? 'selected' : '' }}>
+                        Có nhuận bút
+                    </option>
+                    <option value="0" {{ request()->has('has_royalty') && request('has_royalty') == 0 ? 'selected' : '' }}>
+                        Không nhuận bút
+                    </option>
+                </select>
+
                 @if (!$is_waiting_approve_post)
                     <select name="published" id="filter_by_status" class="form-control non-select2"
                         style="min-width: 60px; max-width:160px; margin-right: 5px">
@@ -142,7 +156,7 @@
             });
         });
 
-        $('#flter_by_category,#filter_by_status').change(function(e) {
+        $('#flter_by_category,#filter_by_status,#filter_by_has_royalty').change(function(e) {
             $('#filter').trigger('submit');
         });
     </script>
