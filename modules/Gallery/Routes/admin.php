@@ -24,4 +24,5 @@ Route::group([
   Route::name('gallery.podcast-category.destroy')->delete('/gallery/podcast-category/{podcastCategory}', 'PodcastCategoryController@destroy');
 
   Route::resource('gallery', 'GalleryController');
+  Route::name('gallery.waiting_approve_gallery')->get('/waiting-approve-gallery', 'GalleryController@index');
 });

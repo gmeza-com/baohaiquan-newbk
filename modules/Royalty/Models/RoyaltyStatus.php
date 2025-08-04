@@ -9,6 +9,8 @@ class RoyaltyStatus extends Model
   protected $table = 'royalty_statuses';
   protected $fillable = ['ordering', 'name'];
 
+  const CANCELED = 4;
+
   public function royalty()
   {
     return $this->hasMany(Royalty::class, 'royalty');

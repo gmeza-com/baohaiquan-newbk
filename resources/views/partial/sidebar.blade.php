@@ -43,7 +43,11 @@
                             ($child->attributes['permission'] == 'news.post.approved_level_*' &&
                                 (allow('news.post.approved_level_1') ||
                                     allow('news.post.approved_level_2') ||
-                                    allow('news.post.approved_level_3'))))
+                                    allow('news.post.approved_level_3'))) ||
+                            ($child->attributes['permission'] == 'gallery.gallery.approved_level_*' &&
+                                (allow('gallery.gallery.approved_level_1') ||
+                                    allow('gallery.gallery.approved_level_2') ||
+                                    allow('gallery.gallery.approved_level_3'))))
                         <li>
                             <a href="{{ @$item->attributes['url'] == '#' ? 'javascript:void(0);' : @$item->attributes['url'] }}"
                                 class="{!! $class !!}">
@@ -70,7 +74,11 @@
                                                 ($child->attributes['permission'] == 'news.post.approved_level_*' &&
                                                     (allow('news.post.approved_level_1') ||
                                                         allow('news.post.approved_level_2') ||
-                                                        allow('news.post.approved_level_3'))))
+                                                        allow('news.post.approved_level_3'))) ||
+                                                ($child->attributes['permission'] == 'gallery.gallery.approved_level_*' &&
+                                                    (allow('gallery.gallery.approved_level_1') ||
+                                                        allow('gallery.gallery.approved_level_2') ||
+                                                        allow('gallery.gallery.approved_level_3'))))
                                             <li>
                                                 <a href="{{ @$child->attributes['url'] }}" class="{{ $active }}">
                                                     {{ @$child->language('name') }}
