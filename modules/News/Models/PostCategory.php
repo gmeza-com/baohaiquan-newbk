@@ -71,8 +71,8 @@ class PostCategory extends Model
         return admin_route('post.category.index');
     }
 
-    public function getParentForSelection($locale = null, $root = true)
+    public function getParentForSelection($locale = null, $root = true, $get_all = true)
     {
-        return $this->getNestedMenusForChoose($locale, $root);
+        return $this->getNestedMenusForChoose($locale, $root, false, $get_all);
     }
 }
