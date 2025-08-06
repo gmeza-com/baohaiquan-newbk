@@ -284,7 +284,7 @@
                     <div class="form_group">
                         {!! Form::select(
                             'category[]',
-                            app(\Modules\News\Models\PostCategory::class)->getParentForSelection(null, false, false),
+                            app(\Modules\News\Models\PostCategory::class)->getParentForSelection(null, false, false, false),
                             @$post->categories->map->id->toArray(),
                             ['class' => 'form-control', 'multiple' => true],
                         ) !!}

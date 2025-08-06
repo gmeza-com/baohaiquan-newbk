@@ -9,7 +9,7 @@ trait ModelNested
 
     public static function bootModelNested()
     {
-        static::deleting(function($model) {
+        static::deleting(function ($model) {
             $children = $model->where('parent_id', $model->id)->get();
             $children->each->delete();
         });
@@ -20,17 +20,23 @@ trait ModelNested
      * @param int $level
      * @return \Illuminate\Support\Collection
      */
-    public function getNestedMenus($parent = 0, $level = 0)
+    public function getNestedMenus($parent = 0, $level = 0, $exclude_draft = false)
     {
         $collect = collect([]);
-        $items = (new static)->where('parent_id', $parent)->with('children')->get();
+        $query = (new static)->where('parent_id', $parent);
+        
+        if ($exclude_draft) {
+            $query->where('published', 1);
+        }
+        
+        $items = $query->with('children')->get();
 
         foreach ($items as $item) {
             $item->level = $level;
             $collect->push($item);
 
-            if($item->children->count() > 0) {
-                $collect = $collect->merge($this->getNestedMenus($item->id, $level+1));
+            if ($item->children->count() > 0) {
+                $collect = $collect->merge($this->getNestedMenus($item->id, $level + 1, $exclude_draft));
             }
         }
 
@@ -49,7 +55,7 @@ trait ModelNested
         $locale = $locale ?: session('lang');
         return $menus->filter(function ($item) use ($locale) {
             return $item->language('name', $locale);
-        })->map(function($item) use($locale) {
+        })->map(function ($item) use ($locale) {
             $item->name = $this->renderPrefix($item->level) . $item->language('name', $locale);
             return $item;
         });
@@ -60,11 +66,11 @@ trait ModelNested
      * @param $root
      * @return mixed
      */
-    protected function getNestedMenusForChoose($locale = null, $root, $removeSelfAndChildren = false)
+    protected function getNestedMenusForChoose($locale = null, $root, $removeSelfAndChildren = false, $get_all = true)
     {
         $locale = $locale ?: session('lang');
 
-        $menus = $this->getNestedMenus();
+        $menus = $this->getNestedMenus(0, 0, !$get_all);
 
         $collect =  $menus->filter(function ($i) use ($removeSelfAndChildren) {
             if ($removeSelfAndChildren) {
@@ -88,9 +94,9 @@ trait ModelNested
      */
     public function renderPrefix($level)
     {
-        if($level > 0) {
+        if ($level > 0) {
             $pre = '';
-            for ($i = 1; $i<= $level; $i++){
+            for ($i = 1; $i <= $level; $i++) {
                 $pre .= '—';
             }
 
