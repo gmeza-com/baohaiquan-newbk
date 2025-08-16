@@ -11,6 +11,7 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
         $this->loadViewsFrom(__DIR__ . '/../Views', 'news');
 
         $this->loadRoutesFrom(__DIR__ . '/../Routes/admin.php');
+        $this->loadRoutesFrom(__DIR__ . '/../Routes/admin-api.php');
         $this->loadRoutesFrom(__DIR__ . '/../Routes/web.php');
         $this->loadRoutesFrom(__DIR__ . '/../Routes/api.php');
     }
