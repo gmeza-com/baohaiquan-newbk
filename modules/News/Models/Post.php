@@ -27,7 +27,8 @@ class Post extends Model
     'prefix',
     'hide',
     'cancel_message',
-    'has_royalty'
+    'has_royalty',
+    'related_post'
   ];
 
   protected $dates = [
@@ -67,6 +68,11 @@ class Post extends Model
   public function royalties()
   {
     return $this->hasMany(\Modules\Royalty\Models\Royalty::class, 'post_id');
+  }
+
+  public function relatedPost()
+  {
+    return $this->belongsTo(Post::class, 'related_post');
   }
 
   /**

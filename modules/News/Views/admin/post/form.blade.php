@@ -340,6 +340,18 @@
                             'class' => 'form-control input-tags',
                         ]) !!}
                     </div>
+
+                    <div class="form-group">
+                        {!! Form::label('name', trans('news::language.related_post'), ['class' => 'label-control']) !!}
+                        <select name="related_post" id="related_post_select" class="form-control">
+                            <option value="">Chọn bài viết liên quan</option>
+                            @if (@$post->related_post && $post->relatedPost)
+                                <option value="{{ $post->relatedPost->id }}" selected>
+                                    {{ $post->relatedPost->language('name') ?: 'Bài viết #' . $post->relatedPost->id }}
+                                </option>
+                            @endif
+                        </select>
+                    </div>
                 </div>
             @endcomponent
 
@@ -424,6 +436,57 @@
 
     @include('partial.editor')
 
+    @push('header')
+        <style>
+            /* Tùy chỉnh Select2 cho related_post */
+            #related_post_select+.select2-container {
+                width: 100% !important;
+            }
+
+            .select2-container--default .select2-selection--single {
+                height: 34px;
+                border: 1px solid #dbe1e8;
+                border-radius: 3px;
+            }
+
+            .select2-container--default .select2-selection--single .select2-selection__rendered {
+                line-height: 32px;
+                padding-left: 12px;
+            }
+
+            .select2-container--default .select2-selection--single .select2-selection__arrow {
+                height: 32px;
+            }
+
+            .select2-dropdown {
+                border-color: #dbe1e8;
+                border-radius: 3px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            }
+
+            .select2-search--dropdown .select2-search__field {
+                padding: 8px 12px;
+                border: 1px solid #dbe1e8;
+                border-radius: 3px;
+            }
+
+            .select2-results__option {
+                padding: 8px 12px;
+                border-bottom: 1px solid #f5f5f5;
+            }
+
+            .select2-results__option--highlighted[aria-selected] {
+                background-color: #1bbae1;
+                color: white;
+            }
+
+            .select2-results__option[aria-selected="true"] {
+                background-color: #f8f9fa;
+                color: #333;
+            }
+        </style>
+    @endpush
+
     @push('footer')
         <script>
             "use strict";
@@ -441,6 +504,89 @@
                 $('input[name="add-royalty"]').on('change', function() {
                     if ($(this).is(":checked")) $('#royalty-config-wrapper').removeClass('hide');
                     else $('#royalty-config-wrapper').addClass('hide');
+                });
+
+                // Khởi tạo Select2 cho related_post với AJAX search
+                $('#related_post_select').select2({
+                    placeholder: 'Tìm kiếm bài viết...',
+                    allowClear: true,
+                    language: {
+                        errorLoading: function() {
+                            return 'Không thể tải kết quả.';
+                        },
+                        inputTooShort: function(args) {
+                            var remainingChars = args.minimum - args.input.length;
+                            var message = 'Vui lòng nhập thêm ' + remainingChars + ' ký tự';
+                            if (remainingChars === 1) {
+                                message = 'Vui lòng nhập thêm 1 ký tự';
+                            }
+                            return message;
+                        },
+                        inputTooLong: function(args) {
+                            var overChars = args.input.length - args.maximum;
+                            var message = 'Vui lòng xóa ' + overChars + ' ký tự';
+                            if (overChars === 1) {
+                                message = 'Vui lòng xóa 1 ký tự';
+                            }
+                            return message;
+                        },
+                        loadingMore: function() {
+                            return 'Đang tải thêm kết quả…';
+                        },
+                        maximumSelected: function(args) {
+                            var message = 'Bạn chỉ có thể chọn ' + args.maximum + ' mục';
+                            if (args.maximum === 1) {
+                                message = 'Bạn chỉ có thể chọn 1 mục';
+                            }
+                            return message;
+                        },
+                        noResults: function() {
+                            return 'Không tìm thấy kết quả';
+                        },
+                        searching: function() {
+                            return 'Đang tìm kiếm…';
+                        },
+                        removeAllItems: function() {
+                            return 'Xóa tất cả các mục';
+                        }
+                    },
+                    ajax: {
+                        url: '{{ route('admin.post.rest_search') }}',
+                        dataType: 'json',
+                        delay: 250,
+                        data: function(params) {
+                            return {
+                                search: params.term, // search term
+                                page: params.page || 1,
+                                limit: 20,
+                                exclude_post_id: '{{ $post->id ?? 0 }}' // Loại trừ bài viết hiện tại
+                            };
+                        },
+                        processResults: function(data, params) {
+                            params.page = params.page || 1;
+
+                            return {
+                                results: data.data.map(function(item) {
+                                    return {
+                                        id: item.post.id, // Lấy id từ Post, không phải PostLanguage
+                                        text: item.name || 'Bài viết #' + item.post.id
+                                    };
+                                }),
+                                pagination: {
+                                    more: data.next_page_url !== null
+                                }
+                            };
+                        },
+                        cache: true
+                    },
+                    minimumInputLength: 2,
+                    templateResult: function(data) {
+                        if (data.loading) return data.text;
+                        return data.text;
+                    },
+                    templateSelection: function(data) {
+                        return data.text || data.id;
+                    }
                 });
             })(jQuery);
         </script>
