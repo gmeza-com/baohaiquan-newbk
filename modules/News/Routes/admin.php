@@ -27,5 +27,4 @@ Route::group([
   Route::resource('post', 'PostController');
   Route::name('post.slug')->get('/post/slug', 'PostController@slug');
   Route::name('post.waiting_approve_post')->get('/waiting-approve-post', 'PostController@index');
-  Route::name('post.rest_search')->get('/rest/post/search', 'PostController@postSearch');
 });

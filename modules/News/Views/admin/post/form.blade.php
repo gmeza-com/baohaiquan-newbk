@@ -551,7 +551,7 @@
                         }
                     },
                     ajax: {
-                        url: '{{ route('admin.post.rest_search') }}',
+                        url: '{{ route('admin-api.post.rest_search') }}',
                         dataType: 'json',
                         delay: 250,
                         data: function(params) {
