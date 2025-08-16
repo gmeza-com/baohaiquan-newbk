@@ -39,5 +39,6 @@ return [
   'horizon_thumbnail' => 'Ảnh đại diện ngang',
   'optional' => "Tùy chọn",
   'waiting_approve_post' => 'Bài chờ duyệt',
-  'royalty' => 'Nhuận bút'
+  'royalty' => 'Nhuận bút',
+  'related_post' => "Tin kỳ trước"
 ];

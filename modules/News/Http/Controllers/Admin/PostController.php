@@ -374,6 +374,14 @@ class PostController extends AdminController
     $data = $this->readyData($request, $data);
     $data['status'] = $request->has('status') ? true : false;
     $data['has_royalty'] = $request->has('add-royalty') ? true : false;
+    
+    // Xử lý related_post
+    if ($request->has('related_post') && $request->related_post) {
+      $data['related_post'] = $request->related_post;
+    } else {
+      $data['related_post'] = null;
+    }
+    
     if (!$this->allowToPublished($post)) {
       $data['published_at'] = null;
     }
@@ -476,6 +484,14 @@ class PostController extends AdminController
     $data = $request->except(['_token', 'language']);
     $data['status'] = $request->has('status') ? true : false;
     $data['has_royalty'] = $request->has('add-royalty') ? true : false;
+    
+    // Xử lý related_post
+    if ($request->has('related_post') && $request->related_post) {
+      $data['related_post'] = $request->related_post;
+    } else {
+      $data['related_post'] = null;
+    }
+    
     $data = $this->readyData($request, $data);
     if ($post->published == 3) {
       unset($data['published']);
@@ -720,5 +736,50 @@ class PostController extends AdminController
     }
 
     return true;
+  }
+
+  /**
+   * AJAX search bài viết cho Select2
+   */
+  public function postSearch(Request $request)
+  {
+    $search = $request->get('search', '');
+    $page = $request->get('page', 1);
+    $limit = $request->get('limit', 20);
+    $excludePostId = $request->get('exclude_post_id'); // ID bài viết cần loại trừ
+
+    $query = PostLanguage::with('post')
+      ->where('locale', session('lang', 'vi'))
+      ->whereHas('post', function ($q) use ($excludePostId) {
+        $q->where('published', 3)
+          ->where('hide', false)
+          ->where('status', false);
+        
+        // Loại trừ bài viết hiện tại nếu có
+        if ($excludePostId) {
+          $q->where('id', '!=', $excludePostId);
+        }
+      });
+
+    if ($search) {
+      $query->where(function ($q) use ($search) {
+        $q->where('name', 'like', '%' . $search . '%');
+      });
+    }
+
+    // Sắp xếp theo published_at từ bảng posts
+    $query->join('posts', 'post_languages.post_id', '=', 'posts.id')
+          ->orderBy('posts.published_at', 'desc')
+          ->select('post_languages.*');
+
+    $posts = $query->paginate($limit, ['*'], 'page', $page);
+
+    return response()->json([
+      'data' => $posts->items(),
+      'pagination' => [
+        'more' => $posts->hasMorePages(),
+        'next_page_url' => $posts->nextPageUrl()
+      ]
+    ]);
   }
 }
